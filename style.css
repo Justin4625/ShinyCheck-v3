@@ -912,3 +912,21 @@ body.gated { overflow: hidden; }
 .gate-google[hidden] { display: none; }
 .gate-confirm { display: none !important; }
 .gate[data-mode="up"] .gate-confirm { display: flex !important; }
+
+/* ---------- Shiny availability labels ---------- */
+.status-chip {
+  display: inline-grid; place-items: center; width: 18px; height: 18px; margin-left: 5px; border-radius: 6px;
+  color: var(--muted); background: var(--surface-2); border: 1px solid var(--border); vertical-align: middle;
+}
+.status-chip svg, .status-note svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.status-chip.event { color: #d9a441; }
+.status-note {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 14px; text-align: left;
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-size: 12.5px; line-height: 1.4;
+}
+.status-note svg { flex: none; width: 16px; height: 16px; margin-top: 1px; }
+.status-note b { color: var(--text); font-weight: 750; margin-right: 2px; }
+.status-note.event svg { color: #d9a441; }
+.dr-sub .status-note { margin-top: 10px; }
+.dr-sub:has(.status-note) { display: block; }
+#enStatus:empty { display: none; }

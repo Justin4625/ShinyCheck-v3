@@ -43,6 +43,41 @@
     const code = "M" + String(i + 1).padStart(3, "0");
     if (m.games.lza) m.extra = { lza: code }; else m.games.lza = code;
   }
+  // Shiny availability (checked Sept 2026 against Serebii's unavailable-Shiny table and
+  // shiny event archive, and NationalDex). Keyed by national dex number.
+  const SHINY_LOCKED = new Set([494, 720, 789, 790, 801, 802, 891, 892, 893, 896, 897, 898,
+    1009, 1010, 1014, 1015, 1016, 1017, 1020, 1021, 1022, 1023, 1024, 1025]);
+  const EVENT_ONLY = {
+    490: "Only via a Pokémon HOME gift (Brilliant Diamond & Shining Pearl Pokédex, 2025).",
+    647: "Only via a Pokémon HOME gift (Sword & Shield Pokédexes, 2025).",
+    648: "Only via a Pokémon HOME gift (Scarlet & Violet Pokédexes, 2024).",
+    719: "Only via event distributions (2015) and a ticketed Pokémon GO research (2025).",
+    721: "Only via a Pokémon HOME gift (Legends: Z-A Pokédex, 2026).",
+    807: "Only via an event distribution (2020).",
+    890: "Only via an event distribution (2022).",
+    1001: "Only via Tera Raid event distributions (2025).",
+    1002: "Only via Tera Raid event distributions (2025).",
+    1003: "Only via Tera Raid event distributions (2025).",
+    1004: "Only via Tera Raid event distributions (2025).",
+    1007: "Only via an event distribution (2025).",
+    1008: "Only via an event distribution (2025).",
+  };
+  const shinyStatus = m => SHINY_LOCKED.has(+m.dex)
+    ? { kind: "locked", label: "Shiny locked", note: "No shiny has ever been released through legitimate means." }
+    : EVENT_ONLY[+m.dex] ? { kind: "event", label: "Event only", note: `Shiny can't be hunted. ${EVENT_ONLY[+m.dex]}` } : null;
+  const ICONS = {
+    locked: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>',
+    event: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="9" width="16" height="12" rx="2"/><path d="M12 9v12M4 13h16M12 9C10 5 6 5 7 8s5 1 5 1zm0 0c2-4 6-4 5-1s-5 1-5 1z"/></svg>',
+  };
+  const statusChip = m => {
+    const s = shinyStatus(m);
+    return s ? `<span class="status-chip ${s.kind}" title="${s.label} — ${s.note}">${ICONS[s.kind]}</span>` : "";
+  };
+  const statusNote = m => {
+    const s = shinyStatus(m);
+    return s ? `<div class="status-note ${s.kind}">${ICONS[s.kind]}<span><b>${s.label}</b> ${s.note}</span></div>` : "";
+  };
+
   const region = g => (genNames[g].match(/\((.*)\)/) || [, genNames[g]])[1];
 
   const safe = fn => { try { return fn(); } catch { return null; } };
@@ -109,7 +144,7 @@
     const on = gid ? found > 0 : has(m);
     return `<article class="pcard ${on ? "on" : ""}" data-id="${m.id}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${esc(m.name)}${m.form ? " " + esc(m.form) : ""}">
       <div class="card-top">
-        <span class="no">#${m.dex}</span>
+        <span class="no">#${m.dex}</span>${statusChip(m)}
         ${found ? `<span class="shiny-count" title="${found} shiny found">${sparkSvg("", "#fff")}${found}</span>` : ""}
         <a class="wiki" href="${m.url}" target="_blank" rel="noopener" title="Open on Bulbapedia">↗</a>
         ${sparkSvg("seal")}
@@ -343,7 +378,7 @@
     $("#drGame").textContent = g.name;
     $("#drMeta").textContent = `#${cur.dex} · ${g.short || g.name} ${codes(cur, curGame).join(" / ")}`;
     $("#drName").textContent = cur.name;
-    $("#drSub").innerHTML = cur.form ? `<span class="form-tag">${esc(cur.form)}</span>` : "";
+    $("#drSub").innerHTML = (cur.form ? `<span class="form-tag">${esc(cur.form)}</span>` : "") + statusNote(cur);
     dr.celebrate.classList.remove("show");
     dr.img.src = cur.sprite || "";
     paintHunt();
@@ -591,6 +626,7 @@
     $("#enChip").textContent = `National Dex #${m.dex}`;
     $("#enImg").src = m.sprite || "";
     $("#enMeta").textContent = `${region(m.gen)} · Gen ${m.gen}`;
+    $("#enStatus").innerHTML = statusNote(m);
     $("#enName").innerHTML = `${esc(m.name)}${logs.length ? ` <span class="en-x">✦${logs.length}</span>` : ""}`;
     $("#enForms").innerHTML = forms.length > 1
       ? forms.map(f => `<button class="en-form ${f.id === m.id ? "active" : ""}" data-form="${f.id}" title="${esc(f.form || f.name)}">
