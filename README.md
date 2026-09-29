@@ -27,4 +27,3 @@ Then open http://localhost:5173.
 
 - Pokémon, forms, sprites and regional dex numbers: a Pokémon HOME Living Dex spreadsheet.
 - Evolution chains: [PokeAPI](https://pokeapi.co) (`evo.js`).
-- Legends: Z-A Mega Dimension dex order: ShinyCheck V2.
