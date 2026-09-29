@@ -20,4 +20,4 @@ export const appCheckSiteKey = null;
 
 // Web Push key pair for notifications (public). Firebase console → Project settings → Cloud
 // Messaging → Web configuration → Web Push certificates → "Key pair". null = notifications off.
-export const vapidKey = null;
+export const vapidKey = "BG6GBfuvfyhHk1ftX7g_adT1p-FQAMVUgVojtbLJ3HvfuCr3XDIpbMhUZZazgdyxDJrro8zVydtGq_iwQiBqgYE";
