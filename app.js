@@ -71,19 +71,36 @@
     1007: "Only via an event distribution (2025).",
     1008: "Only via an event distribution (2025).",
   };
-  const shinyStatus = m => SHINY_LOCKED.has(+m.dex)
+  // Shiny locks within one game (Serebii's shiny-lock table, Sept 2026): every way to get the
+  // Pokémon in that game is locked. Species you can breed there aren't locked (the egg can be
+  // shiny). "dex:Form" locks only that form. Evolutions of a locked-only line are locked too.
+  const GAME_LOCKS = {
+    usum: [718, 785, 786, 787, 788, 791, 792, 800],
+    swsh: [772, 773, 803, 804, 888, 889, "144:Galarian", "145:Galarian", "146:Galarian"],
+    bdsp: [151, 385],
+    pla: [155, 156, "157:Hisuian", 501, 502, "503:Hisuian", 722, 723, "724:Hisuian", "37:Alolan", "38:Alolan",
+      480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 641, 642, 645, 905],
+    sv: [999, 1000, 144, 145, 146, 243, 244, 245, 249, 250, 380, 381, 382, 383, 384,
+      638, 639, 640, 643, 644, 646, 791, 792, 800],
+    lza: [1, 2, 3, 4, 5, 6, 7, 8, 9, 150, 152, 153, 154, 158, 159, 160, 498, 499, 500, 716, 717, 718,
+      382, 383, 384, 485, 491, 647, 648, 649, 720, 721, 801, 802, 807, 808, 809, 999, 1000],
+  };
+  const lockedIn = (m, gid) => !!gid && (SHINY_LOCKED.has(+m.dex)
+    || (GAME_LOCKS[gid] || []).some(k => k === +m.dex || k === `${+m.dex}:${m.form}`));
+  const shinyStatus = (m, gid) => SHINY_LOCKED.has(+m.dex)
     ? { kind: "locked", label: "Shiny locked", note: "No shiny has ever been released through legitimate means." }
+    : lockedIn(m, gid) ? { kind: "locked", label: "Shiny locked", note: `Can't be shiny in ${GAME_INFO[gid].name}. Doesn't count toward this game's total.` }
     : EVENT_ONLY[+m.dex] ? { kind: "event", label: "Event only", note: `Shiny can't be hunted. ${EVENT_ONLY[+m.dex]}` } : null;
   const ICONS = {
     locked: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></svg>',
     event: '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="9" width="16" height="12" rx="2"/><path d="M12 9v12M4 13h16M12 9C10 5 6 5 7 8s5 1 5 1zm0 0c2-4 6-4 5-1s-5 1-5 1z"/></svg>',
   };
-  const statusChip = m => {
-    const s = shinyStatus(m);
+  const statusChip = (m, gid) => {
+    const s = shinyStatus(m, gid);
     return s ? `<span class="status-chip ${s.kind}" title="${s.label} — ${s.note}">${ICONS[s.kind]}</span>` : "";
   };
-  const statusNote = m => {
-    const s = shinyStatus(m);
+  const statusNote = (m, gid) => {
+    const s = shinyStatus(m, gid);
     return s ? `<div class="status-note ${s.kind}">${ICONS[s.kind]}<span><b>${s.label}</b> ${s.note}</span></div>` : "";
   };
 
@@ -162,7 +179,7 @@
     const via = gid && on && !found;
     return `<article class="pcard ${on ? "on" : ""}" data-id="${m.id}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${esc(m.name)}${m.form ? " " + esc(m.form) : ""}">
       <div class="card-top">
-        <span class="no">#${m.dex}</span>${statusChip(m)}
+        <span class="no">#${m.dex}</span>${statusChip(m, gid)}
         ${found ? `<span class="shiny-count" title="${found} shiny found">${sparkSvg("", "#fff")}${found}</span>` : ""}
         ${via ? `<span class="via-chip" title="Counted via ${esc(viaLabel(m))} (Share across games)">via ${esc(loggedIn(m).map(g => GAME_INFO[g].abbr).join("·"))}</span>` : ""}
         <a class="wiki" href="${m.url}" target="_blank" rel="noopener" title="Open on Bulbapedia">↗</a>
@@ -253,7 +270,8 @@
     if (!s.some(([p]) => p === "O") && mons.some(m => m.games[gid] && isExtraForm(m, gid))) s.push(["O", "Outside the dex"]);
   }
   // They only count towards totals when "Count outside the dex" is on.
-  const inGamePool = (m, gid) => state.gOutside || !isExtraForm(m, gid);
+  // Shiny-locked Pokémon never count.
+  const inGamePool = (m, gid) => (state.gOutside || !isExtraForm(m, gid)) && !lockedIn(m, gid);
   const homeMatch = m => homeScope(m) && matchText(m, el.q) && !(state.missing && has(m)) && (state.forms || !m.variant);
 
   function renderHome() {
@@ -341,7 +359,7 @@
     $("#gCount").textContent = `${items.length} shown`;
     el.gameCards.className = "game-mode";
     el.gameCards.innerHTML = items.length
-      ? sectionHtml(String(g.sections.indexOf(section) + 1).padStart(2, "0"), (section[0] === "O" ? section[1] : section[1] + " Dex"), "tab", tabAll, items, gameGrad(g), gid)
+      ? sectionHtml(String(g.sections.indexOf(section) + 1).padStart(2, "0"), (section[0] === "O" ? section[1] : section[1] + " Dex"), "tab", tabAll.filter(m => !lockedIn(m, gid)), items, gameGrad(g), gid)
       : empty(el.gq);
     renderGameStats();
   }
@@ -357,11 +375,11 @@
       ? `<b>${left}</b> shinies still to log across ${(() => { const dx = g.sections.filter(([p]) => p !== "O"); return (dx.length > 1 ? dx.length + " regional dexes" : "the " + dx[0][1] + " Dex") + (state.gOutside && dx.length < g.sections.length ? " and beyond" : ""); })()}.`
       : `<b>Complete!</b> Every shiny from ${esc(g.name)} is logged. ✦`;
     for (const [p2] of g.sections) {
-      const l = full.filter(inTab(gid, p2));
+      const l = full.filter(m => inTab(gid, p2)(m) && !lockedIn(m, gid));
       const n = el.dexTabs.querySelector(`[data-tabcount="${p2}"]`);
       if (n) n.textContent = `${done(l, f)}/${l.length}`;
     }
-    updateSection(el.gameCards, "tab", full.filter(inTab(gid, state.tab)), f);
+    updateSection(el.gameCards, "tab", full.filter(m => inTab(gid, state.tab)(m) && !lockedIn(m, gid)), f);
     const live = full.filter(m => isActive(hunts[hk(gid, m.id)]));
     const seg = el.dexTabs.querySelector(".seg-hunts");
     if (seg) {
@@ -615,7 +633,7 @@
     $("#drGame").textContent = g.name;
     $("#drMeta").textContent = `#${cur.dex} · ${g.short || g.name} ${codeLabel(cur, curGame)}${whereIn(cur, curGame) ? " · " + whereIn(cur, curGame) : ""}`;
     $("#drName").textContent = cur.name;
-    $("#drSub").innerHTML = (cur.form ? `<span class="form-tag">${esc(cur.form)}</span>` : "") + statusNote(cur);
+    $("#drSub").innerHTML = (cur.form ? `<span class="form-tag">${esc(cur.form)}</span>` : "") + statusNote(cur, curGame);
     dr.celebrate.classList.remove("show");
     dr.img.src = cur.sprite || "";
     paintHunt();
