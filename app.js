@@ -1368,27 +1368,40 @@
   $("#v2BannerClose").addEventListener("click", () => { safe(() => localStorage.setItem("shinycheck-v3-v2-dismissed", "1")); renderV2Banner(); });
 
   // Export / import / reset
+  const countShinies = data => Object.values(data.shinies || {}).reduce((n, list) => n + (Array.isArray(list) ? list.length : 0), 0);
+  const countHunts = data => Object.keys(data.hunts || {}).length;
+
   $("#export").addEventListener("click", () => {
-    const data = snapshot();
+    const data = { app: "ShinyCheck", ...snapshot(), exportedAt: Date.now() };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
     const a = Object.assign(document.createElement("a"), {
-      href: URL.createObjectURL(blob), download: `shinycheck-livingdex-${new Date().toISOString().slice(0, 10)}.json`,
+      href: URL.createObjectURL(blob), download: `shinycheck-backup-${new Date().toISOString().slice(0, 10)}.json`,
     });
+    document.body.append(a);
     a.click();
-    URL.revokeObjectURL(a.href);
-    toast(`Backup saved · ${mons.filter(has).length} collected`);
+    a.remove();
+    // Revoking right away can cancel the download in Safari/Firefox.
+    setTimeout(() => URL.revokeObjectURL(a.href), 10000);
+    toast(`Backup saved · ${countShinies(data)} shinies, ${countHunts(data)} hunts`);
   });
   $("#import").addEventListener("change", async e => {
     const f = e.target.files[0];
     if (!f) return;
-    try {
-      applyData(JSON.parse(await f.text()));
-      window.Cloud && window.Cloud.flush();
-      toast(`Backup loaded · ${mons.filter(has).length} collected`);
-    } catch {
-      toast("That file couldn't be read");
-    }
     e.target.value = "";
+    let data;
+    try { data = JSON.parse(await f.text()); } catch { return toast("That file couldn't be read"); }
+    // Only accept ShinyCheck backups; anything else would silently wipe the collection.
+    const isBackup = data && typeof data === "object" && !Array.isArray(data) && typeof data.version === "number"
+      && ["shinies", "hunts", "caught"].some(k => k in data)
+      && (!data.shinies || typeof data.shinies === "object") && (!data.hunts || typeof data.hunts === "object");
+    if (!isBackup) return toast("That isn't a ShinyCheck backup — nothing was changed");
+    const now = snapshot(), s = countShinies(data), h = countHunts(data);
+    const when = data.exportedAt ? ` from ${fmtDate(data.exportedAt)}` : "";
+    const warnEmpty = !s && !h ? "\n\nThis backup has no shinies or hunts." : "";
+    if (!confirm(`Replace your current collection (${countShinies(now)} shinies, ${countHunts(now)} hunts) with this backup${when} (${s} shinies, ${h} hunts)?${warnEmpty}\n\nThis can't be undone — export first if you want to keep what you have now.`)) return;
+    applyData(data);
+    window.Cloud && window.Cloud.flush();
+    toast(`Backup loaded · ${s} shinies, ${h} hunts`);
   });
   $("#reset").addEventListener("click", () => {
     if (!confirm("Reset your whole collection — every shiny log and hunt? Export a backup first if you want to keep it.")) return;
