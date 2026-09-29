@@ -8,18 +8,18 @@
 
   // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
   const GAME_INFO = {
-    swsh: { name: "Sword & Shield", released: "2019-11-15", accent: "#00a1e9", accent2: "#e5006e", logo: "logos/swshLogo.png",
+    swsh: { name: "Sword & Shield", abbr: "SwSh", released: "2019-11-15", accent: "#00a1e9", accent2: "#e5006e", logo: "logos/swshLogo.png",
             sections: [["", "Galar"], ["A", "Isle of Armor"], ["C", "Crown Tundra"]] },
-    bdsp: { name: "Brilliant Diamond & Shining Pearl", released: "2021-11-19", short: "BD & SP", accent: "#3d7bd9", accent2: "#e77fa6", logo: "logos/bdspLogo.png",
+    bdsp: { name: "Brilliant Diamond & Shining Pearl", abbr: "BDSP", released: "2021-11-19", short: "BD & SP", accent: "#3d7bd9", accent2: "#e77fa6", logo: "logos/bdspLogo.png",
             sections: [["", "Sinnoh"]] },
-    pla:  { name: "Legends: Arceus", released: "2022-01-28", accent: "#d97706", accent2: "#5b3a8c", logo: "logos/plaLogo.png",
+    pla:  { name: "Legends: Arceus", abbr: "PLA", released: "2022-01-28", accent: "#d97706", accent2: "#5b3a8c", logo: "logos/plaLogo.png",
             sections: [["", "Hisui"]] },
-    sv:   { name: "Scarlet & Violet", released: "2022-11-18", accent: "#ff4d00", accent2: "#8c00ff", logo: "logos/svLogo.png",
+    sv:   { name: "Scarlet & Violet", abbr: "SV", released: "2022-11-18", accent: "#ff4d00", accent2: "#8c00ff", logo: "logos/svLogo.png",
             sections: [["P", "Paldea"], ["K", "Kitakami"], ["B", "Blueberry"]] },
-    lza:  { name: "Legends: Z-A", released: "2025-10-16", accent: "#06b6d4", accent2: "#2bd67b", logo: "logos/plzaLogo.png",
+    lza:  { name: "Legends: Z-A", abbr: "Z-A", released: "2025-10-16", accent: "#06b6d4", accent2: "#2bd67b", logo: "logos/plzaLogo.png",
             sections: [["", "Lumiose"], ["M", "Mega Dimension"]] },
-    pogo: { name: "Pokémon GO", released: "2016-07-06", short: "GO", accent: "#10b981", accent2: "#3b82f6", logOnly: true, noOdds: true, sections: [] },
-    home: { name: "Pokémon HOME", released: "2020-02-12", short: "HOME", accent: "#14b8a6", accent2: "#6366f1", logOnly: true, noOdds: true, sections: [] },
+    pogo: { name: "Pokémon GO", abbr: "GO", released: "2016-07-06", short: "GO", accent: "#10b981", accent2: "#3b82f6", logOnly: true, noOdds: true, sections: [] },
+    home: { name: "Pokémon HOME", abbr: "HOME", released: "2020-02-12", short: "HOME", accent: "#14b8a6", accent2: "#6366f1", logOnly: true, noOdds: true, sections: [] },
   };
   const gamePrefix = v => v.replace(/[0-9]/g, "");
   const gameNum = v => +v.replace(/\D/g, "");
@@ -129,7 +129,12 @@
   // Living Dex: an entry counts once a shiny of it is logged in any game (including GO).
   const loggedIn = m => LOG_GAMES.filter(g => (shinies[hk(g, m.id)] || []).length);
   const has = m => loggedIn(m).length > 0;
-  const gHas = gid => m => !!(shinies[hk(gid, m.id)] || []).length;
+  // "Share across games" (Shiny Dex toolbar, off by default): a shiny logged anywhere also
+  // counts in every other game the form appears in, like moving it there through HOME.
+  const sharing = () => !!prefs.shareAcrossGames;
+  const ownIn = (gid, m) => (shinies[hk(gid, m.id)] || []).length > 0;
+  const gHas = gid => m => ownIn(gid, m) || (sharing() && has(m));
+  const viaLabel = m => loggedIn(m).map(g => GAME_INFO[g].name).join(", ");
   const done = (list, f = has) => list.filter(f).length;
   const pct = (list, f = has) => list.length ? (done(list, f) / list.length) * 100 : 0;
   const fmtPct = p => (p === 100 || p === 0 ? p.toFixed(0) : p.toFixed(1)) + "%";
@@ -145,11 +150,13 @@
   function card(m, gid) {
     const h = gid && hunts[hk(gid, m.id)];
     const found = gid ? (shinies[hk(gid, m.id)] || []).length : shiniesOf(m).length;
-    const on = gid ? found > 0 : has(m);
+    const on = gid ? gHas(gid)(m) : has(m);
+    const via = gid && on && !found;
     return `<article class="pcard ${on ? "on" : ""}" data-id="${m.id}" tabindex="0" role="button" aria-pressed="${on}" aria-label="${esc(m.name)}${m.form ? " " + esc(m.form) : ""}">
       <div class="card-top">
         <span class="no">#${m.dex}</span>${statusChip(m)}
         ${found ? `<span class="shiny-count" title="${found} shiny found">${sparkSvg("", "#fff")}${found}</span>` : ""}
+        ${via ? `<span class="via-chip" title="Counted via ${esc(viaLabel(m))} (Share across games)">via ${esc(loggedIn(m).map(g => GAME_INFO[g].abbr).join("·"))}</span>` : ""}
         <a class="wiki" href="${m.url}" target="_blank" rel="noopener" title="Open on Bulbapedia">↗</a>
         ${sparkSvg("seal")}
       </div>
@@ -324,6 +331,7 @@
   }
 
   function render() {
+    $("#fShare").setAttribute("aria-pressed", sharing());
     el.home.classList.toggle("hidden", !!state.page || state.huntsView);
     el.game.classList.toggle("hidden", !state.page);
     el.huntsView.classList.toggle("hidden", !state.huntsView);
@@ -1028,6 +1036,13 @@
     c.classList.remove("flash");
     void c.offsetWidth;
     c.classList.add("flash");
+  });
+
+  $("#fShare").addEventListener("click", () => {
+    prefs.shareAcrossGames = !sharing();
+    savePrefs();
+    render();
+    toast(sharing() ? "Shinies now count in every game they appear in ✦" : "Each game counts only its own shinies again");
   });
 
   for (const [id, key] of [["#fMissing", "missing"], ["#fForms", "forms"], ["#gMissing", "gMissing"], ["#gForms", "gForms"]]) {

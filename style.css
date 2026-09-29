@@ -968,3 +968,10 @@ body.gated { overflow: hidden; }
 .hunts-hero { margin-bottom: 26px; }
 .section-dot { width: 14px; height: 14px; border-radius: 50%; align-self: center; background: var(--g); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
 #huntCards .section-head { align-items: center; }
+
+/* Share across games */
+.via-chip {
+  font: 700 9px/1 var(--mono); letter-spacing: .04em; text-transform: uppercase; white-space: nowrap;
+  padding: 3px 5px; border-radius: 6px; color: var(--accent, var(--muted));
+  border: 1px dashed color-mix(in srgb, var(--accent, var(--muted)) 60%, transparent);
+}
