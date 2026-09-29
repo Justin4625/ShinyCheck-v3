@@ -204,7 +204,7 @@
     const left = mons.length - got;
     $("#heroSub").innerHTML = left
       ? `<b>${left}</b> Pokémon and forms still missing from your shiny collection. ${got ? "Keep going!" : "Open a Pokémon to log your first shiny."}`
-      : `<b>Shiny Dex complete!</b> You shined ’em all. ✦`;
+      : `<b>Shiny Dex complete!</b> Every form, shiny and in one place. ✦`;
 
     el.regions.innerHTML = [[0, "All regions", mons], ...Object.keys(genNames).map(g => [+g, region(g), mons.filter(m => m.gen === +g)])]
       .map(([g, n, l]) => `<button class="region ${state.gen === g ? "active" : ""} ${done(l) === l.length ? "done" : ""}" data-gen="${g}">
