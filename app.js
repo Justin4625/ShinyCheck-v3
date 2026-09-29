@@ -104,6 +104,7 @@
   const hk = (gid, id) => `${gid}:${id}`;
   const elapsed = h => Math.floor((h.time || 0) + (h.since ? (Date.now() - h.since) / 1000 : 0));
   const isActive = h => h && (h.count > 0 || elapsed(h) > 0 || h.since);
+  const fmtDate = ts => ts ? new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "Date unknown";
   const fmtTime = s => `${Math.floor(s / 3600)}h ${String(Math.floor(s / 60) % 60).padStart(2, "0")}m ${String(s % 60).padStart(2, "0")}s`;
   const fmtShort = s => s >= 3600 ? `${Math.floor(s / 3600)}h ${Math.floor(s / 60) % 60}m` : s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`;
   const nf = n => n.toLocaleString("en-US");
@@ -357,6 +358,7 @@
   }
 
   function render() {
+    typeof renderV2Banner === "function" && renderV2Banner();
     $("#fShare").setAttribute("aria-pressed", sharing());
     el.home.classList.toggle("hidden", !!state.page || state.huntsView);
     el.game.classList.toggle("hidden", !state.page);
@@ -514,7 +516,7 @@
     dr.log.innerHTML = list.length
       ? list.map((s, i) => `<li>
           <span class="log-n">${sparkSvg()}${i + 1}</span>
-          <span class="log-main"><b>${nf(s.count)}</b> encounters · ${fmtShort(s.time)}<small>${new Date(s.ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })} · 1/${s.odds}</small></span>
+          <span class="log-main"><b>${nf(s.count)}</b> encounters · ${fmtShort(s.time)}<small>${fmtDate(s.ts)}${s.odds ? ` · 1/${s.odds}` : ""}</small></span>
           <button class="log-del" data-del="${i}" title="Delete entry">✕</button>
         </li>`).join("")
       : `<li class="log-empty">No shinies logged yet. Hit <b>Gotcha!</b> when it sparkles.</li>`;
@@ -676,7 +678,7 @@
     const ownForms = new Set(speciesOf(m).map(x => x.form));
     return next.filter(x => !EXCLUSIVE[+x.dex] && !(REGIONAL.includes(x.form) && ownForms.has(x.form)));
   }
-  const fmtDate = ts => new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+
 
 
   // Game picker for manual adds: tiles grouped into the main series (games this form is in)
@@ -747,7 +749,7 @@
 
     en.log.innerHTML = logs.length ? logs.map(l => {
       const g = GAME_INFO[l.g], key = `${l.g}:${l.m.id}:${l.i}`, open = editing === key;
-      const d = new Date(l.ts), local = new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
+      const d = new Date(l.ts), local = l.ts ? new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16) : "";
       return `<li class="en-item ${open ? "open" : ""}" style="--accent:${g.accent};--accent2:${g.accent2}">
         <button class="en-row" data-edit="${key}">
           <span class="en-thumb">${l.m.sprite ? `<img src="${l.m.sprite}" alt="">` : ""}</span>
@@ -1227,6 +1229,143 @@
 
   const hasLocalData = () => caught.size > 0 || Object.keys(hunts).length > 0 || Object.keys(shinies).length > 0;
   window.ShinyApp = { snapshot, applyData, hasLocalData, toast, render };
+
+
+  // ---------- Import from ShinyCheck V2 ----------
+  // V2 lives on the same origin (justin4625.github.io/ShinyCheck/), so its localStorage is
+  // readable here. V2 keys: <game>_shinyData_<id>_<n> {pokemonName, counter, timer, timestamp},
+  // <game>_shiny_<id> (count; GO may count shinies without data), <game>_hunt_<id> {counter, timer}.
+  // Ids are national dex numbers, or PokeAPI form ids (10091…) for regional forms.
+  // Nothing in V2 is changed; imported entries carry a "v2" marker so importing twice is harmless.
+  const V2_GAMES = { plza: "lza", sv: "sv", pla: "pla", pogo: "pogo" };
+  const V2_FORMS = {
+    10091: "Alolan Rattata", 10092: "Alolan Raticate", 10100: "Alolan Raichu", 10101: "Alolan Sandshrew", 10102: "Alolan Sandslash",
+    10103: "Alolan Vulpix", 10104: "Alolan Ninetales", 10105: "Alolan Diglett", 10106: "Alolan Dugtrio", 10107: "Alolan Meowth",
+    10108: "Alolan Persian", 10109: "Alolan Geodude", 10110: "Alolan Graveler", 10111: "Alolan Golem", 10112: "Alolan Grimer",
+    10113: "Alolan Muk", 10114: "Alolan Exeggutor", 10115: "Alolan Marowak",
+    10161: "Galarian Meowth", 10162: "Galarian Ponyta", 10163: "Galarian Rapidash", 10164: "Galarian Slowpoke", 10165: "Galarian Slowbro",
+    10166: "Galarian Farfetch'd", 10167: "Galarian Weezing", 10168: "Galarian Mr. Mime", 10169: "Galarian Articuno", 10170: "Galarian Zapdos",
+    10171: "Galarian Moltres", 10172: "Galarian Slowking", 10173: "Galarian Corsola", 10174: "Galarian Zigzagoon", 10175: "Galarian Linoone",
+    10176: "Galarian Darumaka", 10177: "Galarian Darmanitan", 10179: "Galarian Yamask", 10180: "Galarian Stunfisk",
+    10229: "Hisuian Growlithe", 10230: "Hisuian Arcanine", 10231: "Hisuian Voltorb", 10232: "Hisuian Electrode", 10233: "Hisuian Typhlosion",
+    10234: "Hisuian Qwilfish", 10235: "Hisuian Sneasel", 10236: "Hisuian Samurott", 10237: "Hisuian Lilligant", 10238: "Hisuian Zorua",
+    10239: "Hisuian Zoroark", 10240: "Hisuian Braviary", 10241: "Hisuian Sliggoo", 10242: "Hisuian Goodra", 10243: "Hisuian Avalugg",
+    10244: "Hisuian Decidueye", 10247: "Basculin|White Stripe", 10250: "Tauros|Paldean Combat Breed",
+    10251: "!this form isn't in the Shiny Dex (only the Combat Breed is)", 10252: "!this form isn't in the Shiny Dex (only the Combat Breed is)",
+    10253: "Paldean Wooper",
+  };
+  // → { m } or { reason }
+  function v2Entry(id) {
+    id = +id;
+    if (id <= 1025) {
+      const base = mons.filter(m => +m.dex === id && !m.variant);
+      const m = base.find(x => ["", "Original", "Basic"].includes(x.form)) || base[0];
+      return m ? { m } : { reason: `No Pokémon #${id} in the Shiny Dex` };
+    }
+    const f = V2_FORMS[id];
+    if (!f) return { reason: `Unknown V2 form id ${id}` };
+    if (f.startsWith("!")) return { reason: f.slice(1) };
+    const [name, form] = f.includes("|") ? f.split("|") : [f.slice(f.indexOf(" ") + 1), f.slice(0, f.indexOf(" "))];
+    const m = mons.find(x => x.name === name && x.form === form);
+    return m ? { m } : { reason: `${f} isn't in the Shiny Dex` };
+  }
+
+  function scanV2() {
+    const plan = { shinies: [], hunts: [], skipped: [], already: 0, perGame: {} };
+    const imported = new Set(Object.values(shinies).flat().map(s => s.v2).filter(Boolean));
+    const keys = safe(() => Object.keys(localStorage)) || [];
+    const read = k => safe(() => JSON.parse(localStorage.getItem(k)));
+    const bump = (gid, what) => { const p = plan.perGame[gid] = plan.perGame[gid] || { shinies: 0, hunts: 0 }; p[what]++; };
+    // Shinies: every <game>_shiny_<id> count, with data entries where V2 has them.
+    for (const k of keys) {
+      const mt = k.match(/^(plza|sv|pla|pogo)_shiny_(\d+)$/);
+      if (!mt) continue;
+      const [, prefix, id] = mt, gid = V2_GAMES[prefix], count = +localStorage.getItem(k) || 0;
+      const target = v2Entry(id);
+      for (let n = 1; n <= count; n++) {
+        const d = read(`${prefix}_shinyData_${id}_${n}`);
+        const label = (d && d.pokemonName) || (target.m ? target.m.name : `#${id}`);
+        if (!target.m) { plan.skipped.push({ gid, label, reason: target.reason }); continue; }
+        const marker = `${prefix}_${id}_${n}`;
+        if (imported.has(marker)) { plan.already++; continue; }
+        plan.shinies.push({ gid, m: target.m, entry: {
+          count: Math.max(0, +(d && d.counter) || 0), time: Math.max(0, +(d && d.timer) || 0),
+          odds: null, ts: (d && +d.timestamp) || null, v2: marker,
+        } });
+        bump(gid, "shinies");
+      }
+    }
+    // Hunts in progress (V2's timer only ran while the modal was open, so they come in paused).
+    for (const k of keys) {
+      const mt = k.match(/^(plza|sv|pla)_hunt_(\d+)$/);
+      if (!mt) continue;
+      const d = read(k);
+      if (!d || !(+d.counter > 0 || +d.timer > 0)) continue;
+      const [, prefix, id] = mt, gid = V2_GAMES[prefix], target = v2Entry(id);
+      if (!target.m) { plan.skipped.push({ gid, label: `Hunt #${id}`, reason: target.reason }); continue; }
+      if (isActive(hunts[hk(gid, target.m.id)])) { plan.already++; continue; }
+      plan.hunts.push({ gid, m: target.m, hunt: {
+        count: Math.max(0, +d.counter || 0), time: Math.max(0, +d.timer || 0), since: null,
+        inc: 1, odds: (prefs[gid] || {}).odds || 4096, updated: +d.lastUpdated || Date.now(),
+      } });
+      bump(gid, "hunts");
+    }
+    return plan;
+  }
+
+  const v2 = { root: $("#v2Import"), plan: null };
+  function openV2() {
+    const plan = v2.plan = scanV2();
+    const total = plan.shinies.length + plan.hunts.length;
+    const rows = Object.entries(plan.perGame)
+      .sort(([a], [b]) => (GAME_INFO[b].released || "").localeCompare(GAME_INFO[a].released || ""))
+      .map(([gid, c]) => `<tr style="--accent:${GAME_INFO[gid].accent}"><td><span class="v2-dot"></span>${esc(GAME_INFO[gid].name)}</td><td>${c.shinies}</td><td>${c.hunts}</td></tr>`).join("");
+    $("#v2Body").innerHTML = total || plan.already || plan.skipped.length ? `
+      ${total ? `<table class="v2-table"><thead><tr><th>Game</th><th>Shinies</th><th>Hunts</th></tr></thead><tbody>${rows}</tbody></table>` : ""}
+      ${plan.already ? `<p class="v2-note ok">${plan.already} already imported — they won't be added twice.</p>` : ""}
+      ${plan.skipped.length ? `<div class="v2-note warn"><b>${plan.skipped.length} can't be imported:</b><ul>${plan.skipped.map(s => `<li>${esc(s.label)} (${esc(GAME_INFO[s.gid].name)}) — ${esc(s.reason)}</li>`).join("")}</ul></div>` : ""}
+      <p class="v2-fine">Shinies keep their encounters, time and date. V2 didn't track odds, so those stay empty. Hunts come in paused. Your V2 data isn't changed.</p>`
+      : `<p class="v2-empty">No ShinyCheck V2 data found in this browser. Open this page in the browser (and device) where you used V2.</p>`;
+    $("#v2Go").hidden = !total;
+    $("#v2Go").textContent = `Import ${plan.shinies.length} ${plan.shinies.length === 1 ? "shiny" : "shinies"}${plan.hunts.length ? ` & ${plan.hunts.length} ${plan.hunts.length === 1 ? "hunt" : "hunts"}` : ""} ✦`;
+    v2.root.hidden = false;
+    document.body.classList.add("drawer-open");
+  }
+  function closeV2() {
+    v2.root.hidden = true;
+    document.body.classList.remove("drawer-open");
+  }
+  function runV2() {
+    const plan = v2.plan;
+    for (const { gid, m, entry } of plan.shinies) {
+      const k = hk(gid, m.id);
+      (shinies[k] = shinies[k] || []).push(entry);
+      shinies[k].sort((x, y) => (x.ts || 0) - (y.ts || 0));
+    }
+    for (const { gid, m, hunt } of plan.hunts) hunts[hk(gid, m.id)] = hunt;
+    saveShinies();
+    saveHunts();
+    window.Cloud && window.Cloud.flush();
+    closeV2();
+    render();
+    toast(`Imported ${plan.shinies.length} shinies and ${plan.hunts.length} hunts from V2 ✦`);
+  }
+  $("#v2Open").addEventListener("click", openV2);
+  $("#v2Go").addEventListener("click", runV2);
+  v2.root.addEventListener("click", e => { if (e.target === v2.root || e.target.closest("[data-v2close]")) closeV2(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !v2.root.hidden) { e.stopImmediatePropagation(); closeV2(); } }, true);
+
+  // Offer the import on the Shiny Dex when this browser still has V2 shinies to bring over.
+  function renderV2Banner() {
+    const banner = $("#v2Banner");
+    if (!banner) return;
+    const plan = state.page || state.huntsView || safe(() => localStorage.getItem("shinycheck-v3-v2-dismissed")) ? null : scanV2();
+    const n = plan ? plan.shinies.length + plan.hunts.length : 0;
+    banner.hidden = !n;
+    if (n) $("#v2BannerText").innerHTML = `Found <b>${plan.shinies.length}</b> ${plan.shinies.length === 1 ? "shiny" : "shinies"}${plan.hunts.length ? ` and <b>${plan.hunts.length}</b> ${plan.hunts.length === 1 ? "hunt" : "hunts"}` : ""} from ShinyCheck V2 in this browser.`;
+  }
+  $("#v2BannerOpen").addEventListener("click", openV2);
+  $("#v2BannerClose").addEventListener("click", () => { safe(() => localStorage.setItem("shinycheck-v3-v2-dismissed", "1")); renderV2Banner(); });
 
   // Export / import / reset
   $("#export").addEventListener("click", () => {
