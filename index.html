@@ -2,13 +2,15 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#07070d" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#f4f3f9" media="(prefers-color-scheme: light)">
   <title>ShinyCheck</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23ff7ad9'/><stop offset='.5' stop-color='%23ffd36e'/><stop offset='1' stop-color='%2322d3ee'/></linearGradient></defs><path d='M50 4 C54 38 62 46 96 50 C62 54 54 62 50 96 C46 62 38 54 4 50 C38 46 46 38 50 4Z' fill='url(%23g)'/></svg>">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260929222803">
+  <link rel="stylesheet" href="style.css?v=20260929223811">
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -113,9 +115,11 @@
             <input id="q" type="search" placeholder="Search Pokémon, number or form" autocomplete="off">
             <kbd>/</kbd>
           </label>
-          <button class="chip-toggle" id="fMissing" aria-pressed="false">Missing only</button>
-          <button class="chip-toggle" id="fForms" aria-pressed="true">Forms</button>
-          <button class="chip-toggle" id="fShare" aria-pressed="false" title="Count a shiny in every game its Pokémon appears in, as if moved there through Pokémon HOME">Share across games</button>
+          <div class="toolbar-chips">
+            <button class="chip-toggle" id="fMissing" aria-pressed="false">Missing only</button>
+            <button class="chip-toggle" id="fForms" aria-pressed="true">Forms</button>
+            <button class="chip-toggle" id="fShare" aria-pressed="false" title="Count a shiny in every game its Pokémon appears in, as if moved there through Pokémon HOME">Share across games</button>
+          </div>
           <span class="result-count" id="count"></span>
         </div>
 
@@ -148,12 +152,14 @@
             <input id="gq" type="search" placeholder="Search this dex" autocomplete="off">
             <kbd>/</kbd>
           </label>
-          <button class="chip-toggle" id="gMissing" aria-pressed="false">Missing only</button>
-          <button class="chip-toggle" id="gForms" aria-pressed="false" title="Count Pokémon outside the regional dex (other forms, Dynamax Adventure legends…) in this game's totals">Count outside the dex</button>
-          <button class="random-btn" id="randomHunt" title="Let fate pick your next hunt">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.3"/><circle cx="16" cy="8" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="8" cy="16" r="1.3"/><circle cx="16" cy="16" r="1.3"/></svg>
-            Random hunt
-          </button>
+          <div class="toolbar-chips">
+            <button class="chip-toggle" id="gMissing" aria-pressed="false">Missing only</button>
+            <button class="chip-toggle" id="gForms" aria-pressed="false" title="Count Pokémon outside the regional dex (other forms, Dynamax Adventure legends…) in this game's totals">Count outside the dex</button>
+            <button class="random-btn" id="randomHunt" title="Let fate pick your next hunt">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8" cy="8" r="1.3"/><circle cx="16" cy="8" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="8" cy="16" r="1.3"/><circle cx="16" cy="16" r="1.3"/></svg>
+              Random hunt
+            </button>
+          </div>
           <span class="result-count" id="gCount"></span>
         </div>
 
@@ -396,9 +402,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=20260929222803"></script>
-  <script src="evo.js?v=20260929222803"></script>
-  <script src="app.js?v=20260929222803"></script>
-  <script type="module" src="cloud.js?v=20260929222803"></script>
+  <script src="data.js?v=20260929223811"></script>
+  <script src="evo.js?v=20260929223811"></script>
+  <script src="app.js?v=20260929223811"></script>
+  <script type="module" src="cloud.js?v=20260929223811"></script>
 </body>
 </html>
