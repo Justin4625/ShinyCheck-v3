@@ -3,13 +3,15 @@
   const BASE = new URL(".", document.currentScript.src).pathname;
   const STORE = "livingdex-za-v1";
   const THEME = "livingdex-theme";
-  const GAMES = ["lgpe", "swsh", "bdsp", "pla", "sv", "lza"];
+  const GAMES = ["usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"];
   // Places a shiny can be logged. GO and HOME have no regional dex or hunt page, only
   // logs, and no odds (HOME shinies are gifts; GO odds aren't tracked).
   const LOG_GAMES = [...GAMES, "pogo", "home"];
 
   // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
   const GAME_INFO = {
+    usum: { nativeForms: ["Alolan"], name: "Ultra Sun & Ultra Moon", abbr: "USUM", released: "2017-11-17", accent: "#f08a1c", accent2: "#3b78d8",
+            logo: "logos/usumLogo.png", sections: [["", "Alola"]] },
     lgpe: { name: "Let's Go Pikachu & Eevee", abbr: "LGPE", released: "2018-11-16", accent: "#f2b705", accent2: "#a8672f", logo: "logos/lgpeLogo.png",
             sections: [["", "Kanto"]] },
     swsh: { nativeForms: ["Galarian"], name: "Sword & Shield", abbr: "SwSh", released: "2019-11-15", accent: "#00a1e9", accent2: "#e5006e", logo: "logos/swshLogo.png",
@@ -482,6 +484,10 @@
     // Allowed bonuses may override their rolls per method ("charm:1"). Checked against
     // RotomLabs: in SwSh the charm adds 2 rolls in the wild and in Masuda, 1 for regular
     // eggs; in BD & SP it does nothing in the wild, Grand Underground or Poké Radar.
+    // Ultra Sun & Ultra Moon: SOS chains add rolls at 11, 21 and 31 calls (+4/+8/+12), the
+    // Shiny Charm +2; best 1/273 (checked against RotomLabs / PokéStats / RankedBoost).
+    usum: { methods: [["wild", "Wild / SOS", 1, ["charm", "sos"]], ["masuda", "Masuda", 6, ["charm"]]],
+      bonus: [{ ...CHARM, rolls: 2 }, { id: "sos", label: "SOS chain", type: "level", levels: [["–", 0], ["11+", 4], ["21+", 8], ["31+", 12]] }] },
     // Let's Go: rolls from a Lure (+1), the Shiny Charm (+2) and the species' Catch Combo
     // (11+ → +3, 21+ → +7, 31+ → +11); all three together give 1/273.
     lgpe: { methods: [["wild", "Wild", 1, ["charm", "lure", "combo"]]],
