@@ -8,18 +8,18 @@
 
   // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
   const GAME_INFO = {
-    swsh: { name: "Sword & Shield", accent: "#00a1e9", accent2: "#e5006e", logo: "logos/swshLogo.png",
+    swsh: { name: "Sword & Shield", released: "2019-11-15", accent: "#00a1e9", accent2: "#e5006e", logo: "logos/swshLogo.png",
             sections: [["", "Galar"], ["A", "Isle of Armor"], ["C", "Crown Tundra"]] },
-    bdsp: { name: "Brilliant Diamond & Shining Pearl", short: "BD & SP", accent: "#3d7bd9", accent2: "#e77fa6", logo: "logos/bdspLogo.png",
+    bdsp: { name: "Brilliant Diamond & Shining Pearl", released: "2021-11-19", short: "BD & SP", accent: "#3d7bd9", accent2: "#e77fa6", logo: "logos/bdspLogo.png",
             sections: [["", "Sinnoh"]] },
-    pla:  { name: "Legends: Arceus", accent: "#d97706", accent2: "#5b3a8c", logo: "logos/plaLogo.png",
+    pla:  { name: "Legends: Arceus", released: "2022-01-28", accent: "#d97706", accent2: "#5b3a8c", logo: "logos/plaLogo.png",
             sections: [["", "Hisui"]] },
-    sv:   { name: "Scarlet & Violet", accent: "#ff4d00", accent2: "#8c00ff", logo: "logos/svLogo.png",
+    sv:   { name: "Scarlet & Violet", released: "2022-11-18", accent: "#ff4d00", accent2: "#8c00ff", logo: "logos/svLogo.png",
             sections: [["P", "Paldea"], ["K", "Kitakami"], ["B", "Blueberry"]] },
-    lza:  { name: "Legends: Z-A", accent: "#06b6d4", accent2: "#2bd67b", logo: "logos/plzaLogo.png",
+    lza:  { name: "Legends: Z-A", released: "2025-10-16", accent: "#06b6d4", accent2: "#2bd67b", logo: "logos/plzaLogo.png",
             sections: [["", "Lumiose"], ["M", "Mega Dimension"]] },
-    pogo: { name: "Pokémon GO", short: "GO", accent: "#10b981", accent2: "#3b82f6", logOnly: true, noOdds: true, sections: [] },
-    home: { name: "Pokémon HOME", short: "HOME", accent: "#14b8a6", accent2: "#6366f1", logOnly: true, noOdds: true, sections: [] },
+    pogo: { name: "Pokémon GO", released: "2016-07-06", short: "GO", accent: "#10b981", accent2: "#3b82f6", logOnly: true, noOdds: true, sections: [] },
+    home: { name: "Pokémon HOME", released: "2020-02-12", short: "HOME", accent: "#14b8a6", accent2: "#6366f1", logOnly: true, noOdds: true, sections: [] },
   };
   const gamePrefix = v => v.replace(/[0-9]/g, "");
   const gameNum = v => +v.replace(/\D/g, "");
@@ -599,6 +599,30 @@
   }
   const fmtDate = ts => new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 
+
+  // Game picker for manual adds: tiles grouped into the main series (games this form is in)
+  // and places that also count (GO, HOME), newest first. A filter appears once the list
+  // grows, so adding games later only means adding them to GAME_INFO.
+  function gamePicker(ids, selected) {
+    const tile = gid => {
+      const g = GAME_INFO[gid];
+      return `<label class="gp-tile" style="--accent:${g.accent};--accent2:${g.accent2}" data-name="${esc(g.name.toLowerCase())}">
+        <input type="radio" name="game" value="${gid}" ${gid === selected ? "checked" : ""}>
+        <span class="gp-bar"></span><b>${esc(g.name)}</b><small>${(g.released || "").slice(0, 4)}</small>
+      </label>`;
+    };
+    const byNewest = list => list.sort((x, y) => (GAME_INFO[y].released || "").localeCompare(GAME_INFO[x].released || ""));
+    const groups = [
+      ["Main series", byNewest(ids.filter(g => !GAME_INFO[g].logOnly))],
+      ["Also counts", byNewest(ids.filter(g => GAME_INFO[g].logOnly))],
+    ].filter(([, list]) => list.length);
+    return `<div class="game-pick" role="radiogroup" aria-label="Game">
+      <div class="gp-head"><span>Game</span>${ids.length > 6 ? `<input type="search" class="gp-filter" placeholder="Filter games…" aria-label="Filter games">` : ""}</div>
+      ${groups.map(([title, list]) => `<div class="gp-group"><p class="gp-title">${title}</p><div class="gp-grid">${list.map(tile).join("")}</div></div>`).join("")}
+      <p class="gp-empty" hidden>No game matches.</p>
+    </div>`;
+  }
+
   function openEntry(id) {
     entryMon = mons.find(m => m.id === id);
     editing = null;
@@ -682,10 +706,12 @@
 
     const addGames = LOG_GAMES.filter(g => GAME_INFO[g].logOnly || m.games[g]);
     // Shinies that only exist as Pokémon HOME gifts start with HOME selected.
-    const preset = (EVENT_ONLY[+m.dex] || "").includes("Pokémon HOME gift") ? "home" : addGames[0];
+    // Otherwise the newest main-series game this form is in.
+    const newest = addGames.filter(g => !GAME_INFO[g].logOnly).sort((x, y) => GAME_INFO[y].released.localeCompare(GAME_INFO[x].released))[0];
+    const preset = (EVENT_ONLY[+m.dex] || "").includes("Pokémon HOME gift") ? "home" : newest || addGames[0];
     const now = new Date(), nowLocal = new Date(now - now.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
     $("#enAdd").innerHTML = adding ? `<div class="en-add-form">
-        <label class="wide">Game<select name="game">${addGames.map(g => `<option value="${g}" ${g === preset ? "selected" : ""}>${esc(GAME_INFO[g].name)}</option>`).join("")}</select></label>
+        <div class="wide">${gamePicker(addGames, preset)}</div>
         <label>Encounters<input type="number" min="0" name="count" value="0"></label>
         <label>Hours<input type="number" min="0" name="h" value="0"></label>
         <label>Min<input type="number" min="0" max="59" name="m" value="0"></label>
@@ -716,13 +742,21 @@
     if (!go) form.querySelector('[name="odds"]').value = (prefs[e.target.value] || {}).odds || 4096;
   });
 
+  en.root.addEventListener("input", e => {
+    if (!e.target.classList.contains("gp-filter")) return;
+    const pick = e.target.closest(".game-pick"), q = e.target.value.trim().toLowerCase();
+    pick.querySelectorAll(".gp-tile").forEach(t => { t.hidden = !!q && !t.dataset.name.includes(q); });
+    pick.querySelectorAll(".gp-group").forEach(g => { g.hidden = !g.querySelector(".gp-tile:not([hidden])"); });
+    pick.querySelector(".gp-empty").hidden = !!pick.querySelector(".gp-tile:not([hidden])");
+  });
+
   en.root.addEventListener("click", e => {
     if (e.target.closest("[data-eclose]")) return closeEntry();
     if (e.target.closest("[data-add-open]")) { adding = true; editing = null; return paintEntry(); }
     if (e.target.closest("[data-add-cancel]")) { adding = false; return paintEntry(); }
     const addBtn = e.target.closest("[data-add-save]");
     if (addBtn) {
-      const f = addBtn.closest(".en-add-form"), val = n => f.querySelector(`[name="${n}"]`).value;
+      const f = addBtn.closest(".en-add-form"), val = n => f.querySelector(`[name="${n}"]:not([type="radio"]), [name="${n}"]:checked`).value;
       const g = val("game"), ts = new Date(val("ts")).getTime(), num = n => Math.max(0, +val(n) || 0);
       const k = hk(g, entryMon.id);
       (shinies[k] = shinies[k] || []).push({ count: num("count"), time: num("h") * 3600 + num("m") * 60, odds: GAME_INFO[g].noOdds ? null : +val("odds"), ts: isNaN(ts) ? Date.now() : ts, manual: true });
