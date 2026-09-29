@@ -258,6 +258,8 @@
 
   function renderGame() {
     const gid = state.page, g = GAME_INFO[gid];
+    // The Forms toggle only makes sense for games that have alternate forms.
+    $("#gForms").hidden = !mons.some(m => m.games[gid] && m.variant);
     if (state.tab !== "hunts" && !g.sections.some(([p]) => p === state.tab)) state.tab = g.sections[0][0];
     const all = mons.filter(m => m.games[gid] && inGamePool(m));
     for (const [k, v] of [["--accent", g.accent], ["--accent2", g.accent2], ["--g", gameGrad(g)]]) el.game.style.setProperty(k, v);

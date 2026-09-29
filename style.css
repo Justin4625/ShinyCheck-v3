@@ -1046,3 +1046,4 @@ body.gated { overflow: hidden; }
 @media (max-width: 560px) {
   .random-btn { flex: 1; justify-content: center; }
 }
+.chip-toggle[hidden] { display: none; }
