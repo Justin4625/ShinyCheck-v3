@@ -475,10 +475,15 @@
   // PokéTools); some methods have a fixed rate instead. A new game only needs its parts.
   const CHARM = { id: "charm", label: "Shiny Charm", type: "toggle" };
   const HUNT_SETUP = {
-    swsh: { methods: [["wild", "Wild", 1, ["charm"]], ["masuda", "Masuda", 6, ["charm"]], ["dyna", "Dynamax Adventure", { odds: 300, charm: 100 }, ["charm"]]],
+    // Allowed bonuses may override their rolls per method ("charm:1"). Checked against
+    // RotomLabs: in SwSh the charm adds 2 rolls in the wild and in Masuda, 1 for regular
+    // eggs; in BD & SP it does nothing in the wild, Grand Underground or Poké Radar.
+    swsh: { methods: [["wild", "Wild", 1, ["charm"]], ["breed", "Breeding", 1, ["charm:1"]], ["masuda", "Masuda", 6, ["charm"]],
+      ["dyna", "Dynamax Adventure", { odds: 300, charm: 100 }, ["charm"]]],
       bonus: [{ ...CHARM, rolls: 2 }] },
-    bdsp: { methods: [["wild", "Wild", 1, ["charm"]], ["masuda", "Masuda", 6, ["charm"]], ["radar", "Poké Radar chain 40+", { odds: 100 }, []]],
-      bonus: [{ ...CHARM, rolls: 2 }] },
+    bdsp: { methods: [["wild", "Wild", 1, []], ["gu", "Grand Underground", 1, ["diglett"]], ["breed", "Breeding", 1, ["charm:1"]],
+      ["masuda", "Masuda", 6, ["charm"]], ["radar", "Poké Radar chain 40+", { odds: 99 }, []]],
+      bonus: [{ ...CHARM, rolls: 2 }, { id: "diglett", label: "Diglett bonus", type: "toggle", rolls: 1 }] },
     pla: { methods: [["wild", "Wild", 1, ["charm", "research"]], ["mo", "Mass outbreak", 26, ["charm", "research"]], ["mmo", "Massive mass outbreak", 13, ["charm", "research"]]],
       bonus: [{ ...CHARM, rolls: 3 }, { id: "research", label: "Research", type: "level", levels: [["–", 0], ["Lv 10", 1], ["Perfect", 3]] }] },
     sv: { methods: [["wild", "Wild", 1, ["charm", "outbreak", "sparkling"]], ["masuda", "Masuda", 6, ["charm"]]],
@@ -492,8 +497,10 @@
   function evalSetup(gid, setup) {
     const conf = HUNT_SETUP[gid];
     if (!conf) return { odds: 4096, label: "" };
-    const [, mLabel, base, allowed] = conf.methods.find(([id]) => id === setup.m) || conf.methods[0];
-    const active = conf.bonus.filter(b => allowed.includes(b.id));
+    const [, mLabel, base, allowedRaw] = conf.methods.find(([id]) => id === setup.m) || conf.methods[0];
+    const allowed = allowedRaw.map(x => x.split(":")[0]);
+    const override = Object.fromEntries(allowedRaw.filter(x => x.includes(":")).map(x => [x.split(":")[0], +x.split(":")[1]]));
+    const active = conf.bonus.filter(b => allowed.includes(b.id)).map(b => b.id in override ? { ...b, rolls: override[b.id] } : b);
     const parts = [mLabel];
     if (typeof base === "object") {
       const charm = allowed.includes("charm") && setup.charm && base.charm;
@@ -516,7 +523,7 @@
     const methods = conf && conf.methods.length > 1 ? conf.methods.map(([id, label]) => chip(`data-hm="${id}"`, setup.m === id, esc(label))).join("") : "";
     let rows = "";
     if (conf) {
-      const allowed = (conf.methods.find(([id]) => id === setup.m) || conf.methods[0])[3];
+      const allowed = (conf.methods.find(([id]) => id === setup.m) || conf.methods[0])[3].map(x => x.split(":")[0]);
       rows = conf.bonus.filter(b => allowed.includes(b.id)).map(b => b.type === "toggle"
         ? `<div class="hs-row"><span>${esc(b.label)}</span><button class="hs-switch" role="switch" aria-checked="${!!setup[b.id]}" data-hb="${b.id}"><i></i></button></div>`
         : `<div class="hs-row"><span>${esc(b.label)}</span><div class="hs-seg">${b.levels.map(([lv], i) => chip(`data-hl="${b.id}:${i}"`, (setup[b.id] || 0) === i, esc(lv))).join("")}</div></div>`).join("");
@@ -526,6 +533,11 @@
   }
   function changeSetup(patch) {
     const h = hunt(), setup = { ...(h.setup || defaultSetup(curGame)), ...patch };
+    // Legends: Arceus gives the Shiny Charm only once every species is at research level 10.
+    if (curGame === "pla") {
+      if (patch.charm && !setup.research) setup.research = 1;
+      if ("research" in patch && !patch.research && setup.charm) setup.research = 1;
+    }
     const { odds } = evalSetup(curGame, setup);
     setHunt({ setup, odds });
   }
