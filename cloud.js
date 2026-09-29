@@ -2,7 +2,7 @@
 // The app keeps working from localStorage; this module mirrors that state into one
 // Firestore document per account (users/{uid}) and pulls changes from other devices.
 // Load the config with the same ?v= cache-busting version as this module.
-const { firebaseConfig, googleClientId } = await import(`./firebase-config.js${new URL(import.meta.url).search}`);
+const { firebaseConfig, googleClientId, appCheckSiteKey } = await import(`./firebase-config.js${new URL(import.meta.url).search}`);
 
 const $ = s => document.querySelector(s);
 const gate = $("#gate");
@@ -37,6 +37,13 @@ async function start() {
   } = fs;
 
   const app = initializeApp(firebaseConfig);
+  // App Check: every Firebase request carries a reCAPTCHA v3 token proving it comes from
+  // this site, so a copied API key is useless elsewhere. Must run before Auth/Firestore.
+  if (appCheckSiteKey) {
+    const { initializeAppCheck, ReCaptchaV3Provider } = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-app-check.js`);
+    initializeAppCheck(app, { provider: new ReCaptchaV3Provider(appCheckSiteKey), isTokenAutoRefreshEnabled: true });
+    document.body.classList.add("recaptcha");
+  }
   const auth = getAuth(app);
   // Firestore's own offline cache queues writes while offline and sends them later.
   const db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });

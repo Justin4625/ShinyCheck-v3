@@ -1075,3 +1075,9 @@ body.gated { overflow: hidden; }
 .v2-empty { font-size: 14px; padding: 10px 0; }
 .v2-go[hidden] { display: none; }
 .v2-import .rl-go { opacity: 1; pointer-events: auto; }
+
+/* reCAPTCHA (App Check): the floating badge is hidden; the required notice sits on the login card. */
+.grecaptcha-badge { visibility: hidden !important; }
+.gate-legal { display: none; margin: 14px 0 0; text-align: center; font-size: 11px; color: var(--faint); }
+.gate-legal a { color: var(--muted); }
+body.recaptcha .gate-legal { display: block; }

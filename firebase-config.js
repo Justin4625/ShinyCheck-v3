@@ -14,3 +14,6 @@ export const firebaseConfig = {
 // OAuth "Web client ID" for Google sign-in (Firebase → Authentication → Sign-in method →
 // Google → Web SDK configuration). Makes Google sign-in work on mobile. null = popup only.
 export const googleClientId = "723087237579-gk9gi4c1dhtgkhmfvoiudhjb0ktrnp3i.apps.googleusercontent.com";
+
+// reCAPTCHA v3 site key for Firebase App Check (public). null = App Check off.
+export const appCheckSiteKey = null;
