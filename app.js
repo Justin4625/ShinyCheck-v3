@@ -417,11 +417,18 @@
   }
 
   let toastTimer;
-  function toast(msg) {
+  // Optional action (e.g. Undo) shows as a button and keeps the toast up a little longer.
+  function toast(msg, action) {
     el.toast.textContent = msg;
+    if (action) {
+      const b = Object.assign(document.createElement("button"), { className: "toast-action", textContent: action.label });
+      b.onclick = () => { el.toast.classList.remove("show"); action.run(); };
+      el.toast.append(b);
+    }
+    el.toast.classList.toggle("has-action", !!action);
     el.toast.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.toast.classList.remove("show"), 2400);
+    toastTimer = setTimeout(() => el.toast.classList.remove("show"), action ? 6000 : 2400);
   }
 
 
@@ -495,6 +502,7 @@
     dr.play.textContent = h.since ? "❚❚ Pause" : s ? "▶ Resume" : "▶ Start";
     dr.play.classList.toggle("running", !!h.since);
     dr.root.classList.toggle("running", !!h.since);
+    $("#drCancel").hidden = !isActive(hunts[curKey()]);
     $("#drTimeHint").textContent = h.since ? "Running — keeps going when you close this" : s ? "Paused — press + to resume" : "Press + to start the hunt";
     dr.odds.value = h.odds;
     const inputs = { drInc: h.inc, drSetCount: h.count, drH: Math.floor(s / 3600), drM: Math.floor(s / 60) % 60, drS: s % 60 };
@@ -612,6 +620,23 @@
   for (const id of ["drH", "drM", "drS"]) $("#" + id).addEventListener("change", () => {
     const t = Math.max(0, (+$("#drH").value || 0) * 3600 + (+$("#drM").value || 0) * 60 + (+$("#drS").value || 0));
     setHunt({ time: t, since: hunt().since ? Date.now() : null });
+  });
+  // Cancel the running hunt (two taps), with a short Undo window.
+  $("#drCancel").addEventListener("click", e => {
+    if (!arm(e.currentTarget, "Tap again to cancel")) return;
+    disarm();
+    const k = curKey(), prev = hunts[k], mon = cur, gid = curGame;
+    delete hunts[k];
+    saveHunts();
+    paintHunt();
+    refreshCard();
+    toast(`Hunt for ${mon.name} cancelled`, { label: "Undo", run: () => {
+      hunts[k] = prev;
+      saveHunts();
+      render();
+      if (cur && cur.id === mon.id && curGame === gid) paintHunt();
+      toast("Hunt restored ✦");
+    } });
   });
   $("#drReset").addEventListener("click", e => {
     if (!arm(e.currentTarget, "Tap again to reset")) return;
