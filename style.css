@@ -106,7 +106,7 @@ button, input { font: inherit; color: inherit; }
 .side-item.active { background: var(--surface); color: var(--text); border-color: var(--border); box-shadow: var(--card-shadow); }
 .side-icon { width: 12px; height: 12px; border-radius: 50%; justify-self: center; background: var(--c, var(--brand)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--c, var(--brand)) 20%, transparent); }
 .holo-dot { background: var(--holo); box-shadow: 0 0 12px rgba(255, 122, 217, .5); }
-.side-name { font-weight: 650; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.side-name { font-weight: 650; font-size: 14px; line-height: 1.25; }
 .side-pct { font: 700 11px/1 var(--mono); color: var(--faint); }
 .side-item.active .side-pct { color: var(--text); }
 .side-bar { grid-column: 2 / 4; height: 3px; border-radius: 9px; background: var(--border); overflow: hidden; }

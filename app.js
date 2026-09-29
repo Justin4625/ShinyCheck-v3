@@ -7,9 +7,9 @@
 
   // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
   const GAME_INFO = {
-    swsh: { name: "Sword & Shield", accent: "#00a1e9", accent2: "#e5006e",
+    swsh: { name: "Sword & Shield", accent: "#00a1e9", accent2: "#e5006e", logo: "logos/swshLogo.png",
             sections: [["", "Galar"], ["A", "Isle of Armor"], ["C", "Crown Tundra"]] },
-    bdsp: { name: "Brilliant Diamond & Shining Pearl", short: "BD & SP", accent: "#3d7bd9", accent2: "#e77fa6",
+    bdsp: { name: "Brilliant Diamond & Shining Pearl", short: "BD & SP", accent: "#3d7bd9", accent2: "#e77fa6", logo: "logos/bdspLogo.png",
             sections: [["", "Sinnoh"]] },
     pla:  { name: "Legends: Arceus", accent: "#d97706", accent2: "#5b3a8c", logo: "logos/plaLogo.png",
             sections: [["", "Hisui"]] },
@@ -271,7 +271,7 @@
       const g = GAME_INFO[id], l = mons.filter(m => m.games[id]);
       return `<a class="side-item ${state.page === id ? "active" : ""}" href="#/${id}" style="--c:${g.accent};--g:${gameGrad(g)}">
         <span class="side-icon"></span>
-        <span class="side-name">${esc(g.short || g.name)}</span>
+        <span class="side-name">${esc(g.name)}</span>
         <span class="side-pct">${fmtPct(pct(l, gHas(id)))}</span>
         <span class="side-bar"><i style="width:${pct(l, gHas(id))}%"></i></span>
       </a>`;
