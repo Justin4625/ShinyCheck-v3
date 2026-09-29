@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ShinyCheck V3</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23ff7ad9'/><stop offset='.5' stop-color='%23ffd36e'/><stop offset='1' stop-color='%2322d3ee'/></linearGradient></defs><path d='M50 4 C54 38 62 46 96 50 C62 54 54 62 50 96 C46 62 38 54 4 50 C38 46 46 38 50 4Z' fill='url(%23g)'/></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <defs>
+      <linearGradient id="holo" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#ff7ad9"/>
+        <stop offset=".35" stop-color="#ffd36e"/>
+        <stop offset=".7" stop-color="#7afcff"/>
+        <stop offset="1" stop-color="#9d7bff"/>
+      </linearGradient>
+      <symbol id="spark" viewBox="0 0 100 100">
+        <path d="M50 4 C54 38 62 46 96 50 C62 54 54 62 50 96 C46 62 38 54 4 50 C38 46 46 38 50 4Z"/>
+      </symbol>
+    </defs>
+  </svg>
+
+  <!-- Mobile top bar -->
+  <header class="topbar">
+    <button class="icon-btn" id="menuBtn" aria-label="Open menu">☰</button>
+    <a class="logo" href="#/"><svg class="logo-mark"><use href="#spark" fill="url(#holo)"/></svg><span>Shiny<b>Check</b></span></a>
+    <button class="icon-btn" id="themeBtnTop" aria-label="Toggle theme">◐</button>
+  </header>
+
+  <div class="shell">
+    <aside class="sidebar" id="sidebar">
+      <a class="logo" href="#/">
+        <svg class="logo-mark"><use href="#spark" fill="url(#holo)"/></svg>
+        <span>Shiny<b>Check</b></span>
+        <em class="v3">V3</em>
+      </a>
+
+      <nav class="side-nav">
+        <p class="side-label">Tracker</p>
+        <a class="side-item" href="#/" data-page="">
+          <span class="side-icon holo-dot"></span>
+          <span class="side-name">Living Dex</span>
+          <span class="side-pct" id="sideDexPct">0%</span>
+          <span class="side-bar"><i id="sideDexBar"></i></span>
+        </a>
+
+        <p class="side-label">Games</p>
+        <div id="sideGames"></div>
+      </nav>
+
+      <div class="side-foot">
+        <div id="account"></div>
+        <div class="side-actions">
+          <button class="ghost-btn" id="export" title="Download a backup of your progress">↓ Export</button>
+          <label class="ghost-btn" title="Load a backup file">↑ Import<input type="file" id="import" accept="application/json" hidden></label>
+          <button class="ghost-btn square" id="themeBtn" title="Light / dark">◐</button>
+        </div>
+        <button class="link-btn" id="reset">Reset progress</button>
+      </div>
+    </aside>
+    <div class="scrim" id="scrim"></div>
+
+    <main class="main">
+      <!-- Living Dex -->
+      <section id="homeView">
+        <div class="hero">
+          <div class="hero-glow" aria-hidden="true"></div>
+          <div class="hero-text">
+            <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> Pokémon HOME · Living Dex</p>
+            <h1>Every form.<br><span class="holo-text">One home.</span></h1>
+            <p class="hero-sub" id="heroSub"></p>
+            <div class="stats">
+              <div class="stat"><b id="statCaught">0</b><span>Registered</span></div>
+              <div class="stat"><b id="statLeft">0</b><span>To go</span></div>
+              <div class="stat"><b id="statRegions">0</b><span>Regions done</span></div>
+            </div>
+          </div>
+          <div class="hero-side">
+            <div class="ring big" id="heroRing">
+              <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="fill" cx="60" cy="60" r="52" stroke="url(#holo)"/></svg>
+              <div class="ring-label"><b id="heroPct">0%</b><span>complete</span></div>
+            </div>
+            <div class="up-next">
+              <p class="mini-label">Up next</p>
+              <div class="up-next-row" id="upNext"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="regions" id="regions"></div>
+
+        <div class="toolbar">
+          <label class="search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+            <input id="q" type="search" placeholder="Search Pokémon, number or form" autocomplete="off">
+            <kbd>/</kbd>
+          </label>
+          <button class="chip-toggle" id="fMissing" aria-pressed="false">Missing only</button>
+          <button class="chip-toggle" id="fForms" aria-pressed="true">Forms</button>
+          <span class="result-count" id="count"></span>
+        </div>
+
+        <div id="cards"></div>
+      </section>
+
+      <!-- Game page -->
+      <section id="gameView" class="hidden">
+        <div class="banner" id="banner">
+          <div class="banner-bg" aria-hidden="true"></div>
+          <div class="banner-content">
+            <div class="banner-logo" id="bannerLogo"></div>
+            <div class="banner-text">
+              <p class="eyebrow">Game tracker</p>
+              <h1 id="gameTitle"></h1>
+              <p class="hero-sub" id="gameSub"></p>
+            </div>
+            <div class="ring" id="gameRing">
+              <svg viewBox="0 0 120 120"><circle class="track" cx="60" cy="60" r="52"/><circle class="fill" cx="60" cy="60" r="52"/></svg>
+              <div class="ring-label"><b id="gamePct">0%</b><span id="gameCount">0 / 0</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="segmented" id="dexTabs"></div>
+
+        <div class="toolbar">
+          <label class="search">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>
+            <input id="gq" type="search" placeholder="Search this dex" autocomplete="off">
+            <kbd>/</kbd>
+          </label>
+          <button class="chip-toggle" id="gMissing" aria-pressed="false">Missing only</button>
+          <button class="chip-toggle" id="gForms" aria-pressed="true">Forms</button>
+          <span class="result-count" id="gCount"></span>
+        </div>
+
+        <div id="gameCards"></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Hunt Deck: slides in from the right on game pages -->
+  <div class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-scrim" data-close></div>
+    <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="drName" tabindex="-1">
+      <header class="dr-head">
+        <span class="dr-chip" id="drGame"></span>
+        <div class="dr-head-actions">
+          <button class="dr-icon dr-pop" id="drPop" title="Pop out — mini window that stays on top" aria-label="Pop out">⧉</button>
+          <button class="dr-icon" id="drPrev" title="Previous (←)" aria-label="Previous Pokémon">‹</button>
+          <button class="dr-icon" id="drNext" title="Next (→)" aria-label="Next Pokémon">›</button>
+          <button class="dr-icon" data-close title="Close (Esc)" aria-label="Close">✕</button>
+        </div>
+      </header>
+
+      <div class="dr-scroll">
+        <div class="dr-stage" id="drStage">
+          <div class="dr-orbit" aria-hidden="true"></div>
+          <button class="dr-sprite" id="drSprite" title="Tap to add an encounter"><img id="drImg" alt=""></button>
+          <div class="dr-float" id="drFloat" aria-hidden="true"></div>
+          <div class="dr-celebrate" id="drCelebrate" aria-live="polite"></div>
+        </div>
+
+        <div class="dr-title">
+          <p class="dr-meta" id="drMeta"></p>
+          <h2 id="drName"></h2>
+          <p class="dr-sub" id="drSub"></p>
+        </div>
+
+        <section class="dr-card dr-counter">
+          <span class="dr-label">Encounters</span>
+          <div class="dr-count" id="drCount">0</div>
+          <div class="dr-count-actions">
+            <button class="dr-minus" id="drMinus">−1</button>
+            <button class="dr-plus" id="drPlus"><span id="drPlusLabel">+1</span><kbd>space</kbd></button>
+          </div>
+        </section>
+
+        <section class="dr-card dr-row">
+          <div>
+            <span class="dr-label">Duration</span>
+            <div class="dr-time" id="drTime">0h 00m 00s</div>
+            <span class="dr-hint" id="drTimeHint">Press + to start the hunt</span>
+          </div>
+          <button class="dr-play" id="drPlay">▶ Start</button>
+        </section>
+
+        <section class="dr-card dr-luck">
+          <div class="dr-luck-top">
+            <span class="dr-label">Luck meter</span>
+            <select id="drOdds" aria-label="Shiny odds">
+              <option value="8192">1/8192 · Full odds (Gen 2–5)</option>
+              <option value="4096">1/4096 · Full odds</option>
+              <option value="2048">1/2048</option>
+              <option value="1365">1/1365 · Shiny Charm</option>
+              <option value="1024">1/1024</option>
+              <option value="683">1/683 · Masuda</option>
+              <option value="512">1/512 · Masuda + Charm</option>
+              <option value="256">1/256</option>
+              <option value="128">1/128</option>
+            </select>
+          </div>
+          <div class="dr-luck-bar"><i id="drLuckBar"></i><span class="dr-luck-mark" title="At odds (63.2%)"></span></div>
+          <p class="dr-luck-text" id="drLuckText"></p>
+        </section>
+
+        <details class="dr-card dr-settings">
+          <summary>Adjust hunt</summary>
+          <div class="dr-fields">
+            <label>Step<input type="number" min="1" id="drInc"></label>
+            <label>Encounters<input type="number" min="0" id="drSetCount"></label>
+            <label>Hours<input type="number" min="0" id="drH"></label>
+            <label>Min<input type="number" min="0" max="59" id="drM"></label>
+            <label>Sec<input type="number" min="0" max="59" id="drS"></label>
+          </div>
+          <button class="dr-danger" id="drReset">Reset hunt</button>
+        </details>
+
+        <section class="dr-log">
+          <span class="dr-label">Shiny log</span>
+          <ul id="drLog"></ul>
+        </section>
+      </div>
+
+      <footer class="dr-foot">
+        <button class="dr-gotcha" id="drGotcha">✦ Gotcha!</button>
+      </footer>
+    </aside>
+  </div>
+
+  <!-- Dex Entry: every shiny of a species across all games (Living Dex) -->
+  <div class="drawer entry" id="entry" aria-hidden="true">
+    <div class="drawer-scrim" data-eclose></div>
+    <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="enName" tabindex="-1">
+      <header class="dr-head">
+        <span class="dr-chip en-chip" id="enChip"></span>
+        <div class="dr-head-actions">
+          <button class="dr-icon" id="enPrev" title="Previous (←)" aria-label="Previous Pokémon">‹</button>
+          <button class="dr-icon" id="enNext" title="Next (→)" aria-label="Next Pokémon">›</button>
+          <button class="dr-icon" data-eclose title="Close (Esc)" aria-label="Close">✕</button>
+        </div>
+      </header>
+
+      <div class="dr-scroll">
+        <div class="en-hero">
+          <div class="en-sprite"><img id="enImg" alt=""></div>
+          <div class="en-hero-text">
+            <p class="dr-meta" id="enMeta"></p>
+            <h2 id="enName"></h2>
+            <div class="en-forms" id="enForms"></div>
+          </div>
+        </div>
+
+        <div class="en-stats" id="enStats"></div>
+
+        <div class="en-add" id="enAdd"></div>
+
+        <section>
+          <span class="dr-label">Shiny log · all games</span>
+          <ul class="en-log" id="enLog"></ul>
+        </section>
+
+        <section>
+          <span class="dr-label">Hunt it in</span>
+          <div class="en-games" id="enGames"></div>
+        </section>
+      </div>
+    </aside>
+  </div>
+
+  <!-- Login screen (only when Firebase is configured) -->
+  <div class="gate" id="gate" hidden>
+    <div class="gate-bg" aria-hidden="true"></div>
+    <div class="gate-card">
+      <div class="logo gate-logo">
+        <svg class="logo-mark"><use href="#spark" fill="url(#holo)"/></svg>
+        <span>Shiny<b>Check</b></span>
+        <em class="v3">V3</em>
+      </div>
+      <h1 id="gateTitle">Welcome back, Trainer</h1>
+      <p class="gate-sub">Your Living Dex, hunts and shiny log — saved to your account and synced across devices.</p>
+
+      <button class="gate-google" id="gateGoogle" type="button">
+        <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+        Continue with Google
+      </button>
+      <div class="gate-or"><span>or</span></div>
+
+      <form id="gateForm" novalidate>
+        <label>Email<input id="gateEmail" type="email" autocomplete="email" required></label>
+        <label class="gate-pw">Password<input id="gatePassword" type="password" autocomplete="current-password" minlength="6"></label>
+        <p class="gate-error" id="gateError" role="alert"></p>
+        <button class="gate-submit" id="gateSubmit" type="submit">Sign in</button>
+      </form>
+
+      <p class="gate-switch">
+        <span class="only-in">New here? <button type="button" data-mode="up">Create an account</button> · <button type="button" data-mode="reset">Forgot password?</button></span>
+        <span class="only-up">Already have an account? <button type="button" data-mode="in">Sign in</button></span>
+        <span class="only-reset"><button type="button" data-mode="in">Back to sign in</button></span>
+      </p>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="data.js"></script>
+  <script src="evo.js"></script>
+  <script src="app.js"></script>
+  <script type="module" src="cloud.js"></script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+rules_version = '2';
+
+// Each account has exactly one document, users/{uid}, holding its progress.
+// Only the signed-in owner can read or write it, and writes must have ShinyCheck's
+// shape: known fields only, the right types, sane sizes and a server timestamp.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{uid} {
+      function isOwner() {
+        return request.auth != null && request.auth.uid == uid;
+      }
+
+      function validProgress(d) {
+        return d.keys().hasOnly(['version', 'caught', 'hunts', 'shinies', 'prefs', 'rev', 'updatedAt'])
+          && d.keys().hasAll(['version', 'caught', 'hunts', 'shinies', 'prefs', 'rev', 'updatedAt'])
+          && d.version is int && d.version >= 1 && d.version <= 100
+          && d.caught is list && d.caught.size() <= 2000
+          && d.hunts is map && d.hunts.size() <= 5000
+          && d.shinies is map && d.shinies.size() <= 5000
+          && d.prefs is map && d.prefs.size() <= 50
+          && d.rev is string && d.rev.size() <= 40
+          && d.updatedAt == request.time;
+      }
+
+      allow read: if isOwner();
+      allow create, update: if isOwner() && validProgress(request.resource.data);
+      allow delete: if isOwner();
+    }
+  }
+}
