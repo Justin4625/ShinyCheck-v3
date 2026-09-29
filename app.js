@@ -469,12 +469,37 @@
   const curKey = () => hk(curGame, cur.id);
   // Odds and step are remembered per game, so they stick before the first encounter
   // and carry over to the next hunt in that game.
-  const gamePrefs = () => ({ inc: 1, odds: 4096, ...prefs[curGame] });
+  // Hunt methods per game. Odds come from shiny "rolls" (P = 1 − (4095/4096)^rolls), as in
+  // the games; roll counts checked against RotomLabs and PokéTools. Some methods have a
+  // fixed rate instead ({ odds }). Legends: Arceus research bonuses are per species.
+  const METHODS = {
+    swsh: [["full", "Full odds", 1], ["charm", "Shiny Charm", 3], ["masuda", "Masuda method", 6], ["masuda-charm", "Masuda + Shiny Charm", 8],
+      ["dyna", "Dynamax Adventure", { odds: 300 }], ["dyna-charm", "Dynamax Adventure + Shiny Charm", { odds: 100 }]],
+    bdsp: [["full", "Full odds", 1], ["charm", "Shiny Charm", 3], ["masuda", "Masuda method", 6], ["masuda-charm", "Masuda + Shiny Charm", 8],
+      ["radar", "Poké Radar chain 40+", { odds: 100 }]],
+    pla: [["full", "Full odds", 1], ["charm", "Shiny Charm", 4], ["r10", "Research level 10", 2], ["perfect", "Perfect research", 4],
+      ["perfect-charm", "Perfect research + Shiny Charm", 7], ["mo", "Mass outbreak", 26], ["mo-max", "Mass outbreak + Perfect + Charm", 32],
+      ["mmo", "Massive mass outbreak", 13], ["mmo-max", "Massive mass outbreak + Perfect + Charm", 19]],
+    sv: [["full", "Full odds", 1], ["charm", "Shiny Charm", 3], ["o60", "Outbreak (60+ cleared)", 3], ["o60-charm", "Outbreak 60+ + Shiny Charm", 5],
+      ["sp3", "Sparkling Power Lv. 3", 4], ["sp3-charm", "Sparkling Power 3 + Shiny Charm", 6], ["o60-sp3", "Outbreak 60+ + Sparkling Power 3", 6],
+      ["o60-sp3-charm", "Outbreak 60+ + Sparkling Power 3 + Charm", 8], ["masuda", "Masuda method", 6], ["masuda-charm", "Masuda + Shiny Charm", 8]],
+    lza: [["full", "Full odds", 1], ["charm", "Shiny Charm", 4], ["sp3", "Sparkling Power Lv. 3", 4], ["sp3-charm", "Sparkling Power 3 + Shiny Charm", 7]],
+  };
+  const rollOdds = r => typeof r === "object" ? r.odds : Math.round(1 / (1 - Math.pow(4095 / 4096, r)));
+  const methodOf = (gid, id) => (METHODS[gid] || []).find(([k]) => k === id);
+  const CUSTOM_ODDS = [8192, 4096, 2048, 1366, 1024, 683, 512, 256, 128];
+  function buildMethods(gid) {
+    dr.odds.innerHTML = `<optgroup label="${esc(GAME_INFO[gid].name)}">${(METHODS[gid] || []).map(([id, label, r]) =>
+      `<option value="m:${id}">${esc(label)} · 1/${rollOdds(r)}</option>`).join("")}</optgroup>
+      <optgroup label="Custom odds">${CUSTOM_ODDS.map(o => `<option value="o:${o}">1/${o}</option>`).join("")}</optgroup>`;
+  }
+
+  const gamePrefs = () => ({ inc: 1, odds: 4096, method: "full", ...prefs[curGame] });
   const hunt = () => hunts[curKey()] || { count: 0, time: 0, since: null, ...gamePrefs() };
   function setHunt(patch) {
     const h = { ...hunt(), ...patch, updated: Date.now() };
     if ("odds" in patch || "inc" in patch) {
-      prefs[curGame] = { inc: h.inc, odds: h.odds };
+      prefs[curGame] = { inc: h.inc, odds: h.odds, method: h.method || null };
       savePrefs();
     }
     if (!isActive(h)) delete hunts[curKey()]; else hunts[curKey()] = h;
@@ -487,6 +512,7 @@
     cur = mons.find(m => m.id === id);
     curGame = gid;
     const g = GAME_INFO[curGame];
+    buildMethods(curGame);
     for (const [k, v] of [["--accent", g.accent], ["--accent2", g.accent2]]) dr.root.style.setProperty(k, v);
     $("#drGame").textContent = g.name;
     $("#drMeta").textContent = `#${cur.dex} · ${g.short || g.name} ${codes(cur, curGame).join(" / ")}`;
@@ -530,7 +556,10 @@
     dr.root.classList.toggle("running", !!h.since);
     $("#drCancel").hidden = !isActive(hunts[curKey()]);
     $("#drTimeHint").textContent = h.since ? "Running — keeps going when you close this" : s ? "Paused — press + to resume" : "Press + to start the hunt";
-    dr.odds.value = h.odds;
+    const val = h.method && methodOf(curGame, h.method) ? `m:${h.method}` : `o:${h.odds}`;
+    if (![...dr.odds.options].some(o => o.value === val)) dr.odds.add(new Option(`1/${h.odds}`, val));
+    dr.odds.value = val;
+    $("#drOddsShow").textContent = `1/${nf(h.odds)}`;
     const inputs = { drInc: h.inc, drSetCount: h.count, drH: Math.floor(s / 3600), drM: Math.floor(s / 60) % 60, drS: s % 60 };
     for (const [id, v] of Object.entries(inputs)) if (document.activeElement !== $("#" + id)) $("#" + id).value = v;
     // Chance that a hunter would have hit the shiny by now: 1 - (1 - 1/odds)^n.
@@ -550,7 +579,7 @@
     dr.log.innerHTML = list.length
       ? list.map((s, i) => `<li>
           <span class="log-n">${sparkSvg()}${i + 1}</span>
-          <span class="log-main"><b>${nf(s.count)}</b> encounters · ${fmtShort(s.time)}<small>${fmtDate(s.ts)}${s.odds ? ` · 1/${s.odds}` : ""}</small></span>
+          <span class="log-main"><b>${nf(s.count)}</b> encounters · ${fmtShort(s.time)}<small>${fmtDate(s.ts)}${s.method ? ` · ${esc(s.method)}` : ""}${s.odds ? ` · 1/${s.odds}` : ""}</small></span>
           <button class="log-del" data-del="${i}" title="Delete entry">✕</button>
         </li>`).join("")
       : `<li class="log-empty">No shinies logged yet. Hit <b>Gotcha!</b> when it sparkles.</li>`;
@@ -610,7 +639,8 @@
     disarm();
     const h = hunt();
     const k = curKey();
-    (shinies[k] = shinies[k] || []).push({ count: h.count, time: elapsed(h), odds: h.odds, ts: Date.now() });
+    const method = h.method && methodOf(curGame, h.method);
+    (shinies[k] = shinies[k] || []).push({ count: h.count, time: elapsed(h), odds: h.odds, ...(method ? { method: method[1] } : {}), ts: Date.now() });
     saveShinies();
     delete hunts[k];
     saveHunts();
@@ -640,7 +670,11 @@
   $("#drMinus").addEventListener("click", () => addEncounter(-1));
   dr.play.addEventListener("click", togglePlay);
   dr.gotcha.addEventListener("click", gotcha);
-  dr.odds.addEventListener("change", () => setHunt({ odds: +dr.odds.value }));
+  dr.odds.addEventListener("change", () => {
+    const [kind, v] = dr.odds.value.split(":");
+    const m = kind === "m" && methodOf(curGame, v);
+    setHunt(m ? { method: v, odds: rollOdds(m[2]) } : { method: null, odds: +v });
+  });
   $("#drInc").addEventListener("change", e => setHunt({ inc: Math.max(1, +e.target.value || 1) }));
   $("#drSetCount").addEventListener("change", e => setHunt({ count: Math.max(0, +e.target.value || 0) }));
   for (const id of ["drH", "drM", "drS"]) $("#" + id).addEventListener("change", () => {
@@ -807,7 +841,7 @@
           <span class="en-main">
             <b>${esc(l.m.name)}${l.m.form ? ` <em>${esc(l.m.form)}</em>` : ""}</b>
             <span class="en-game">${esc(g.name)}</span>
-            <small>${fmtDate(l.ts)}${l.odds && !GAME_INFO[l.g].noOdds ? ` · 1/${l.odds}` : ""}</small>
+            <small>${fmtDate(l.ts)}${l.method ? ` · ${esc(l.method)}` : ""}${l.odds && !GAME_INFO[l.g].noOdds ? ` · 1/${l.odds}` : ""}</small>
           </span>
           <span class="en-nums"><b>${nf(l.count)}</b><small>${fmtShort(l.time)}</small></span>
         </button>

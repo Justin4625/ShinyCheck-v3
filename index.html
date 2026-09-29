@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260929175912">
+  <link rel="stylesheet" href="style.css?v=20260929180245">
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -224,18 +224,14 @@
 
         <section class="dr-card dr-luck">
           <div class="dr-luck-top">
+            <span class="dr-label">Hunt method</span>
+            <b class="dr-odds-show" id="drOddsShow">1/4096</b>
+          </div>
+          <select id="drOdds" class="dr-method" aria-label="Hunt method">
+            <!-- filled per game from METHODS in app.js -->
+          </select>
+          <div class="dr-luck-top dr-luck-sub">
             <span class="dr-label">Luck meter</span>
-            <select id="drOdds" aria-label="Shiny odds">
-              <option value="8192">1/8192 · Full odds (Gen 2–5)</option>
-              <option value="4096">1/4096 · Full odds</option>
-              <option value="2048">1/2048</option>
-              <option value="1365">1/1365 · Shiny Charm</option>
-              <option value="1024">1/1024</option>
-              <option value="683">1/683 · Masuda</option>
-              <option value="512">1/512 · Masuda + Charm</option>
-              <option value="256">1/256</option>
-              <option value="128">1/128</option>
-            </select>
           </div>
           <div class="dr-luck-bar"><i id="drLuckBar"></i><span class="dr-luck-mark" title="At odds (63.2%)"></span></div>
           <p class="dr-luck-text" id="drLuckText"></p>
@@ -379,9 +375,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=20260929175912"></script>
-  <script src="evo.js?v=20260929175912"></script>
-  <script src="app.js?v=20260929175912"></script>
-  <script type="module" src="cloud.js?v=20260929175912"></script>
+  <script src="data.js?v=20260929180245"></script>
+  <script src="evo.js?v=20260929180245"></script>
+  <script src="app.js?v=20260929180245"></script>
+  <script type="module" src="cloud.js?v=20260929180245"></script>
 </body>
 </html>
