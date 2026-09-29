@@ -3,13 +3,15 @@
   const BASE = new URL(".", document.currentScript.src).pathname;
   const STORE = "livingdex-za-v1";
   const THEME = "livingdex-theme";
-  const GAMES = ["swsh", "bdsp", "pla", "sv", "lza"];
+  const GAMES = ["lgpe", "swsh", "bdsp", "pla", "sv", "lza"];
   // Places a shiny can be logged. GO and HOME have no regional dex or hunt page, only
   // logs, and no odds (HOME shinies are gifts; GO odds aren't tracked).
   const LOG_GAMES = [...GAMES, "pogo", "home"];
 
   // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
   const GAME_INFO = {
+    lgpe: { name: "Let's Go Pikachu & Eevee", abbr: "LGPE", released: "2018-11-16", accent: "#f2b705", accent2: "#a8672f", logo: "logos/lgpeLogo.png",
+            sections: [["", "Kanto"]] },
     swsh: { nativeForms: ["Galarian"], name: "Sword & Shield", abbr: "SwSh", released: "2019-11-15", accent: "#00a1e9", accent2: "#e5006e", logo: "logos/swshLogo.png",
             sections: [["", "Galar"], ["A", "Isle of Armor"], ["C", "Crown Tundra"]] },
     bdsp: { name: "Brilliant Diamond & Shining Pearl", abbr: "BDSP", released: "2021-11-19", short: "BD & SP", accent: "#3d7bd9", accent2: "#e77fa6", logo: "logos/bdspLogo.png",
@@ -480,6 +482,11 @@
     // Allowed bonuses may override their rolls per method ("charm:1"). Checked against
     // RotomLabs: in SwSh the charm adds 2 rolls in the wild and in Masuda, 1 for regular
     // eggs; in BD & SP it does nothing in the wild, Grand Underground or Poké Radar.
+    // Let's Go: rolls from a Lure (+1), the Shiny Charm (+2) and the species' Catch Combo
+    // (11+ → +3, 21+ → +7, 31+ → +11); all three together give 1/273.
+    lgpe: { methods: [["wild", "Wild", 1, ["charm", "lure", "combo"]]],
+      bonus: [{ ...CHARM, rolls: 2 }, { id: "lure", label: "Lure", type: "toggle", rolls: 1 },
+        { id: "combo", label: "Catch Combo", type: "level", levels: [["0–10", 0], ["11+", 3], ["21+", 7], ["31+", 11]] }] },
     swsh: { methods: [["wild", "Wild", 1, ["charm"]], ["breed", "Breeding", 1, ["charm:1"]], ["masuda", "Masuda", 6, ["charm"]],
       ["dyna", "Dynamax Adventure", { odds: 300, charm: 100 }, ["charm"]]],
       bonus: [{ ...CHARM, rolls: 2 }] },
