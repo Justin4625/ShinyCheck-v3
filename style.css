@@ -1179,3 +1179,13 @@ body.recaptcha .gate-legal { display: block; }
 .en-setup-head b { font: 800 18px/1 var(--font); letter-spacing: -.03em; background: var(--holo); -webkit-background-clip: text; background-clip: text; color: transparent; }
 .en-setup .hs-chip { --accent: #9d7bff; --accent2: #ff7ad9; }
 .en-setup .hs-switch { --accent: #9d7bff; --accent2: #ff7ad9; }
+
+/* Move a shiny to another game */
+.en-move { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding-top: 4px; }
+.en-move > span { width: 100%; font: 700 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin-bottom: 2px; }
+.en-move-btn {
+  padding: 6px 10px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; color: var(--text);
+  border: 1px solid var(--border); background: var(--surface-2); border-left: 3px solid var(--accent);
+}
+.en-move-btn:hover { border-color: var(--accent); }
+.en-from { font-style: normal; color: var(--muted); letter-spacing: 0; text-transform: none; }

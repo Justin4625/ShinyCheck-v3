@@ -986,7 +986,7 @@
           <span class="en-thumb">${l.m.sprite ? `<img src="${l.m.sprite}" alt="">` : ""}</span>
           <span class="en-main">
             <b>${esc(l.m.name)}${l.m.form ? ` <em>${esc(l.m.form)}</em>` : ""}</b>
-            <span class="en-game">${esc(g.name)}</span>
+            <span class="en-game">${esc(g.name)}${l.caughtIn && GAME_INFO[l.caughtIn] ? ` <em class="en-from">· caught in ${esc(GAME_INFO[l.caughtIn].abbr || GAME_INFO[l.caughtIn].name)}</em>` : ""}</span>
             <small>${fmtDate(l.ts)}${l.method ? ` · ${esc(l.method)}` : ""}${l.odds && !GAME_INFO[l.g].noOdds ? ` · 1/${l.odds}` : ""}${l.phases ? ` · after ${l.phases} ${l.phases === 1 ? "phase" : "phases"}` : ""}</small>
           </span>
           <span class="en-nums"><b>${nf(l.count)}</b><small>${fmtShort(l.time)}</small></span>
@@ -1007,6 +1007,12 @@
             return evos.length ? `<div class="en-evolve"><span>Evolve into</span>${evos.map(x => `<button class="en-evo" data-evolve="${x.id}" title="Move this shiny to ${esc(x.name)}${x.form ? " (" + esc(x.form) + ")" : ""}">
               ${x.sprite ? `<img src="${x.sprite}" alt="">` : ""}<b>${esc(x.name)}</b>${x.form && x.form !== "Original" ? `<small>${esc(x.form)}</small>` : ""}</button>`).join("")}</div>`
               : `<div class="en-evolve final"><span>Final evolution ✦</span></div>`;
+          })()}
+          ${(() => {
+            // Moved through HOME to another game: the shiny then counts there.
+            const to = LOG_GAMES.filter(x => x !== l.g && (GAME_INFO[x].logOnly || l.m.games[x]))
+              .sort((x, y) => !!GAME_INFO[x].logOnly - !!GAME_INFO[y].logOnly || (GAME_INFO[y].released || "").localeCompare(GAME_INFO[x].released || ""));
+            return to.length ? `<div class="en-move"><span>Move to game</span>${to.map(x => `<button class="en-move-btn" data-move="${x}" style="--accent:${GAME_INFO[x].accent};--accent2:${GAME_INFO[x].accent2}">${esc(GAME_INFO[x].abbr || GAME_INFO[x].name)}</button>`).join("")}</div>` : "";
           })()}
           <div class="en-edit-actions">
             <button class="en-save" data-save>Save</button>
@@ -1123,6 +1129,35 @@
       burst({ getBoundingClientRect: () => r });
       toast(msg(from));
     };
+    const mv = e.target.closest("[data-move]");
+    if (mv) {
+      const to = mv.dataset.move, mon = mons.find(m => m.id === +id);
+      const [entry] = list.splice(+i, 1);
+      if (!list.length) delete shinies[`${gid}:${id}`];
+      const caughtIn = entry.caughtIn || gid;
+      const moved = { ...entry, caughtIn };
+      if (caughtIn === to) delete moved.caughtIn;
+      const dest = shinies[hk(to, mon.id)] = shinies[hk(to, mon.id)] || [];
+      dest.push(moved);
+      dest.sort((x, y) => (x.ts || 0) - (y.ts || 0));
+      saveShinies();
+      editing = `${to}:${mon.id}:${dest.indexOf(moved)}`;
+      paintEntry();
+      refreshHomeCard(mon.id);
+      renderHomeStats();
+      return toast(`Shiny ${mon.name} moved to ${GAME_INFO[to].name}`, { label: "Undo", run: () => {
+        const d = shinies[hk(to, mon.id)], j = d.indexOf(moved);
+        if (j >= 0) d.splice(j, 1);
+        if (!d.length) delete shinies[hk(to, mon.id)];
+        (shinies[`${gid}:${id}`] = shinies[`${gid}:${id}`] || []).push(entry);
+        shinies[`${gid}:${id}`].sort((x, y) => (x.ts || 0) - (y.ts || 0));
+        saveShinies();
+        editing = null;
+        if (entryMon) paintEntry();
+        refreshHomeCard(mon.id);
+        renderHomeStats();
+      } });
+    }
     const back = e.target.closest("[data-devolve]");
     if (back) {
       const hist = list[+i].evolvedFrom, to = mons.find(m => m.id === hist.at(-1));
