@@ -1618,6 +1618,50 @@
   $("#v2BannerOpen").addEventListener("click", openV2);
   $("#v2BannerClose").addEventListener("click", () => { safe(() => localStorage.setItem("shinycheck-v3-v2-dismissed", "1")); renderV2Banner(); });
 
+  // ---------- Backups (cloud) ----------
+  const bk = { root: $("#backups") };
+  const BK_KIND = { auto: "Weekly", manual: "Manual", "before-restore": "Before restore" };
+  async function paintBackups() {
+    const list = $("#bkList"), api = window.Cloud && window.Cloud.backups;
+    if (!api || !api.available()) {
+      list.innerHTML = `<li class="bk-empty">Sign in to use backups — they're stored in your account. Without an account, use Export.</li>`;
+      $("#bkNow").hidden = true;
+      return;
+    }
+    $("#bkNow").hidden = false;
+    list.innerHTML = `<li class="bk-empty">Loading…</li>`;
+    try {
+      const items = await api.list();
+      list.innerHTML = items.length ? items.map(b => `<li>
+          <span class="bk-main"><b>${new Date(b.date).toLocaleString("en-GB", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}</b>
+          <small>${esc(BK_KIND[b.kind] || b.kind)} · ${b.counts?.shinies ?? "?"} shinies · ${b.counts?.hunts ?? "?"} hunts</small></span>
+          <button class="bk-restore" data-restore="${b.id}">Restore</button>
+        </li>`).join("") : `<li class="bk-empty">No backups yet. The first one is made automatically, or press Back up now.</li>`;
+    } catch (err) {
+      list.innerHTML = `<li class="bk-empty">Backups aren't available yet (${esc(err.code || err.message || "error")}). The Firebase rules may need the backups section.</li>`;
+    }
+  }
+  $("#backupsOpen").addEventListener("click", () => { bk.root.hidden = false; document.body.classList.add("drawer-open"); paintBackups(); });
+  const closeBackups = () => { bk.root.hidden = true; document.body.classList.remove("drawer-open"); };
+  bk.root.addEventListener("click", async e => {
+    if (e.target === bk.root || e.target.closest("[data-bkclose]")) return closeBackups();
+    const r = e.target.closest("[data-restore]");
+    if (!r || !arm(r, "Tap again to restore")) return;
+    disarm();
+    r.disabled = true; r.textContent = "Restoring…";
+    try { await window.Cloud.backups.restore(r.dataset.restore); toast("Backup restored ✦"); closeBackups(); }
+    catch (err) { toast(`Restore failed (${err.code || err.message})`); paintBackups(); }
+  });
+  $("#bkNow").addEventListener("click", async e => {
+    const b = e.currentTarget;
+    b.disabled = true; b.textContent = "Backing up…";
+    try { await window.Cloud.backups.create(); toast("Backup saved to your account ✦"); }
+    catch (err) { toast(`Backup failed (${err.code || err.message})`); }
+    b.disabled = false; b.textContent = "Back up now ✦";
+    paintBackups();
+  });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && !bk.root.hidden) { e.stopImmediatePropagation(); closeBackups(); } }, true);
+
   // Export / import / reset
   const countShinies = data => Object.values(data.shinies || {}).reduce((n, list) => n + (Array.isArray(list) ? list.length : 0), 0);
   const countHunts = data => Object.keys(data.hunts || {}).length;

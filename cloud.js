@@ -34,6 +34,7 @@ async function start() {
   const {
     initializeFirestore, persistentLocalCache, persistentMultipleTabManager,
     doc, onSnapshot, setDoc, serverTimestamp,
+    collection, addDoc, getDocs, getDoc, deleteDoc, query, orderBy,
   } = fs;
 
   const app = initializeApp(firebaseConfig);
@@ -118,6 +119,7 @@ async function start() {
         if (data.rev !== lastRev) window.ShinyApp.applyData(data, { quiet: true });
       }
       localStorage.setItem(OWNER, user.uid);
+      if (first) setTimeout(autoBackup, 5000);
       first = false;
       setStatus("saved");
     }, err => {
@@ -125,6 +127,45 @@ async function start() {
       setStatus("error");
     });
   });
+
+  // ---------- Backups: users/{uid}/backups, one automatic copy a week, newest 8 kept ----------
+  const WEEK = 7 * 24 * 3600 * 1000, KEEP = 8;
+  const backupsCol = () => ref && collection(db, "users", auth.currentUser.uid, "backups");
+  const counts = d => ({
+    shinies: Object.values(d.shinies || {}).reduce((n, l) => n + l.length, 0),
+    hunts: Object.keys(d.hunts || {}).length,
+  });
+  async function listBackups() {
+    const snap = await getDocs(query(backupsCol(), orderBy("createdAt", "desc")));
+    return snap.docs.map(d => ({ id: d.id, ...d.data(), date: d.data().createdAt?.toMillis?.() || Date.now() }));
+  }
+  async function createBackup(kind = "manual") {
+    await flush();
+    const { rev, ...data } = window.ShinyApp.snapshot();
+    await addDoc(backupsCol(), { createdAt: serverTimestamp(), kind, counts: counts(data), data });
+    const all = await listBackups();
+    await Promise.all(all.slice(KEEP).map(b => deleteDoc(doc(backupsCol(), b.id))));
+  }
+  async function autoBackup() {
+    if (!ref || !window.ShinyApp.hasLocalData()) return;
+    try {
+      const [latest] = await listBackups();
+      if (!latest || Date.now() - latest.date > WEEK) await createBackup("auto");
+    } catch (err) { console.warn("Automatic backup skipped:", err.code || err); }
+  }
+  async function restoreBackup(id) {
+    await createBackup("before-restore");
+    const snap = await getDoc(doc(backupsCol(), id));
+    if (!snap.exists()) throw new Error("Backup not found");
+    window.ShinyApp.applyData(snap.data().data);
+    await flush();
+  }
+  window.Cloud.backups = {
+    available: () => !!ref,
+    list: listBackups,
+    create: () => createBackup("manual"),
+    restore: restoreBackup,
+  };
 
   // ---------- Account UI ----------
   function renderAccount(user) {

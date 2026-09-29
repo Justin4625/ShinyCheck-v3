@@ -26,5 +26,16 @@ service cloud.firestore {
       allow create, update: if isOwner() && validProgress(request.resource.data);
       allow delete: if isOwner();
     }
+
+    // Backups of that progress: created by the app (weekly or on request), never edited.
+    match /users/{uid}/backups/{backupId} {
+      allow read, delete: if request.auth != null && request.auth.uid == uid;
+      allow create: if request.auth != null && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['createdAt', 'kind', 'counts', 'data'])
+        && request.resource.data.createdAt == request.time
+        && request.resource.data.kind in ['auto', 'manual', 'before-restore']
+        && request.resource.data.counts is map
+        && request.resource.data.data is map;
+    }
   }
 }

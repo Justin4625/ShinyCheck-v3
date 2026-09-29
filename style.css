@@ -1159,3 +1159,13 @@ body.recaptcha .gate-legal { display: block; }
   .dr-counter { flex-wrap: wrap; }
   .dr-phase-row, .dr-phase-pick, .dr-phases { flex-basis: 100%; }
 }
+
+/* Backups */
+.bk-list { list-style: none; margin: 14px 0 4px; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; }
+.bk-list li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); }
+.bk-list li.bk-empty { display: block; color: var(--muted); font-size: 13px; border-style: dashed; background: none; }
+.bk-main { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.bk-main small { font: 700 10px/1.3 var(--mono); color: var(--faint); }
+.bk-restore { flex: none; border: 1px solid var(--border-2); background: var(--surface); border-radius: 10px; padding: 7px 12px; cursor: pointer; font-weight: 700; font-size: 12.5px; color: var(--text); }
+.bk-restore.armed { background: #ff9f43; border-color: transparent; color: #14121f; }
+#bkNow[hidden] { display: none; }
