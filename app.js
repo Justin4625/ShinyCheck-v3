@@ -1511,6 +1511,10 @@
   // Mobile menu
   $("#menuBtn").addEventListener("click", () => document.body.classList.add("menu-open"));
   $("#scrim").addEventListener("click", () => document.body.classList.remove("menu-open"));
+  // Dialogs opened from the menu (Backups, V2 import, Reset) shouldn't sit on top of it on phones.
+  $("#sidebar").addEventListener("click", e => {
+    if (e.target.closest("#backupsOpen, #v2Open, #reset, #export")) document.body.classList.remove("menu-open");
+  });
 
   // Theme
   const applyTheme = th => th ? document.documentElement.dataset.theme = th : delete document.documentElement.dataset.theme;

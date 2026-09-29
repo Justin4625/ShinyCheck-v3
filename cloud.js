@@ -234,13 +234,16 @@ async function start() {
         use_fedcm_for_button: true,
       });
       const slot = $("#gateGoogleSlot");
+      // Measure the slot while it's visible, so the button fits a phone-width card (GIS takes 200–400px).
+      $("#gateGoogle").hidden = true;
+      slot.hidden = false;
+      // The gate may still be hidden (width 0); the card's inner width is then ~viewport − 80 on phones, 357 on desktop.
+      const fit = slot.clientWidth || Math.min(357, innerWidth - 80);
       google.accounts.id.renderButton(slot, {
         type: "standard", shape: "pill", size: "large", text: "continue_with", locale: "en",
         theme: matchMedia("(prefers-color-scheme: dark)").matches || document.documentElement.dataset.theme === "dark" ? "filled_black" : "outline",
-        width: Math.min(360, slot.clientWidth || 360),
+        width: Math.max(200, Math.min(400, fit)),
       });
-      $("#gateGoogle").hidden = true;
-      slot.hidden = false;
     }).catch(() => { /* keep the Firebase popup button */ });
   }
   form.onsubmit = async e => {
