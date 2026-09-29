@@ -5,7 +5,8 @@
 // - Sprites, type icons, logos: saved the first time they're shown, then served from the cache.
 // - Fonts and the Firebase SDK: served from the cache, refreshed in the background.
 // Firestore, sign-in and other API calls are never touched (Firestore keeps its own offline copy).
-const VERSION = "20260929231639"; // stamped by scripts/bump-version.sh on every commit
+// Also shows push notifications (update news) and opens the app when one is tapped.
+const VERSION = "20260929233630"; // stamped by scripts/bump-version.sh on every commit
 const SHELL = `shinycheck-shell-${VERSION}`;
 const RUNTIME = "shinycheck-runtime-v1";
 const CORE = [
@@ -97,3 +98,31 @@ async function fresh(req) {
   }
   return update;
 }
+
+// ---------- Notifications ----------
+// Sent through Firebase Cloud Messaging by .github/workflows/notify.yml as a data message
+// { title, body, url }; a "notification" payload is read the same way.
+self.addEventListener("push", event => {
+  let msg = {};
+  try { msg = event.data ? event.data.json() : {}; } catch { msg = { data: { body: event.data.text() } }; }
+  const d = { ...(msg.notification || {}), ...(msg.data || {}) };
+  const scope = self.registration.scope;
+  event.waitUntil(self.registration.showNotification(d.title || "ShinyCheck", {
+    body: d.body || "",
+    icon: new URL("icons/icon-192.png", scope).href,
+    ...(d.tag ? { tag: d.tag } : {}),
+    data: { url: new URL(d.url || "./", scope).href },
+  }));
+});
+
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+  const url = event.notification.data?.url || self.registration.scope;
+  event.waitUntil((async () => {
+    const wins = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+    const win = wins.find(w => w.url.startsWith(self.registration.scope));
+    if (!win) return self.clients.openWindow(url);
+    await win.focus();
+    if (win.url !== url) await win.navigate(url).catch(() => {});
+  })());
+});

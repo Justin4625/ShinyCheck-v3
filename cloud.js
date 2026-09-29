@@ -2,7 +2,7 @@
 // The app keeps working from localStorage; this module mirrors that state into one
 // Firestore document per account (users/{uid}) and pulls changes from other devices.
 // Load the config with the same ?v= cache-busting version as this module.
-const { firebaseConfig, googleClientId, appCheckSiteKey } = await import(`./firebase-config.js${new URL(import.meta.url).search}`);
+const { firebaseConfig, googleClientId, appCheckSiteKey, vapidKey } = await import(`./firebase-config.js${new URL(import.meta.url).search}`);
 
 const $ = s => document.querySelector(s);
 const gate = $("#gate");
@@ -120,6 +120,7 @@ async function start() {
       }
       localStorage.setItem(OWNER, user.uid);
       if (first) setTimeout(autoBackup, 5000);
+      if (first) setTimeout(refreshPush, 8000);
       first = false;
       setStatus("saved");
     }, err => {
@@ -166,6 +167,61 @@ async function start() {
     create: () => createBackup("manual"),
     restore: restoreBackup,
   };
+
+  // ---------- Notifications: update news pushed to devices that opt in ----------
+  // Each device gets a Firebase Cloud Messaging token, saved as pushTokens/{token}. The
+  // "Send notification" GitHub Action (.github/workflows/notify.yml) sends to all of them
+  // and sw.js shows the message.
+  const PUSH_ON = "shinycheck-v3-push";
+  let fcm = null;
+  const pushErr = code => Object.assign(new Error(code), { code: `push/${code}` });
+  async function messaging() {
+    if (fcm) return fcm;
+    const m = await import(`https://www.gstatic.com/firebasejs/${V}/firebase-messaging.js`);
+    if (!(await m.isSupported())) throw pushErr("unsupported");
+    return (fcm = { m, it: m.getMessaging(app) });
+  }
+  async function pushToken() {
+    const reg = await navigator.serviceWorker.getRegistration();
+    if (!reg) throw pushErr("no-service-worker");
+    const { m, it } = await messaging();
+    return m.getToken(it, { vapidKey, serviceWorkerRegistration: reg });
+  }
+  async function saveToken(token) {
+    await setDoc(doc(db, "pushTokens", token), { uid: auth.currentUser.uid, createdAt: serverTimestamp() });
+    localStorage.setItem(PUSH_ON, token);
+  }
+  const permission = () => typeof Notification === "undefined" ? "unsupported" : Notification.permission;
+  window.Cloud.push = {
+    available: !!vapidKey,
+    permission,
+    enabled: () => !!localStorage.getItem(PUSH_ON) && permission() === "granted",
+    async enable() {
+      if (permission() === "unsupported" || !("serviceWorker" in navigator)) throw pushErr("unsupported");
+      if (!auth.currentUser) throw pushErr("signed-out");
+      // Asked first, while the tap still counts as a user gesture (Safari requires that).
+      if (await Notification.requestPermission() !== "granted") throw pushErr("denied");
+      await saveToken(await pushToken());
+    },
+    async disable() {
+      const token = localStorage.getItem(PUSH_ON);
+      localStorage.removeItem(PUSH_ON);
+      if (!token) return;
+      await deleteDoc(doc(db, "pushTokens", token)).catch(() => {});
+      await messaging().then(({ m, it }) => m.deleteToken(it)).catch(() => {});
+    },
+  };
+  if (vapidKey) $("#pushOpen").hidden = false;
+  // Tokens can rotate: re-save this device's token (under the signed-in account) once per launch.
+  async function refreshPush() {
+    const old = localStorage.getItem(PUSH_ON);
+    if (!vapidKey || !old || permission() !== "granted" || !auth.currentUser) return;
+    try {
+      const token = await pushToken();
+      if (token !== old) await deleteDoc(doc(db, "pushTokens", old)).catch(() => {});
+      await saveToken(token);
+    } catch (err) { console.warn("Notification token not refreshed:", err.code || err); }
+  }
 
   // ---------- Account UI ----------
   function renderAccount(user) {

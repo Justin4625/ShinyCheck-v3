@@ -1,0 +1,40 @@
+# Send a notification to everyone who turned them on in ShinyCheck.
+# Actions → Send notification → Run workflow, or:
+#   gh workflow run notify.yml -f title="Sun & Moon has been added" -f body="Track your Alola shinies" -f url=/sm
+name: Send notification
+
+on:
+  workflow_dispatch:
+    inputs:
+      title:
+        description: Title
+        required: true
+      body:
+        description: Message
+        required: false
+        default: ""
+      url:
+        description: Page to open when tapped (e.g. /sm)
+        required: false
+        default: /
+      dry_run:
+        description: Only count subscribed devices, send nothing
+        type: boolean
+        default: false
+
+jobs:
+  send:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install --no-save --no-package-lock firebase-admin@13
+      - run: node scripts/send-push.mjs
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          TITLE: ${{ inputs.title }}
+          BODY: ${{ inputs.body }}
+          URL: ${{ inputs.url }}
+          DRY_RUN: ${{ inputs.dry_run }}

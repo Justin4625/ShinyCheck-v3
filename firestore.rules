@@ -37,5 +37,16 @@ service cloud.firestore {
         && request.resource.data.counts is map
         && request.resource.data.data is map;
     }
+
+    // Notifications: one document per device that turned them on, keyed by its FCM token.
+    // Written by the signed-in app, never read by it (the send script uses the Admin SDK).
+    match /pushTokens/{token} {
+      allow create, update: if request.auth != null
+        && token.size() <= 400
+        && request.resource.data.keys().hasOnly(['uid', 'createdAt'])
+        && request.resource.data.uid == request.auth.uid
+        && request.resource.data.createdAt == request.time;
+      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
+    }
   }
 }

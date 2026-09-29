@@ -1121,6 +1121,10 @@ body.gated { overflow: hidden; }
 .v2-empty { font-size: 14px; padding: 10px 0; }
 .v2-go[hidden] { display: none; }
 .v2-import .rl-go { opacity: 1; pointer-events: auto; }
+.push-state { margin: 14px 0 2px; }
+.push-state .v2-note { margin: 0; }
+.push-state .v2-note:not(.ok):not(.warn) { background: var(--surface-2); color: var(--muted); }
+.push-state .v2-note b { color: var(--text); }
 
 /* reCAPTCHA (App Check): the floating badge is hidden; the required notice sits on the login card. */
 .grecaptcha-badge { visibility: hidden !important; }

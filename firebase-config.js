@@ -17,3 +17,7 @@ export const googleClientId = "723087237579-gk9gi4c1dhtgkhmfvoiudhjb0ktrnp3i.app
 
 // reCAPTCHA v3 site key for Firebase App Check (public). null = App Check off.
 export const appCheckSiteKey = null;
+
+// Web Push key pair for notifications (public). Firebase console → Project settings → Cloud
+// Messaging → Web configuration → Web Push certificates → "Key pair". null = notifications off.
+export const vapidKey = null;

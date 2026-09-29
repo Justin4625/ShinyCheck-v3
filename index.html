@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260929231639">
+  <link rel="stylesheet" href="style.css?v=20260929233630">
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -78,6 +78,7 @@
           <button class="ghost-btn square" id="themeBtn" title="Light / dark">◐</button>
         </div>
         <button class="link-btn" id="backupsOpen">Backups</button>
+        <button class="link-btn" id="pushOpen" hidden>Notifications</button>
         <button class="link-btn" id="v2Open">Import from ShinyCheck V2</button>
         <button class="link-btn" id="reset">Reset collection</button>
       </div>
@@ -404,6 +405,18 @@
     </div>
   </div>
 
+  <!-- Notifications: update news on this device -->
+  <div class="roulette v2-import" id="pushDlg" hidden>
+    <div class="rl-card v2-card" role="dialog" aria-modal="true" aria-labelledby="pushTitle">
+      <button class="dr-icon rl-close" data-pushclose aria-label="Close">✕</button>
+      <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> ShinyCheck news</p>
+      <h3 class="v2-title" id="pushTitle">Notifications</h3>
+      <p class="v2-fine">Get a notification when ShinyCheck adds something new, like a new game or feature. Only real updates, no spam.</p>
+      <div class="push-state" id="pushState"></div>
+      <div class="rl-actions" id="pushActions"></div>
+    </div>
+  </div>
+
   <!-- Install on iPhone / iPad: Safari has no install prompt, so explain the two taps -->
   <div class="roulette v2-import" id="installHelp" hidden>
     <div class="rl-card v2-card" role="dialog" aria-modal="true" aria-labelledby="installTitle">
@@ -436,9 +449,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=20260929231639"></script>
-  <script src="evo.js?v=20260929231639"></script>
-  <script src="app.js?v=20260929231639"></script>
-  <script type="module" src="cloud.js?v=20260929231639"></script>
+  <script src="data.js?v=20260929233630"></script>
+  <script src="evo.js?v=20260929233630"></script>
+  <script src="app.js?v=20260929233630"></script>
+  <script type="module" src="cloud.js?v=20260929233630"></script>
 </body>
 </html>
