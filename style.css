@@ -975,3 +975,13 @@ body.gated { overflow: hidden; }
   padding: 3px 5px; border-radius: 6px; color: var(--accent, var(--muted));
   border: 1px dashed color-mix(in srgb, var(--accent, var(--muted)) 60%, transparent);
 }
+
+/* Recommended */
+.rec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.rec-head .mini-label { margin: 0; }
+.rec-shuffle {
+  width: 26px; height: 26px; display: grid; place-items: center; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--muted); transition: color .2s, transform .3s;
+}
+.rec-shuffle:hover { color: var(--text); transform: rotate(180deg); }
+.rec-shuffle svg { width: 13px; height: 13px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }

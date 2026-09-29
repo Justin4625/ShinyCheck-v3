@@ -183,6 +183,24 @@
 
   const empty = input => `<div class="empty-state">${sparkSvg()}No Pokémon found${input.value ? ` for “${esc(input.value)}”` : ""}</div>`;
 
+  // Recommended: missing shinies you can actually hunt — not shiny locked or event only,
+  // and in at least one tracked game. A random order is drawn once per page load (and on
+  // shuffle) so the picks stay put while you click around.
+  let recOrder = [];
+  const shuffleRecs = () => {
+    recOrder = mons.map(m => m.id);
+    for (let i = recOrder.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [recOrder[i], recOrder[j]] = [recOrder[j], recOrder[i]];
+    }
+  };
+  shuffleRecs();
+  const huntable = m => !shinyStatus(m) && GAMES.some(g => m.games[g]) && m.sprite;
+  function recommended(scope) {
+    const ok = new Set(scope.filter(m => !has(m) && huntable(m)).map(m => m.id));
+    return recOrder.filter(id => ok.has(id)).slice(0, 6).map(id => mons.find(m => m.id === id));
+  }
+
   // ---------- Living Dex ----------
   const homeScope = m => !state.gen || m.gen === state.gen;
   // The Forms toggle decides whether alternate forms count towards totals and percentages:
@@ -226,10 +244,10 @@
         <span class="r-bar" style="width:${pct(l)}%"></span>
       </button>`).join("");
 
-    const next = pool.filter(m => homeScope(m) && !has(m) && m.sprite).slice(0, 6);
+    const next = recommended(pool.filter(homeScope));
     el.upNext.innerHTML = next.length
-      ? next.map(m => `<button data-jump="${m.id}" title="#${m.dex} ${esc(m.name)}${m.form ? " (" + esc(m.form) + ")" : ""}"><img src="${m.sprite}" alt="${esc(m.name)}"></button>`).join("")
-      : `<p class="up-next-empty">Nothing left to find here ✦</p>`;
+      ? next.map(m => `<button data-jump="${m.id}" title="#${m.dex} ${esc(m.name)}${m.form ? " (" + esc(m.form) + ")" : ""} — hunt in ${esc(GAMES.filter(g => m.games[g]).map(g => GAME_INFO[g].abbr).reverse().join(", "))}"><img src="${m.sprite}" alt="${esc(m.name)}"></button>`).join("")
+      : `<p class="up-next-empty">Nothing left to hunt here ✦</p>`;
 
     for (const g of Object.keys(genNames)) updateSection(el.cards, g, pool.filter(m => m.gen === +g));
     renderSidebar();
@@ -1032,17 +1050,12 @@
     const t = e.target.closest(".seg");
     if (t) { state.tab = t.dataset.tab; renderGame(); }
   });
+  // A recommendation opens its Dex Entry, where "Hunt it in" starts the hunt.
   el.upNext.addEventListener("click", e => {
     const b = e.target.closest("[data-jump]");
-    if (!b) return;
-    let c = el.cards.querySelector(`.pcard[data-id="${b.dataset.jump}"]`);
-    if (!c) { el.q.value = ""; state.missing = false; $("#fMissing").setAttribute("aria-pressed", "false"); render(); c = el.cards.querySelector(`.pcard[data-id="${b.dataset.jump}"]`); }
-    if (!c) return;
-    c.scrollIntoView({ behavior: "smooth", block: "center" });
-    c.classList.remove("flash");
-    void c.offsetWidth;
-    c.classList.add("flash");
+    if (b) openEntry(+b.dataset.jump);
   });
+  $("#recShuffle").addEventListener("click", () => { shuffleRecs(); renderHomeStats(); });
 
   $("#fShare").addEventListener("click", () => {
     prefs.shareAcrossGames = !sharing();
