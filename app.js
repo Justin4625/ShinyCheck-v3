@@ -2,8 +2,9 @@
   const STORE = "livingdex-za-v1";
   const THEME = "livingdex-theme";
   const GAMES = ["swsh", "bdsp", "pla", "sv", "lza"];
-  // Games a shiny can be logged in. GO has no regional dex or hunt page, only logs.
-  const LOG_GAMES = [...GAMES, "pogo"];
+  // Places a shiny can be logged. GO and HOME have no regional dex or hunt page, only
+  // logs, and no odds (HOME shinies are gifts; GO odds aren't tracked).
+  const LOG_GAMES = [...GAMES, "pogo", "home"];
 
   // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
   const GAME_INFO = {
@@ -17,7 +18,8 @@
             sections: [["P", "Paldea"], ["K", "Kitakami"], ["B", "Blueberry"]] },
     lza:  { name: "Legends: Z-A", accent: "#06b6d4", accent2: "#2bd67b", logo: "logos/plzaLogo.png",
             sections: [["", "Lumiose"], ["M", "Mega Dimension"]] },
-    pogo: { name: "Pokémon GO", short: "GO", accent: "#10b981", accent2: "#3b82f6", logOnly: true, sections: [] },
+    pogo: { name: "Pokémon GO", short: "GO", accent: "#10b981", accent2: "#3b82f6", logOnly: true, noOdds: true, sections: [] },
+    home: { name: "Pokémon HOME", short: "HOME", accent: "#14b8a6", accent2: "#6366f1", logOnly: true, noOdds: true, sections: [] },
   };
   const gamePrefix = v => v.replace(/[0-9]/g, "");
   const gameNum = v => +v.replace(/\D/g, "");
@@ -648,7 +650,7 @@
           <span class="en-main">
             <b>${esc(l.m.name)}${l.m.form ? ` <em>${esc(l.m.form)}</em>` : ""}</b>
             <span class="en-game">${esc(g.name)}</span>
-            <small>${fmtDate(l.ts)}${l.odds && l.g !== "pogo" ? ` · 1/${l.odds}` : ""}</small>
+            <small>${fmtDate(l.ts)}${l.odds && !GAME_INFO[l.g].noOdds ? ` · 1/${l.odds}` : ""}</small>
           </span>
           <span class="en-nums"><b>${nf(l.count)}</b><small>${fmtShort(l.time)}</small></span>
         </button>
@@ -677,14 +679,16 @@
       </li>`;
     }).join("") : `<li class="log-empty">No shinies logged for ${esc(m.name)} yet. Start a hunt below ✦</li>`;
 
-    const addGames = LOG_GAMES.filter(g => g === "pogo" || m.games[g]);
+    const addGames = LOG_GAMES.filter(g => GAME_INFO[g].logOnly || m.games[g]);
+    // Shinies that only exist as Pokémon HOME gifts start with HOME selected.
+    const preset = (EVENT_ONLY[+m.dex] || "").includes("Pokémon HOME gift") ? "home" : addGames[0];
     const now = new Date(), nowLocal = new Date(now - now.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
     $("#enAdd").innerHTML = adding ? `<div class="en-add-form">
-        <label class="wide">Game<select name="game">${addGames.map(g => `<option value="${g}">${esc(GAME_INFO[g].name)}</option>`).join("")}</select></label>
+        <label class="wide">Game<select name="game">${addGames.map(g => `<option value="${g}" ${g === preset ? "selected" : ""}>${esc(GAME_INFO[g].name)}</option>`).join("")}</select></label>
         <label>Encounters<input type="number" min="0" name="count" value="0"></label>
         <label>Hours<input type="number" min="0" name="h" value="0"></label>
         <label>Min<input type="number" min="0" max="59" name="m" value="0"></label>
-        <label class="en-odds">Odds<select name="odds">${ODDS.map(o => `<option value="${o}" ${o === 4096 ? "selected" : ""}>1/${o}</option>`).join("")}</select></label>
+        <label class="en-odds" ${GAME_INFO[preset].noOdds ? "hidden" : ""}>Odds<select name="odds">${ODDS.map(o => `<option value="${o}" ${o === 4096 ? "selected" : ""}>1/${o}</option>`).join("")}</select></label>
         <label class="wide">Caught on<input type="datetime-local" name="ts" value="${nowLocal}"></label>
         <div class="en-edit-actions">
           <button class="en-save" data-add-save>Add ${esc(m.name)}${m.form && m.form !== "Original" ? ` (${esc(m.form)})` : ""} ✦</button>
@@ -703,10 +707,10 @@
       : `<p class="en-none">Not obtainable in the tracked games.</p>`;
   }
 
-  // GO has no odds to pick; main-series games default to the odds last used there.
+  // GO and HOME have no odds to pick; main-series games default to the odds last used there.
   en.root.addEventListener("change", e => {
     if (e.target.name !== "game" || !e.target.closest(".en-add-form")) return;
-    const form = e.target.closest(".en-add-form"), go = e.target.value === "pogo";
+    const form = e.target.closest(".en-add-form"), go = !!GAME_INFO[e.target.value].noOdds;
     form.querySelector(".en-odds").hidden = go;
     if (!go) form.querySelector('[name="odds"]').value = (prefs[e.target.value] || {}).odds || 4096;
   });
@@ -720,7 +724,7 @@
       const f = addBtn.closest(".en-add-form"), val = n => f.querySelector(`[name="${n}"]`).value;
       const g = val("game"), ts = new Date(val("ts")).getTime(), num = n => Math.max(0, +val(n) || 0);
       const k = hk(g, entryMon.id);
-      (shinies[k] = shinies[k] || []).push({ count: num("count"), time: num("h") * 3600 + num("m") * 60, odds: g === "pogo" ? null : +val("odds"), ts: isNaN(ts) ? Date.now() : ts, manual: true });
+      (shinies[k] = shinies[k] || []).push({ count: num("count"), time: num("h") * 3600 + num("m") * 60, odds: GAME_INFO[g].noOdds ? null : +val("odds"), ts: isNaN(ts) ? Date.now() : ts, manual: true });
       shinies[k].sort((x, y) => x.ts - y.ts);
       saveShinies();
       adding = false;
