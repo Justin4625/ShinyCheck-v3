@@ -3,13 +3,15 @@
   const BASE = new URL(".", document.currentScript.src).pathname;
   const STORE = "livingdex-za-v1";
   const THEME = "livingdex-theme";
-  const GAMES = ["usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"];
+  const GAMES = ["sm", "usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"];
   // Places a shiny can be logged. GO and HOME have no regional dex or hunt page, only
   // logs, and no odds (HOME shinies are gifts; GO odds aren't tracked).
   const LOG_GAMES = [...GAMES, "pogo", "home"];
 
   // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
   const GAME_INFO = {
+    sm:   { nativeForms: ["Alolan"], name: "Sun & Moon", abbr: "SM", released: "2016-11-18", accent: "#f5a300", accent2: "#6f4fd8",
+            logo: "logos/smLogo.png", sections: [["", "Alola"], ["O", "Outside the dex"]] },
     usum: { nativeForms: ["Alolan"], name: "Ultra Sun & Ultra Moon", abbr: "USUM", released: "2017-11-17", accent: "#f08a1c", accent2: "#3b78d8",
             logo: "logos/usumLogo.png", sections: [["", "Alola"], ["O", "Outside the dex"]] },
     lgpe: { name: "Let's Go Pikachu & Eevee", abbr: "LGPE", released: "2018-11-16", accent: "#f2b705", accent2: "#a8672f", logo: "logos/lgpeLogo.png",
@@ -77,6 +79,7 @@
   // Zone 20, the PLA starters in outbreaks). "dex:Form" locks only that form; evolutions of a
   // locked-only line are locked too.
   const GAME_LOCKS = {
+    sm: [718, 785, 786, 787, 788, 791, 792, 793, 794, 795, 796, 797, 798, 799, 800],
     usum: [718, 785, 786, 787, 788, 791, 792, 800],
     swsh: [772, 773, 803, 804, 888, 889, "144:Galarian", "145:Galarian", "146:Galarian"],
     bdsp: [151, 385],
@@ -521,6 +524,8 @@
     // Shiny Charm +2; best 1/273 (checked against RotomLabs / PokéStats / RankedBoost).
     usum: { methods: [["wild", "Wild / SOS", 1, ["charm", "sos"]], ["masuda", "Masuda", 6, ["charm"]]],
       bonus: [{ ...CHARM, rolls: 2 }, { id: "sos", label: "SOS chain", type: "level", levels: [["–", 0], ["11+", 4], ["21+", 8], ["31+", 12]] }] },
+    // Sun & Moon share Gen 7's SOS, Masuda and Shiny Charm rules with USUM.
+    get sm() { return this.usum; },
     // Let's Go: rolls from a Lure (+1), the Shiny Charm (+2) and the species' Catch Combo
     // (11+ → +3, 21+ → +7, 31+ → +11); all three together give 1/273.
     lgpe: { methods: [["wild", "Wild", 1, ["charm", "lure", "combo"]]],

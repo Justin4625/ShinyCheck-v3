@@ -3,7 +3,7 @@
 Shiny Dex and shiny-hunt tracker for Pokémon. Plain HTML, CSS and JavaScript — no build step.
 
 - **Shiny Dex** — all 1,081 Pokémon and forms. A card glows once a shiny of it is logged in any game.
-- **Games** — Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes.
+- **Games** — Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
 - **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore.
