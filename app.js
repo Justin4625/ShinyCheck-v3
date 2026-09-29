@@ -1,4 +1,6 @@
 (() => {
+  // Where the app lives: "/" on shinycheck.nl, "/ShinyCheck-v3/" on github.io.
+  const BASE = new URL(".", document.currentScript.src).pathname;
   const STORE = "livingdex-za-v1";
   const THEME = "livingdex-theme";
   const GAMES = ["swsh", "bdsp", "pla", "sv", "lza"];
@@ -118,7 +120,7 @@
     q: $("#q"), gq: $("#gq"), toast: $("#toast"),
   };
   // page: "" = Living Dex, otherwise a game id. tab = regional dex on a game page.
-  // huntsView: the Active hunts page (#/hunts); page stays "" there.
+  // huntsView: the Active hunts page (/hunts); page stays "" there.
   const state = { huntsView: false, page: "", gen: 0, tab: "", missing: false, forms: true, gMissing: false, gForms: true };
 
   const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
@@ -369,7 +371,7 @@
     // Newest release first (GAMES itself runs oldest → newest).
     el.sideGames.innerHTML = [...GAMES].reverse().map(id => {
       const g = GAME_INFO[id], l = mons.filter(m => m.games[id] && inGamePool(m, id));
-      return `<a class="side-item ${state.page === id ? "active" : ""}" href="#/${id}" style="--c:${g.accent};--g:${gameGrad(g)}">
+      return `<a class="side-item ${state.page === id ? "active" : ""}" href="${BASE}${id}" style="--c:${g.accent};--g:${gameGrad(g)}">
         <span class="side-icon"></span>
         <span class="side-name">${esc(g.name)}</span>
         <span class="side-pct">${fmtPct(pct(l, gHas(id)))}</span>
@@ -995,7 +997,7 @@
     if (hunt) {
       pendingHunt = entryMon.id;
       closeEntry();
-      location.hash = "#/" + hunt.dataset.hunt;
+      navigate(hunt.dataset.hunt);
       return;
     }
     const box = e.target.closest(".en-edit");
@@ -1285,9 +1287,15 @@
     if (e.key === "Escape") document.body.classList.remove("menu-open");
   });
 
-  // Routing: #/ is the Living Dex, #/<game> a game page.
+  // Routing with clean paths: / is the Shiny Dex, /<game> a game page, /hunts the hunts.
+  // GitHub Pages has no server routing, so 404.html sends unknown paths back to the app
+  // as ?p=/<path>; old #/<path> links keep working too.
+  function navigate(path, replace = false) {
+    history[replace ? "replaceState" : "pushState"](null, "", BASE + path.replace(/^\//, ""));
+    route();
+  }
   function route() {
-    const id = location.hash.replace(/^#\/?/, "");
+    const id = location.pathname.startsWith(BASE) ? decodeURIComponent(location.pathname.slice(BASE.length)).replace(/\/$/, "") : "";
     const page = GAME_INFO[id] && !GAME_INFO[id].logOnly ? id : "";
     const huntsView = id === "hunts";
     if (page !== state.page || huntsView !== state.huntsView) {
@@ -1297,7 +1305,22 @@
     render();
     if (pendingHunt && state.page) { openDrawer(pendingHunt); pendingHunt = null; }
   }
-  addEventListener("hashchange", route);
+  addEventListener("popstate", route);
+  addEventListener("hashchange", () => { if (location.hash.startsWith("#/")) navigate(location.hash.slice(2), true); });
+  // Internal links navigate without reloading the page.
+  document.addEventListener("click", e => {
+    const a = e.target.closest("a[href]");
+    if (!a || a.target || e.metaKey || e.ctrlKey || e.shiftKey || e.button) return;
+    const url = new URL(a.href, location.href);
+    if (url.origin !== location.origin || !url.pathname.startsWith(BASE) || url.hash) return;
+    e.preventDefault();
+    navigate(url.pathname.slice(BASE.length));
+  });
+  {
+    const redirected = new URLSearchParams(location.search).get("p");
+    if (redirected !== null) history.replaceState(null, "", BASE + redirected.replace(/^\//, "") + location.hash);
+    else if (location.hash.startsWith("#/")) history.replaceState(null, "", BASE + location.hash.slice(2));
+  }
 
   // Mobile menu
   $("#menuBtn").addEventListener("click", () => document.body.classList.add("menu-open"));
