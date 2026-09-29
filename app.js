@@ -724,9 +724,11 @@
       f.style.left = 40 + Math.random() * 20 + "%";
       dr.float.append(f);
       setTimeout(() => f.remove(), 900);
-      dr.count.classList.remove("bump");
-      void dr.count.offsetWidth;
-      dr.count.classList.add("bump");
+      for (const c of [dr.count, pip && pip.document.querySelector(".pip-count")].filter(Boolean)) {
+        c.classList.remove("bump");
+        void c.offsetWidth;
+        c.classList.add("bump");
+      }
     }
   }
 
@@ -1336,17 +1338,22 @@
     if (document.documentElement.dataset.theme) d.documentElement.dataset.theme = document.documentElement.dataset.theme;
     d.body.className = "pip-body";
     d.body.innerHTML = `<div class="pip">
-      <img class="pip-img" alt="">
-      <div class="pip-info"><span class="pip-name"></span><span class="pip-time"></span></div>
-      <button class="pip-play"></button>
-      <div class="pip-row">
-        <span class="pip-count"></span>
-        <button class="pip-minus"></button>
-        <button class="pip-plus"></button>
+      <button class="pip-stage" title="+1 (Space)"><img class="pip-img" alt=""></button>
+      <div class="pip-info">
+        <span class="pip-game"></span>
+        <span class="pip-name"></span>
+        <span class="pip-time"><i></i><b></b></span>
       </div>
+      <button class="pip-play" title="Start / pause (P)"></button>
+      <div class="pip-row">
+        <div class="pip-tally"><span class="pip-count"></span><span class="pip-odds"></span></div>
+        <button class="pip-minus" title="−1 (−)"></button>
+        <button class="pip-plus" title="+1 (Space)"></button>
+      </div>
+      <div class="pip-meter"><i></i></div>
     </div>`;
     d.querySelector(".pip-plus").onclick = () => addEncounter(1);
-    d.querySelector(".pip-img").onclick = () => addEncounter(1);
+    d.querySelector(".pip-stage").onclick = () => addEncounter(1);
     d.querySelector(".pip-minus").onclick = () => addEncounter(-1);
     d.querySelector(".pip-play").onclick = togglePlay;
     pip.addEventListener("keydown", e => {
@@ -1372,9 +1379,14 @@
     const img = d.querySelector(".pip-img");
     const src = new URL(cur.sprite || "", location.href).href;
     if (img.src !== src) img.src = src;
+    d.querySelector(".pip-game").textContent = g.abbr;
     d.querySelector(".pip-name").textContent = cur.name + (cur.form ? ` · ${cur.form}` : "");
-    d.querySelector(".pip-time").textContent = fmtTime(s);
+    d.querySelector(".pip-time b").textContent = fmtTime(s);
     d.querySelector(".pip-count").textContent = nf(h.count);
+    // Same luck meter as the Hunt Deck: chance a hunter would have found it by now.
+    const p = 1 - Math.pow(1 - 1 / h.odds, h.count);
+    d.querySelector(".pip-odds").textContent = `1/${nf(h.odds)}${h.count ? ` · ${(h.count / h.odds).toFixed(2)}×` : ""}`;
+    d.querySelector(".pip-meter i").style.width = Math.min(100, p * 100) + "%";
     d.querySelector(".pip-plus").textContent = h.since ? `+${h.inc}` : "▶";
     d.querySelector(".pip-minus").textContent = `−${h.inc}`;
     d.querySelector(".pip-play").textContent = h.since ? "❚❚" : "▶";

@@ -670,36 +670,81 @@ body.drawer-open { overflow: hidden; }
 }
 
 /* ---------- Pop-out mini window ---------- */
-.pip-body { margin: 0; height: 100vh; overflow: hidden; background: var(--bg-2); color: var(--text); font-family: var(--font); }
+.pip-body {
+  margin: 0; height: 100vh; overflow: hidden; color: var(--text); font-family: var(--font); user-select: none;
+  background:
+    radial-gradient(120% 90% at 0% 0%, color-mix(in srgb, var(--accent) 26%, transparent), transparent 60%),
+    radial-gradient(90% 80% at 100% 100%, color-mix(in srgb, var(--accent2) 22%, transparent), transparent 60%),
+    var(--bg-2);
+}
+/* Fits the 360×196 window and scales a little when it's resized. */
 .pip {
-  height: 100%; box-sizing: border-box; padding: 10px; display: grid; gap: 8px;
-  grid-template-columns: 64px minmax(0, 1fr) auto; grid-template-rows: 64px 1fr;
+  position: relative; height: 100%; box-sizing: border-box; padding: 12px 12px 14px; display: grid; gap: 8px 10px;
+  grid-template-columns: auto minmax(0, 1fr) auto; grid-template-rows: auto 1fr;
 }
-.pip-img {
-  width: 64px; height: 64px; object-fit: contain; cursor: pointer; border-radius: 16px;
-  background: radial-gradient(circle, color-mix(in srgb, var(--accent) 40%, transparent), transparent 70%), var(--surface);
-  border: 1px solid var(--border);
+.pip-stage {
+  position: relative; width: clamp(58px, 20vw, 84px); aspect-ratio: 1; padding: 0; cursor: pointer; border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: radial-gradient(circle at 50% 60%, color-mix(in srgb, var(--accent) 38%, transparent), transparent 68%), var(--surface);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 10%, transparent), 0 8px 22px -10px var(--accent);
 }
-.pip-info { display: flex; flex-direction: column; justify-content: center; gap: 4px; min-width: 0; }
-.pip-name { font-size: 16px; font-weight: 800; letter-spacing: -.02em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.pip-time { font: 700 15px/1 var(--mono); color: var(--muted); white-space: nowrap; }
-.pip-body.running .pip-time { color: var(--accent); }
+.pip-stage::after {
+  content: ""; position: absolute; inset: -3px; border-radius: 50%; padding: 2px; opacity: 0; transition: opacity .3s;
+  background: var(--holo-conic); -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude;
+}
+.pip-body.running .pip-stage::after { opacity: .9; animation: pip-spin 4s linear infinite; }
+@property --spin { syntax: "<angle>"; inherits: false; initial-value: 0deg; }
+@keyframes pip-spin { to { --spin: 360deg; } }
+.pip-img { width: 100%; height: 100%; box-sizing: border-box; padding: 10%; object-fit: contain; image-rendering: auto; filter: drop-shadow(0 4px 6px rgba(0, 0, 0, .35)); }
+.pip-body.running .pip-img { animation: pip-bob 2.4s ease-in-out infinite; }
+@keyframes pip-bob { 50% { transform: translateY(-3px); } }
+.pip-stage:active { transform: scale(.95); }
+
+.pip-info { display: flex; flex-direction: column; justify-content: center; gap: 5px; min-width: 0; }
+.pip-game {
+  align-self: flex-start; font: 700 9px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; padding: 4px 7px; border-radius: 99px;
+  color: #fff; background: linear-gradient(100deg, var(--accent), var(--accent2));
+}
+.pip-name { font-size: 17px; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pip-time { display: flex; align-items: center; gap: 6px; font: 700 13px/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.pip-time i { width: 7px; height: 7px; border-radius: 50%; background: var(--faint); flex: none; }
+.pip-body.running .pip-time { color: var(--text); }
+.pip-body.running .pip-time i { background: var(--accent); box-shadow: 0 0 0 0 var(--accent); animation: pip-pulse 1.6s ease-out infinite; }
+@keyframes pip-pulse { 70%, 100% { box-shadow: 0 0 0 6px transparent; } }
 .pip-play {
-  align-self: center; width: 44px; height: 44px; border-radius: 12px; cursor: pointer; font-size: 14px;
+  align-self: center; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 13px; display: grid; place-items: center;
   border: 1px solid var(--border-2); background: var(--surface); color: var(--text);
 }
 .pip-body.running .pip-play { background: var(--text); color: var(--bg); border-color: transparent; }
-.pip-row { grid-column: 1 / -1; display: flex; align-items: center; gap: 6px; }
-.pip-count { flex: 1; min-width: 0; font-size: 44px; font-weight: 800; letter-spacing: -.05em; line-height: 1; font-variant-numeric: tabular-nums; }
+
+.pip-row { grid-column: 1 / -1; display: flex; align-items: stretch; gap: 8px; min-height: 0; }
+.pip-tally { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+.pip-count {
+  font-size: clamp(34px, 13vw, 56px); font-weight: 800; letter-spacing: -.05em; line-height: .9; font-variant-numeric: tabular-nums;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; transform-origin: left center;
+}
+.pip-count.bump { animation: bump .25s ease-out; }
+.pip-odds { font: 700 10px/1 var(--mono); letter-spacing: .06em; color: var(--muted); white-space: nowrap; }
 .pip-minus {
-  width: 46px; height: 100%; max-height: 64px; border-radius: 14px; cursor: pointer; font-weight: 800; font-size: 15px;
-  border: 1px solid var(--border); background: var(--surface); color: var(--muted);
+  width: 44px; max-height: 60px; border-radius: 14px; cursor: pointer; font-weight: 800; font-size: 14px;
+  border: 1px solid var(--border-2); background: color-mix(in srgb, var(--surface) 80%, transparent); color: var(--muted);
 }
 .pip-plus {
-  width: 110px; height: 100%; max-height: 64px; border: 0; border-radius: 14px; cursor: pointer; color: #fff;
-  font-size: 24px; font-weight: 800; background: linear-gradient(100deg, var(--accent), var(--accent2));
+  position: relative; overflow: hidden; width: 104px; max-height: 60px; border: 0; border-radius: 14px; cursor: pointer; color: #fff;
+  font-size: 24px; font-weight: 800; letter-spacing: -.02em; background: linear-gradient(100deg, var(--accent), var(--accent2));
+  box-shadow: 0 10px 24px -12px var(--accent), inset 0 1px 0 rgba(255, 255, 255, .25);
 }
+.pip-plus::after {
+  content: ""; position: absolute; inset: 0; transform: translateX(-120%);
+  background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, .35) 50%, transparent 70%);
+}
+.pip-plus:active::after { transform: translateX(120%); transition: transform .45s; }
 .pip-plus:active, .pip-minus:active { transform: scale(.96); }
+.pip-meter { position: absolute; left: 12px; right: 12px; bottom: 6px; height: 3px; border-radius: 3px; background: var(--border); overflow: hidden; }
+.pip-meter i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--holo); transition: width .3s; }
+@media (prefers-reduced-motion: reduce) {
+  .pip-body.running .pip-img, .pip-body.running .pip-stage::after, .pip-body.running .pip-time i { animation: none; }
+}
 
 /* + button while the timer is stopped: it starts the hunt instead of counting */
 .dr-plus.idle { font-size: 20px; letter-spacing: -.01em; }
