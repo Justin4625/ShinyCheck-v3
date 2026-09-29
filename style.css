@@ -1189,3 +1189,10 @@ body.recaptcha .gate-legal { display: block; }
 }
 .en-move-btn:hover { border-color: var(--accent); }
 .en-from { font-style: normal; color: var(--muted); letter-spacing: 0; text-transform: none; }
+
+/* Outside-the-dex location on game cards */
+.where-tag {
+  max-width: 100%; margin-top: 6px; padding: 3px 7px; border-radius: 6px; min-height: 15px;
+  font: 700 9px/1.2 var(--mono); letter-spacing: .03em; color: var(--muted);
+  border: 1px dashed var(--border-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}

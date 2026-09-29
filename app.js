@@ -11,17 +11,17 @@
   // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
   const GAME_INFO = {
     usum: { nativeForms: ["Alolan"], name: "Ultra Sun & Ultra Moon", abbr: "USUM", released: "2017-11-17", accent: "#f08a1c", accent2: "#3b78d8",
-            logo: "logos/usumLogo.png", sections: [["", "Alola"]] },
+            logo: "logos/usumLogo.png", sections: [["", "Alola"], ["O", "Outside the dex"]] },
     lgpe: { name: "Let's Go Pikachu & Eevee", abbr: "LGPE", released: "2018-11-16", accent: "#f2b705", accent2: "#a8672f", logo: "logos/lgpeLogo.png",
             sections: [["", "Kanto"]] },
     swsh: { nativeForms: ["Galarian"], name: "Sword & Shield", abbr: "SwSh", released: "2019-11-15", accent: "#00a1e9", accent2: "#e5006e", logo: "logos/swshLogo.png",
-            sections: [["", "Galar"], ["A", "Isle of Armor"], ["C", "Crown Tundra"]] },
+            sections: [["", "Galar"], ["A", "Isle of Armor"], ["C", "Crown Tundra"], ["O", "Outside the dex"]] },
     bdsp: { name: "Brilliant Diamond & Shining Pearl", abbr: "BDSP", released: "2021-11-19", short: "BD & SP", accent: "#3d7bd9", accent2: "#e77fa6", logo: "logos/bdspLogo.png",
             sections: [["", "Sinnoh"]] },
     pla:  { nativeForms: ["Hisuian", "White Stripe"], name: "Legends: Arceus", abbr: "PLA", released: "2022-01-28", accent: "#d97706", accent2: "#5b3a8c", logo: "logos/plaLogo.png",
             sections: [["", "Hisui"]] },
     sv:   { nativeForms: ["Paldean", "Paldean Combat Breed"], name: "Scarlet & Violet", abbr: "SV", released: "2022-11-18", accent: "#ff4d00", accent2: "#8c00ff", logo: "logos/svLogo.png",
-            sections: [["P", "Paldea"], ["K", "Kitakami"], ["B", "Blueberry"]] },
+            sections: [["P", "Paldea"], ["K", "Kitakami"], ["B", "Blueberry"], ["O", "Outside the dex"]] },
     lza:  { name: "Legends: Z-A", abbr: "Z-A", released: "2025-10-16", accent: "#06b6d4", accent2: "#2bd67b", logo: "logos/plzaLogo.png",
             sections: [["", "Lumiose"], ["M", "Mega Dimension"]] },
     pogo: { name: "Pokémon GO", abbr: "GO", released: "2016-07-06", short: "GO", accent: "#10b981", accent2: "#3b82f6", logOnly: true, noOdds: true, sections: [] },
@@ -170,7 +170,9 @@
       </div>
       <div class="sprite">${m.sprite ? `<img src="${m.sprite}" alt="" loading="lazy" decoding="async">` : `<span class="nosprite">?</span>`}</div>
       <h4 class="pname">${esc(m.name)}</h4>
-      <span class="form-tag ${m.form ? "" : "blank"}" title="${esc(m.form)}">${esc(m.form) || "&nbsp;"}</span>
+      ${gid && outsideOnly(m, gid)
+        ? `<span class="where-tag" title="${esc(whereIn(m, gid))}">${esc(whereIn(m, gid) || "Outside the dex")}</span>`
+        : `<span class="form-tag ${m.form ? "" : "blank"}" title="${esc(m.form)}">${esc(m.form) || "&nbsp;"}</span>`}
       <div class="types">${typeImgs(m)}</div>
       ${isActive(h) ? `<div class="hunt-strip ${h.since ? "live" : ""}"><span>⚡ ${nf(h.count)}</span><span data-live="${m.id}">${fmtTime(elapsed(h))}</span></div>` : ""}
     </article>`;
@@ -238,7 +240,12 @@
     }
     EXTRA[gid] = new Set([...extraIn].filter(([id, n]) => n === seen.get(id)).map(([id]) => id));
   }
-  const isExtraForm = (m, gid) => EXTRA[gid].has(m.id);
+  // "Outside the dex" entries (code O…, e.g. Island Scan or Dynamax Adventures) are catchable
+  // in the game but not part of its regional dex, so they also fall under Extra.
+  const outsideOnly = (m, gid) => codes(m, gid).every(c => gamePrefix(c) === "O");
+  const isExtraForm = (m, gid) => EXTRA[gid].has(m.id) || outsideOnly(m, gid);
+  const whereIn = (m, gid) => (m.where && m.where[gid]) || "";
+  const codeLabel = (m, gid) => outsideOnly(m, gid) ? "outside the dex" : codes(m, gid).join(" / ");
   const inGamePool = (m, gid) => state.gForms || !isExtraForm(m, gid);
   const homeMatch = m => homeScope(m) && matchText(m, el.q) && !(state.missing && has(m)) && (state.forms || !m.variant);
 
@@ -326,7 +333,7 @@
     $("#gCount").textContent = `${items.length} shown`;
     el.gameCards.className = "game-mode";
     el.gameCards.innerHTML = items.length
-      ? sectionHtml(String(g.sections.indexOf(section) + 1).padStart(2, "0"), section[1] + " Dex", "tab", tabAll, items, gameGrad(g), gid)
+      ? sectionHtml(String(g.sections.indexOf(section) + 1).padStart(2, "0"), (section[0] === "O" ? section[1] : section[1] + " Dex"), "tab", tabAll, items, gameGrad(g), gid)
       : empty(el.gq);
     renderGameStats();
   }
@@ -339,7 +346,7 @@
     $("#gameCount").textContent = `${done(all, f)} / ${all.length}`;
     setRing($("#gameRing"), p);
     $("#gameSub").innerHTML = left
-      ? `<b>${left}</b> shinies still to log across ${g.sections.length > 1 ? g.sections.length + " regional dexes" : "the " + g.sections[0][1] + " Dex"}.`
+      ? `<b>${left}</b> shinies still to log across ${(() => { const dx = g.sections.filter(([p]) => p !== "O"); return (dx.length > 1 ? dx.length + " regional dexes" : "the " + dx[0][1] + " Dex") + (dx.length < g.sections.length ? " and beyond" : ""); })()}.`
       : `<b>Complete!</b> Every shiny from ${esc(g.name)} is logged. ✦`;
     for (const [p2] of g.sections) {
       const l = all.filter(inTab(gid, p2));
@@ -598,7 +605,7 @@
     $("#drPhaseQ").value = "";
     for (const [k, v] of [["--accent", g.accent], ["--accent2", g.accent2]]) dr.root.style.setProperty(k, v);
     $("#drGame").textContent = g.name;
-    $("#drMeta").textContent = `#${cur.dex} · ${g.short || g.name} ${codes(cur, curGame).join(" / ")}`;
+    $("#drMeta").textContent = `#${cur.dex} · ${g.short || g.name} ${codeLabel(cur, curGame)}${whereIn(cur, curGame) ? " · " + whereIn(cur, curGame) : ""}`;
     $("#drName").textContent = cur.name;
     $("#drSub").innerHTML = (cur.form ? `<span class="form-tag">${esc(cur.form)}</span>` : "") + statusNote(cur);
     dr.celebrate.classList.remove("show");
@@ -749,7 +756,7 @@
     GAME_INFO[gid].sections.forEach(([p], si) => {
       for (const m of mons) {
         const c = codeIn(m, gid, p);
-        if (c) list.push({ m, code: c, key: si * 10000 + gameNum(c) });
+        if (c) list.push({ m, code: p === "O" ? "Outside dex" : c, key: si * 10000 + gameNum(c) });
       }
     });
     const seen = new Set();
@@ -1050,7 +1057,7 @@
       ? games.map(gid => {
         const g = GAME_INFO[gid], h = hunts[hk(gid, m.id)];
         return `<button class="en-game-chip" data-hunt="${gid}" style="--accent:${g.accent};--accent2:${g.accent2}">
-          <span>${esc(g.short || g.name)}</span><small>${isActive(h) ? `⚡ ${nf(h.count)}` : codes(m, gid).join(" / ")}</small></button>`;
+          <span>${esc(g.short || g.name)}</span><small>${isActive(h) ? `⚡ ${nf(h.count)}` : codeLabel(m, gid)}</small></button>`;
       }).join("")
       : `<p class="en-none">Not obtainable in the tracked games.</p>`;
   }
