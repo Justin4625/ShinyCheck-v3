@@ -36,8 +36,9 @@
     if (e.header) genNames[e.gen] = e.header;
     else mons.push(e);
   }
-  // Legends: Z-A Mega Dimension DLC dex, shown as M001…
-  const LZA_MD = [56,57,979,52,53,863,83,865,104,105,137,233,474,951,952,957,958,959,967,969,970,479,971,972,769,770,352,973,615,977,978,996,997,998,999,1000,211,904,252,253,254,255,256,257,258,259,260,349,350,433,358,876,509,510,517,518,538,539,562,563,867,767,768,827,828,852,853,778,900,877,622,623,821,822,823,174,39,40,926,927,396,397,398,325,326,931,739,740,932,933,934,316,317,41,42,169,935,936,937,942,943,848,849,944,945,335,336,439,122,866,590,591,485,721,638,641,642,647,648,649,720,802,808,809,491,380,381,382,383,384,801,807];
+  // Legends: Z-A Mega Dimension DLC (Hyperspace) dex, shown as M001… — species and order
+  // checked against Serebii's Hyperspace Pokédex.
+  const LZA_MD = [56,57,979,52,53,863,83,865,104,105,137,233,474,951,952,957,958,959,967,969,970,479,971,972,769,770,352,973,615,977,978,996,997,998,999,1000,211,904,252,253,254,255,256,257,258,259,260,349,350,433,358,876,509,510,517,518,538,539,562,563,867,767,768,827,828,852,853,778,900,877,622,623,821,822,823,174,39,40,926,927,396,397,398,325,326,931,739,740,932,933,934,316,317,41,42,169,935,936,937,942,943,848,849,944,945,335,336,439,122,866,590,591,485,721,638,639,640,647,648,649,720,802,808,809,491,380,381,382,383,384,801,807];
   const MD_FORMS = { 52: ["Alolan", "Galarian"], 53: ["Alolan"], 83: ["Galarian"], 105: ["Alolan"], 122: ["Galarian"], 211: ["Hisuian"], 562: ["Galarian"] };
   for (const m of mons) {
     const i = LZA_MD.indexOf(+m.dex);
@@ -207,9 +208,31 @@
   // The Forms toggle decides whether alternate forms count towards totals and percentages:
   // Shiny Dex uses its own toggle, game pages share theirs.
   const homePool = () => mons.filter(m => state.forms || !m.variant);
-  // On a game page the game's own regional forms (nativeForms, e.g. Galarian in Sword &
-  // Shield) belong to its dex; only forms from elsewhere fall under the Forms toggle.
-  const isExtraForm = (m, gid) => !!m.variant && !(GAME_INFO[gid].nativeForms || []).includes(m.form);
+  // "Extra" on game pages: each regional dex number counts once. When several entries share a
+  // number (Raichu and Alolan Raichu on Galar #195), one is the dex entry — the game's own
+  // regional form (nativeForms), else the regular form — and the rest are extra. An entry is
+  // extra for a game if it's extra in every dex of that game it appears in.
+  const EXTRA = {};
+  for (const gid of GAMES) {
+    const seen = new Map(), extraIn = new Map(), native = GAME_INFO[gid].nativeForms || [];
+    const rank = m => native.includes(m.form) ? 0 : !m.variant && ["", "Original", "Basic"].includes(m.form) ? 1 : 2;
+    for (const [p] of GAME_INFO[gid].sections) {
+      const groups = new Map();
+      for (const m of mons) {
+        const c = codeIn(m, gid, p);
+        if (!c) continue;
+        groups.set(c, [...(groups.get(c) || []), m]);
+        seen.set(m.id, (seen.get(m.id) || 0) + 1);
+      }
+      for (const list of groups.values()) {
+        if (list.length < 2) continue;
+        const base = [...list].sort((x, y) => rank(x) - rank(y) || x.id - y.id)[0];
+        for (const m of list) if (m !== base) extraIn.set(m.id, (extraIn.get(m.id) || 0) + 1);
+      }
+    }
+    EXTRA[gid] = new Set([...extraIn].filter(([id, n]) => n === seen.get(id)).map(([id]) => id));
+  }
+  const isExtraForm = (m, gid) => EXTRA[gid].has(m.id);
   const inGamePool = (m, gid) => state.gForms || !isExtraForm(m, gid);
   const homeMatch = m => homeScope(m) && matchText(m, el.q) && !(state.missing && has(m)) && (state.forms || !m.variant);
 
