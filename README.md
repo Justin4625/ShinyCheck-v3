@@ -18,6 +18,12 @@ python3 -m http.server 5173
 
 Then open http://localhost:5173.
 
+## Deploying
+
+Push to `main`; GitHub Pages publishes it within a minute. Scripts and the stylesheet carry a
+`?v=` version so browsers don't keep serving old files — `scripts/bump-version.sh` updates it
+(run it before committing, or install it as a pre-commit hook).
+
 ## Firebase
 
 - `firebase-config.js` — the project's web config (public by design). Set it to `null` for local-only mode.

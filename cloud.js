@@ -1,7 +1,8 @@
 // Accounts + cloud sync (Firebase Auth + Firestore).
 // The app keeps working from localStorage; this module mirrors that state into one
 // Firestore document per account (users/{uid}) and pulls changes from other devices.
-import { firebaseConfig, googleClientId } from "./firebase-config.js";
+// Load the config with the same ?v= cache-busting version as this module.
+const { firebaseConfig, googleClientId } = await import(`./firebase-config.js${new URL(import.meta.url).search}`);
 
 const $ = s => document.querySelector(s);
 const gate = $("#gate");
