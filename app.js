@@ -111,11 +111,13 @@
   const $ = s => document.querySelector(s);
   const el = {
     home: $("#homeView"), game: $("#gameView"), cards: $("#cards"), gameCards: $("#gameCards"),
+    huntsView: $("#huntsView"), huntCards: $("#huntCards"),
     regions: $("#regions"), dexTabs: $("#dexTabs"), sideGames: $("#sideGames"), upNext: $("#upNext"),
     q: $("#q"), gq: $("#gq"), toast: $("#toast"),
   };
   // page: "" = Living Dex, otherwise a game id. tab = regional dex on a game page.
-  const state = { page: "", gen: 0, tab: "", missing: false, forms: true, gMissing: false, gForms: true };
+  // huntsView: the Active hunts page (#/hunts); page stays "" there.
+  const state = { huntsView: false, page: "", gen: 0, tab: "", missing: false, forms: true, gMissing: false, gForms: true };
 
   const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   const matchText = (m, input) => {
@@ -314,13 +316,52 @@
         <span class="side-bar"><i style="width:${pct(l, gHas(id))}%"></i></span>
       </a>`;
     }).join("");
-    document.querySelector('.side-item[data-page=""]').classList.toggle("active", !state.page);
+    document.querySelector('.side-item[data-page=""]').classList.toggle("active", !state.page && !state.huntsView);
+    const live = activeHunts();
+    $("#sideHuntCount").textContent = live.length;
+    $("#sideHuntDot").classList.toggle("on", live.some(x => x.h.since));
+    document.querySelector('.side-item[data-page="hunts"]').classList.toggle("active", state.huntsView);
   }
 
   function render() {
-    el.home.classList.toggle("hidden", !!state.page);
+    el.home.classList.toggle("hidden", !!state.page || state.huntsView);
     el.game.classList.toggle("hidden", !state.page);
-    state.page ? renderGame() : renderHome();
+    el.huntsView.classList.toggle("hidden", !state.huntsView);
+    state.huntsView ? renderHunts() : state.page ? renderGame() : renderHome();
+  }
+
+  // ---------- Active hunts (all games) ----------
+  const activeHunts = () => GAMES.flatMap(gid => mons
+    .filter(m => isActive(hunts[hk(gid, m.id)]))
+    .map(m => ({ gid, m, h: hunts[hk(gid, m.id)] })));
+
+  function renderHunts() {
+    const list = activeHunts(), running = list.filter(x => x.h.since).length;
+    const enc = list.reduce((s, x) => s + x.h.count, 0);
+    $("#huntsSub").innerHTML = list.length
+      ? `<b>${list.length}</b> ${list.length === 1 ? "hunt" : "hunts"} going across ${new Set(list.map(x => x.gid)).size} ${new Set(list.map(x => x.gid)).size === 1 ? "game" : "games"}. ${running ? `${running} running right now.` : "All paused."}`
+      : "No hunts yet. Open a game, pick a Pokémon and press + to start one.";
+    $("#huntsStats").innerHTML = [
+      [list.length, "Active"], [running, "Running"], [nf(enc), "Encounters"],
+      [fmtShort(list.reduce((s, x) => s + elapsed(x.h), 0)), "Hunt time", "huntsTime"],
+    ].map(([v, l, id]) => `<div class="stat"><b ${id ? `id="${id}"` : ""}>${v}</b><span>${l}</span></div>`).join("");
+
+    // Newest game first; inside a game the most recently touched hunt first.
+    el.huntCards.innerHTML = [...GAMES].reverse().map(gid => {
+      const g = GAME_INFO[gid];
+      const items = list.filter(x => x.gid === gid).sort((x, y) => (y.h.updated || 0) - (x.h.updated || 0));
+      if (!items.length) return "";
+      const genc = items.reduce((s, x) => s + x.h.count, 0);
+      return `<section class="dex-section game-mode" data-game="${gid}" style="--accent:${g.accent};--accent2:${g.accent2};--g:${gameGrad(g)}">
+        <div class="section-head">
+          <span class="section-dot"></span>
+          <h3 class="section-title">${esc(g.name)}</h3>
+          <div class="section-meta"><span class="sec-count">${items.length} ${items.length === 1 ? "hunt" : "hunts"} · ${nf(genc)} encounters</span></div>
+        </div>
+        <div class="card-grid">${items.map(x => card(x.m, gid)).join("")}</div>
+      </section>`;
+    }).join("") || `<div class="empty-state">${sparkSvg()}No active hunts yet<small>Start one from any game page — they all gather here.</small></div>`;
+    renderSidebar();
   }
 
   // Drawn in a fixed layer on top of the page so the card's paint containment doesn't clip it.
@@ -373,9 +414,9 @@
     refreshCard();
   }
 
-  function openDrawer(id) {
+  function openDrawer(id, gid = state.page) {
     cur = mons.find(m => m.id === id);
-    curGame = state.page;
+    curGame = gid;
     const g = GAME_INFO[curGame];
     for (const [k, v] of [["--accent", g.accent], ["--accent2", g.accent2]]) dr.root.style.setProperty(k, v);
     $("#drGame").textContent = g.name;
@@ -446,7 +487,9 @@
   }
 
   function refreshCard() {
-    if (!cur || state.page !== curGame) return;
+    if (!cur) return;
+    if (state.huntsView) return renderHunts();
+    if (state.page !== curGame) return renderSidebar();
     const c = el.gameCards.querySelector(`.pcard[data-id="${cur.id}"]`);
     if (c) c.outerHTML = card(cur, curGame);
     renderGameStats();
@@ -554,13 +597,15 @@
     paintLog();
     refreshCard();
   });
+  // On the Active hunts page the same Pokémon can appear for several games.
+  const gameOf = c => (c.closest("[data-game]") || {}).dataset?.game || state.page;
   const step = dir => {
-    const ids = [...el.gameCards.querySelectorAll(".pcard")].map(c => +c.dataset.id);
-    const i = ids.indexOf(cur.id);
-    if (i < 0 || !ids.length) return;
-    const next = ids[(i + dir + ids.length) % ids.length];
-    openDrawer(next);
-    el.gameCards.querySelector(`.pcard[data-id="${next}"]`).scrollIntoView({ block: "nearest" });
+    const cards = [...(state.huntsView ? el.huntCards : el.gameCards).querySelectorAll(".pcard")];
+    const i = cards.findIndex(c => +c.dataset.id === cur.id && gameOf(c) === curGame);
+    if (i < 0) return;
+    const next = cards[(i + dir + cards.length) % cards.length];
+    openDrawer(+next.dataset.id, gameOf(next));
+    next.scrollIntoView({ block: "nearest" });
   };
   $("#drPrev").addEventListener("click", () => step(-1));
   $("#drNext").addEventListener("click", () => step(1));
@@ -927,16 +972,17 @@
   // One clock for everything that runs: the open drawer and live hunt strips on cards.
   setInterval(() => {
     if (cur && hunt().since) { dr.time.textContent = fmtTime(elapsed(hunt())); paintPip(); }
-    if (!state.page) return;
-    for (const n of el.gameCards.querySelectorAll("[data-live]")) {
-      const h = hunts[hk(state.page, n.dataset.live)];
+    for (const n of document.querySelectorAll("#gameCards [data-live], #huntCards [data-live]")) {
+      const gid = gameOf(n);
+      const h = gid && hunts[hk(gid, n.dataset.live)];
       if (h && h.since) n.textContent = fmtTime(elapsed(h));
     }
+    if (state.huntsView && $("#huntsTime")) $("#huntsTime").textContent = fmtShort(activeHunts().reduce((s, x) => s + elapsed(x.h), 0));
   }, 1000);
 
   // ---------- Events ----------
-  for (const root of [el.cards, el.gameCards]) {
-    const activate = c => root === el.gameCards ? openDrawer(+c.dataset.id) : openEntry(+c.dataset.id);
+  for (const root of [el.cards, el.gameCards, el.huntCards]) {
+    const activate = c => root === el.cards ? openEntry(+c.dataset.id) : openDrawer(+c.dataset.id, gameOf(c));
     root.addEventListener("click", e => {
       if (e.target.closest(".wiki")) return;
       const c = e.target.closest(".pcard");
@@ -1005,7 +1051,10 @@
   function route() {
     const id = location.hash.replace(/^#\/?/, "");
     const page = GAME_INFO[id] && !GAME_INFO[id].logOnly ? id : "";
-    if (page !== state.page) { closeDrawer(); closeEntry(); state.page = page; state.tab = ""; el.gq.value = ""; scrollTo(0, 0); }
+    const huntsView = id === "hunts";
+    if (page !== state.page || huntsView !== state.huntsView) {
+      closeDrawer(); closeEntry(); state.page = page; state.huntsView = huntsView; state.tab = ""; el.gq.value = ""; scrollTo(0, 0);
+    }
     document.body.classList.remove("menu-open");
     render();
     if (pendingHunt && state.page) { openDrawer(pendingHunt); pendingHunt = null; }

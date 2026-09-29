@@ -960,3 +960,11 @@ body.gated { overflow: hidden; }
 .gp-tile:has(input:focus-visible) { outline: 2px solid var(--brand); outline-offset: 2px; }
 .gp-group[hidden], .gp-empty[hidden] { display: none; }
 .gp-empty { margin: 0; font-size: 13px; color: var(--muted); }
+
+/* ---------- Active hunts ---------- */
+.side-hunts { grid-template-rows: auto; }
+.hunt-dot { background: var(--border-2); box-shadow: none; }
+.hunt-dot.on { background: #ff4d6d; box-shadow: 0 0 0 3px rgba(255, 77, 109, .25); animation: blink 1.2s steps(2) infinite; }
+.hunts-hero { margin-bottom: 26px; }
+.section-dot { width: 14px; height: 14px; border-radius: 50%; align-self: center; background: var(--g); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
+#huntCards .section-head { align-items: center; }
