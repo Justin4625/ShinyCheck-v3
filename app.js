@@ -8,13 +8,13 @@
 
   // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
   const GAME_INFO = {
-    swsh: { name: "Sword & Shield", abbr: "SwSh", released: "2019-11-15", accent: "#00a1e9", accent2: "#e5006e", logo: "logos/swshLogo.png",
+    swsh: { nativeForms: ["Galarian"], name: "Sword & Shield", abbr: "SwSh", released: "2019-11-15", accent: "#00a1e9", accent2: "#e5006e", logo: "logos/swshLogo.png",
             sections: [["", "Galar"], ["A", "Isle of Armor"], ["C", "Crown Tundra"]] },
     bdsp: { name: "Brilliant Diamond & Shining Pearl", abbr: "BDSP", released: "2021-11-19", short: "BD & SP", accent: "#3d7bd9", accent2: "#e77fa6", logo: "logos/bdspLogo.png",
             sections: [["", "Sinnoh"]] },
-    pla:  { name: "Legends: Arceus", abbr: "PLA", released: "2022-01-28", accent: "#d97706", accent2: "#5b3a8c", logo: "logos/plaLogo.png",
+    pla:  { nativeForms: ["Hisuian", "White Stripe"], name: "Legends: Arceus", abbr: "PLA", released: "2022-01-28", accent: "#d97706", accent2: "#5b3a8c", logo: "logos/plaLogo.png",
             sections: [["", "Hisui"]] },
-    sv:   { name: "Scarlet & Violet", abbr: "SV", released: "2022-11-18", accent: "#ff4d00", accent2: "#8c00ff", logo: "logos/svLogo.png",
+    sv:   { nativeForms: ["Paldean", "Paldean Combat Breed"], name: "Scarlet & Violet", abbr: "SV", released: "2022-11-18", accent: "#ff4d00", accent2: "#8c00ff", logo: "logos/svLogo.png",
             sections: [["P", "Paldea"], ["K", "Kitakami"], ["B", "Blueberry"]] },
     lza:  { name: "Legends: Z-A", abbr: "Z-A", released: "2025-10-16", accent: "#06b6d4", accent2: "#2bd67b", logo: "logos/plzaLogo.png",
             sections: [["", "Lumiose"], ["M", "Mega Dimension"]] },
@@ -207,7 +207,10 @@
   // The Forms toggle decides whether alternate forms count towards totals and percentages:
   // Shiny Dex uses its own toggle, game pages share theirs.
   const homePool = () => mons.filter(m => state.forms || !m.variant);
-  const inGamePool = m => state.gForms || !m.variant;
+  // On a game page the game's own regional forms (nativeForms, e.g. Galarian in Sword &
+  // Shield) belong to its dex; only forms from elsewhere fall under the Forms toggle.
+  const isExtraForm = (m, gid) => !!m.variant && !(GAME_INFO[gid].nativeForms || []).includes(m.form);
+  const inGamePool = (m, gid) => state.gForms || !isExtraForm(m, gid);
   const homeMatch = m => homeScope(m) && matchText(m, el.q) && !(state.missing && has(m)) && (state.forms || !m.variant);
 
   function renderHome() {
@@ -260,9 +263,9 @@
   function renderGame() {
     const gid = state.page, g = GAME_INFO[gid];
     // The Forms toggle only makes sense for games that have alternate forms.
-    $("#gForms").hidden = !mons.some(m => m.games[gid] && m.variant);
+    $("#gForms").hidden = !mons.some(m => m.games[gid] && isExtraForm(m, gid));
     if (state.tab !== "hunts" && !g.sections.some(([p]) => p === state.tab)) state.tab = g.sections[0][0];
-    const all = mons.filter(m => m.games[gid] && inGamePool(m));
+    const all = mons.filter(m => m.games[gid] && inGamePool(m, gid));
     for (const [k, v] of [["--accent", g.accent], ["--accent2", g.accent2], ["--g", gameGrad(g)]]) el.game.style.setProperty(k, v);
     $("#bannerLogo").innerHTML = g.logo ? `<img src="${g.logo}" alt="${esc(g.name)}">` : `<span class="wordmark">${esc(g.short || g.name)}</span>`;
     $("#gameTitle").textContent = g.name;
@@ -289,7 +292,7 @@
     const section = g.sections.find(([p]) => p === state.tab);
     const tabAll = all.filter(inTab(gid, state.tab));
     const items = tabAll
-      .filter(m => matchText(m, el.gq) && !(state.gMissing && gHas(gid)(m)) && (state.gForms || !m.variant))
+      .filter(m => matchText(m, el.gq) && !(state.gMissing && gHas(gid)(m)) && inGamePool(m, gid))
       .sort((x, y) => gameNum(codeIn(x, gid, state.tab)) - gameNum(codeIn(y, gid, state.tab)) || x.id - y.id);
     $("#gCount").textContent = `${items.length} shown`;
     el.gameCards.className = "game-mode";
@@ -301,7 +304,7 @@
 
   function renderGameStats() {
     const gid = state.page, g = GAME_INFO[gid];
-    const all = mons.filter(m => m.games[gid] && inGamePool(m)), f = gHas(gid);
+    const all = mons.filter(m => m.games[gid] && inGamePool(m, gid)), f = gHas(gid);
     const p = pct(all, f), left = all.length - done(all, f);
     $("#gamePct").textContent = fmtPct(p);
     $("#gameCount").textContent = `${done(all, f)} / ${all.length}`;
@@ -342,7 +345,7 @@
     $("#sideDexBar").style.width = pct(pool) + "%";
     // Newest release first (GAMES itself runs oldest → newest).
     el.sideGames.innerHTML = [...GAMES].reverse().map(id => {
-      const g = GAME_INFO[id], l = mons.filter(m => m.games[id] && inGamePool(m));
+      const g = GAME_INFO[id], l = mons.filter(m => m.games[id] && inGamePool(m, id));
       return `<a class="side-item ${state.page === id ? "active" : ""}" href="#/${id}" style="--c:${g.accent};--g:${gameGrad(g)}">
         <span class="side-icon"></span>
         <span class="side-name">${esc(g.name)}</span>
@@ -621,16 +624,16 @@
     const t = Math.max(0, (+$("#drH").value || 0) * 3600 + (+$("#drM").value || 0) * 60 + (+$("#drS").value || 0));
     setHunt({ time: t, since: hunt().since ? Date.now() : null });
   });
-  // Cancel the running hunt (two taps), with a short Undo window.
+  // Delete the running hunt (two taps), with a short Undo window.
   $("#drCancel").addEventListener("click", e => {
-    if (!arm(e.currentTarget, "Tap again to cancel")) return;
+    if (!arm(e.currentTarget, "Tap again to delete")) return;
     disarm();
     const k = curKey(), prev = hunts[k], mon = cur, gid = curGame;
     delete hunts[k];
     saveHunts();
     paintHunt();
     refreshCard();
-    toast(`Hunt for ${mon.name} cancelled`, { label: "Undo", run: () => {
+    toast(`Hunt for ${mon.name} deleted`, { label: "Undo", run: () => {
       hunts[k] = prev;
       saveHunts();
       render();
@@ -974,7 +977,7 @@
   const ITEM = 104; // tile width + gap, keep in sync with .rl-tile
   function spin() {
     const gid = state.page, g = GAME_INFO[gid];
-    const pool = mons.filter(m => m.games[gid] && inGamePool(m) && !gHas(gid)(m) && huntable(m) && !isActive(hunts[hk(gid, m.id)]));
+    const pool = mons.filter(m => m.games[gid] && inGamePool(m, gid) && !gHas(gid)(m) && huntable(m) && !isActive(hunts[hk(gid, m.id)]));
     if (!pool.length) return toast("Nothing left to hunt in this game ✦");
     const pickFrom = () => pool[Math.floor(Math.random() * pool.length)];
     rl.gid = gid;
