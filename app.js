@@ -185,6 +185,10 @@
 
   // ---------- Living Dex ----------
   const homeScope = m => !state.gen || m.gen === state.gen;
+  // The Forms toggle decides whether alternate forms count towards totals and percentages:
+  // Shiny Dex uses its own toggle, game pages share theirs.
+  const homePool = () => mons.filter(m => state.forms || !m.variant);
+  const inGamePool = m => state.gForms || !m.variant;
   const homeMatch = m => homeScope(m) && matchText(m, el.q) && !(state.missing && has(m)) && (state.forms || !m.variant);
 
   function renderHome() {
@@ -193,40 +197,41 @@
     let html = "";
     for (const g of Object.keys(genNames).map(Number)) {
       const items = list.filter(m => m.gen === g);
-      if (items.length) html += sectionHtml(String(g).padStart(2, "0"), region(g), g, mons.filter(m => m.gen === g), items);
+      if (items.length) html += sectionHtml(String(g).padStart(2, "0"), region(g), g, homePool().filter(m => m.gen === g), items);
     }
     el.cards.innerHTML = html || empty(el.q);
     renderHomeStats();
   }
 
   function renderHomeStats() {
-    const got = done(mons), p = pct(mons);
+    const pool = homePool();
+    const got = done(pool), p = pct(pool);
     const regionsDone = Object.keys(genNames).filter(g => {
-      const l = mons.filter(m => m.gen === +g);
+      const l = pool.filter(m => m.gen === +g);
       return done(l) === l.length;
     }).length;
     $("#statCaught").textContent = got;
-    $("#statLeft").textContent = mons.length - got;
+    $("#statLeft").textContent = pool.length - got;
     $("#statRegions").textContent = `${regionsDone}/${Object.keys(genNames).length}`;
     $("#heroPct").textContent = fmtPct(p);
     setRing($("#heroRing"), p);
-    const left = mons.length - got;
+    const left = pool.length - got;
     $("#heroSub").innerHTML = left
       ? `<b>${left}</b> Pokémon and forms still missing from your shiny collection. ${got ? "Keep going!" : "Open a Pokémon to log your first shiny."}`
       : `<b>Shiny Dex complete!</b> Every form, shiny and in one place. ✦`;
 
-    el.regions.innerHTML = [[0, "All regions", mons], ...Object.keys(genNames).map(g => [+g, region(g), mons.filter(m => m.gen === +g)])]
+    el.regions.innerHTML = [[0, "All regions", pool], ...Object.keys(genNames).map(g => [+g, region(g), pool.filter(m => m.gen === +g)])]
       .map(([g, n, l]) => `<button class="region ${state.gen === g ? "active" : ""} ${done(l) === l.length ? "done" : ""}" data-gen="${g}">
         <span class="r-name">${esc(n)}</span><span class="r-num">${done(l)} / ${l.length}</span>
         <span class="r-bar" style="width:${pct(l)}%"></span>
       </button>`).join("");
 
-    const next = mons.filter(m => homeScope(m) && !has(m) && m.sprite).slice(0, 6);
+    const next = pool.filter(m => homeScope(m) && !has(m) && m.sprite).slice(0, 6);
     el.upNext.innerHTML = next.length
       ? next.map(m => `<button data-jump="${m.id}" title="#${m.dex} ${esc(m.name)}${m.form ? " (" + esc(m.form) + ")" : ""}"><img src="${m.sprite}" alt="${esc(m.name)}"></button>`).join("")
       : `<p class="up-next-empty">Nothing left to find here ✦</p>`;
 
-    for (const g of Object.keys(genNames)) updateSection(el.cards, g, mons.filter(m => m.gen === +g));
+    for (const g of Object.keys(genNames)) updateSection(el.cards, g, pool.filter(m => m.gen === +g));
     renderSidebar();
   }
 
@@ -236,7 +241,7 @@
   function renderGame() {
     const gid = state.page, g = GAME_INFO[gid];
     if (state.tab !== "hunts" && !g.sections.some(([p]) => p === state.tab)) state.tab = g.sections[0][0];
-    const all = mons.filter(m => m.games[gid]);
+    const all = mons.filter(m => m.games[gid] && inGamePool(m));
     for (const [k, v] of [["--accent", g.accent], ["--accent2", g.accent2], ["--g", gameGrad(g)]]) el.game.style.setProperty(k, v);
     $("#bannerLogo").innerHTML = g.logo ? `<img src="${g.logo}" alt="${esc(g.name)}">` : `<span class="wordmark">${esc(g.short || g.name)}</span>`;
     $("#gameTitle").textContent = g.name;
@@ -275,7 +280,7 @@
 
   function renderGameStats() {
     const gid = state.page, g = GAME_INFO[gid];
-    const all = mons.filter(m => m.games[gid]), f = gHas(gid);
+    const all = mons.filter(m => m.games[gid] && inGamePool(m)), f = gHas(gid);
     const p = pct(all, f), left = all.length - done(all, f);
     $("#gamePct").textContent = fmtPct(p);
     $("#gameCount").textContent = `${done(all, f)} / ${all.length}`;
@@ -311,11 +316,12 @@
   }
 
   function renderSidebar() {
-    $("#sideDexPct").textContent = fmtPct(pct(mons));
-    $("#sideDexBar").style.width = pct(mons) + "%";
+    const pool = homePool();
+    $("#sideDexPct").textContent = fmtPct(pct(pool));
+    $("#sideDexBar").style.width = pct(pool) + "%";
     // Newest release first (GAMES itself runs oldest → newest).
     el.sideGames.innerHTML = [...GAMES].reverse().map(id => {
-      const g = GAME_INFO[id], l = mons.filter(m => m.games[id]);
+      const g = GAME_INFO[id], l = mons.filter(m => m.games[id] && inGamePool(m));
       return `<a class="side-item ${state.page === id ? "active" : ""}" href="#/${id}" style="--c:${g.accent};--g:${gameGrad(g)}">
         <span class="side-icon"></span>
         <span class="side-name">${esc(g.name)}</span>
