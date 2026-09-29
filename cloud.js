@@ -102,7 +102,7 @@ async function start() {
         if (first && window.ShinyApp.hasLocalData() && (!owner || owner === user.uid)) {
           dirty = true;
           flush();
-          window.ShinyApp.toast("Your progress is now saved to your account ✦");
+          window.ShinyApp.toast("Your shiny collection is now saved to your account ✦");
         } else if (first && owner && owner !== user.uid) {
           window.ShinyApp.applyData({}, { quiet: true });
         }

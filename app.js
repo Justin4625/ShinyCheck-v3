@@ -203,8 +203,8 @@
     setRing($("#heroRing"), p);
     const left = mons.length - got;
     $("#heroSub").innerHTML = left
-      ? `<b>${left}</b> Pokémon and forms left to register in your HOME boxes. ${got ? "Keep going!" : "Open a Pokémon to log a shiny."}`
-      : `<b>Living Dex complete!</b> Every form, one home. ✦`;
+      ? `<b>${left}</b> Pokémon and forms still missing from your shiny collection. ${got ? "Keep going!" : "Open a Pokémon to log your first shiny."}`
+      : `<b>Shiny Dex complete!</b> Every form, shining. ✦`;
 
     el.regions.innerHTML = [[0, "All regions", mons], ...Object.keys(genNames).map(g => [+g, region(g), mons.filter(m => m.gen === +g)])]
       .map(([g, n, l]) => `<button class="region ${state.gen === g ? "active" : ""} ${done(l) === l.length ? "done" : ""}" data-gen="${g}">
@@ -215,7 +215,7 @@
     const next = mons.filter(m => homeScope(m) && !has(m) && m.sprite).slice(0, 6);
     el.upNext.innerHTML = next.length
       ? next.map(m => `<button data-jump="${m.id}" title="#${m.dex} ${esc(m.name)}${m.form ? " (" + esc(m.form) + ")" : ""}"><img src="${m.sprite}" alt="${esc(m.name)}"></button>`).join("")
-      : `<p class="up-next-empty">Nothing left here ✦</p>`;
+      : `<p class="up-next-empty">Nothing left to find here ✦</p>`;
 
     for (const g of Object.keys(genNames)) updateSection(el.cards, g, mons.filter(m => m.gen === +g));
     renderSidebar();
@@ -272,7 +272,7 @@
     $("#gameCount").textContent = `${done(all, f)} / ${all.length}`;
     setRing($("#gameRing"), p);
     $("#gameSub").innerHTML = left
-      ? `<b>${left}</b> to go across ${g.sections.length > 1 ? g.sections.length + " regional dexes" : "the " + g.sections[0][1] + " Dex"}.`
+      ? `<b>${left}</b> shinies still to log across ${g.sections.length > 1 ? g.sections.length + " regional dexes" : "the " + g.sections[0][1] + " Dex"}.`
       : `<b>Complete!</b> Every shiny from ${esc(g.name)} is logged. ✦`;
     for (const [p2] of g.sections) {
       const l = all.filter(inTab(gid, p2));
@@ -678,7 +678,7 @@
           </div>
         </div>` : ""}
       </li>`;
-    }).join("") : `<li class="log-empty">No shinies logged for ${esc(m.name)} yet. Start a hunt below ✦</li>`;
+    }).join("") : `<li class="log-empty">No shinies of ${esc(m.name)} yet. Start a hunt below or add one manually ✦</li>`;
 
     const addGames = LOG_GAMES.filter(g => GAME_INFO[g].logOnly || m.games[g]);
     // Shinies that only exist as Pokémon HOME gifts start with HOME selected.
@@ -1054,7 +1054,7 @@
     });
     a.click();
     URL.revokeObjectURL(a.href);
-    toast(`Backup saved · ${mons.filter(has).length} registered`);
+    toast(`Backup saved · ${mons.filter(has).length} collected`);
   });
   $("#import").addEventListener("change", async e => {
     const f = e.target.files[0];
@@ -1062,17 +1062,17 @@
     try {
       applyData(JSON.parse(await f.text()));
       window.Cloud && window.Cloud.flush();
-      toast(`Backup loaded · ${mons.filter(has).length} registered`);
+      toast(`Backup loaded · ${mons.filter(has).length} collected`);
     } catch {
       toast("That file couldn't be read");
     }
     e.target.value = "";
   });
   $("#reset").addEventListener("click", () => {
-    if (!confirm("Reset all progress, hunts and shiny logs? Export a backup first if you want to keep it.")) return;
+    if (!confirm("Reset your whole collection — every shiny log and hunt? Export a backup first if you want to keep it.")) return;
     applyData({});
     window.Cloud && window.Cloud.flush();
-    toast("Progress reset");
+    toast("Collection reset");
   });
 
   route();

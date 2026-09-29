@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260929144936">
+  <link rel="stylesheet" href="style.css?v=20260929145233">
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -41,10 +41,10 @@
       </a>
 
       <nav class="side-nav">
-        <p class="side-label">Tracker</p>
+        <p class="side-label">Collection</p>
         <a class="side-item" href="#/" data-page="">
           <span class="side-icon holo-dot"></span>
-          <span class="side-name">Living Dex</span>
+          <span class="side-name">Shiny Dex</span>
           <span class="side-pct" id="sideDexPct">0%</span>
           <span class="side-bar"><i id="sideDexBar"></i></span>
         </a>
@@ -56,28 +56,28 @@
       <div class="side-foot">
         <div id="account"></div>
         <div class="side-actions">
-          <button class="ghost-btn" id="export" title="Download a backup of your progress">↓ Export</button>
+          <button class="ghost-btn" id="export" title="Download a backup of your shiny collection">↓ Export</button>
           <label class="ghost-btn" title="Load a backup file">↑ Import<input type="file" id="import" accept="application/json" hidden></label>
           <button class="ghost-btn square" id="themeBtn" title="Light / dark">◐</button>
         </div>
-        <button class="link-btn" id="reset">Reset progress</button>
+        <button class="link-btn" id="reset">Reset collection</button>
       </div>
     </aside>
     <div class="scrim" id="scrim"></div>
 
     <main class="main">
-      <!-- Living Dex -->
+      <!-- Shiny Dex -->
       <section id="homeView">
         <div class="hero">
           <div class="hero-glow" aria-hidden="true"></div>
           <div class="hero-text">
-            <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> Pokémon HOME · Living Dex</p>
-            <h1>Every form.<br><span class="holo-text">One home.</span></h1>
+            <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> Shiny Dex · All games</p>
+            <h1>Every form.<br><span class="holo-text">Every shine.</span></h1>
             <p class="hero-sub" id="heroSub"></p>
             <div class="stats">
-              <div class="stat"><b id="statCaught">0</b><span>Registered</span></div>
+              <div class="stat"><b id="statCaught">0</b><span>Collected</span></div>
               <div class="stat"><b id="statLeft">0</b><span>To go</span></div>
-              <div class="stat"><b id="statRegions">0</b><span>Regions done</span></div>
+              <div class="stat"><b id="statRegions">0</b><span>Regions complete</span></div>
             </div>
           </div>
           <div class="hero-side">
@@ -86,7 +86,7 @@
               <div class="ring-label"><b id="heroPct">0%</b><span>complete</span></div>
             </div>
             <div class="up-next">
-              <p class="mini-label">Up next</p>
+              <p class="mini-label">Next to find</p>
               <div class="up-next-row" id="upNext"></div>
             </div>
           </div>
@@ -233,7 +233,7 @@
     </aside>
   </div>
 
-  <!-- Dex Entry: every shiny of a species across all games (Living Dex) -->
+  <!-- Dex Entry: every shiny of a species across all games (Shiny Dex) -->
   <div class="drawer entry" id="entry" aria-hidden="true">
     <div class="drawer-scrim" data-eclose></div>
     <aside class="drawer-panel" role="dialog" aria-modal="true" aria-labelledby="enName" tabindex="-1">
@@ -284,7 +284,7 @@
         <em class="v3">V3</em>
       </div>
       <h1 id="gateTitle">Welcome back, Trainer</h1>
-      <p class="gate-sub">Your Living Dex, hunts and shiny log — saved to your account and synced across devices.</p>
+      <p class="gate-sub">Your Shiny Dex, hunts and shiny log — saved to your account and synced across devices.</p>
 
       <button class="gate-google" id="gateGoogle" type="button">
         <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
@@ -311,9 +311,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=20260929144936"></script>
-  <script src="evo.js?v=20260929144936"></script>
-  <script src="app.js?v=20260929144936"></script>
-  <script type="module" src="cloud.js?v=20260929144936"></script>
+  <script src="data.js?v=20260929145233"></script>
+  <script src="evo.js?v=20260929145233"></script>
+  <script src="app.js?v=20260929145233"></script>
+  <script type="module" src="cloud.js?v=20260929145233"></script>
 </body>
 </html>

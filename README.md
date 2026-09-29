@@ -1,8 +1,8 @@
 # ShinyCheck V3
 
-Pokémon HOME Living Dex and shiny-hunt tracker. Plain HTML, CSS and JavaScript — no build step.
+Shiny Dex and shiny-hunt tracker for Pokémon. Plain HTML, CSS and JavaScript — no build step.
 
-- **Living Dex** — all 1,081 Pokémon and forms that go in your HOME boxes. A card glows once a shiny of it is logged.
+- **Shiny Dex** — all 1,081 Pokémon and forms. A card glows once a shiny of it is logged in any game.
 - **Games** — Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes.
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
