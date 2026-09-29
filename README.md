@@ -7,6 +7,7 @@ Shiny Dex and shiny-hunt tracker for Pokémon. Plain HTML, CSS and JavaScript �
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
 - **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore.
+- **App** — installable (Add to Home Screen / Install app) and works offline via a service worker (`sw.js`); new versions show an Update prompt.
 
 ## Run locally
 
@@ -16,7 +17,7 @@ Firebase sign-in needs an http(s) origin, so serve the folder instead of opening
 python3 -m http.server 5173
 ```
 
-Then open http://localhost:5173.
+Then open http://localhost:5173. The service worker stays off on localhost so you always get fresh files; add `?sw` to test it.
 
 ## Deploying
 

@@ -21,7 +21,7 @@ if (!firebaseConfig) {
 
 async function start() {
   document.body.classList.add("locked");
-  const V = "12.19.0";
+  const V = "12.19.0"; // also in sw.js (FIREBASE), which saves the SDK for offline use
   const [{ initializeApp }, authMod, fs] = await Promise.all([
     import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),
     import(`https://www.gstatic.com/firebasejs/${V}/firebase-auth.js`),

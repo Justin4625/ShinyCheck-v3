@@ -486,7 +486,7 @@
 
   let toastTimer;
   // Optional action (e.g. Undo) shows as a button and keeps the toast up a little longer.
-  function toast(msg, action) {
+  function toast(msg, action, ms) {
     el.toast.textContent = msg;
     if (action) {
       const b = Object.assign(document.createElement("button"), { className: "toast-action", textContent: action.label });
@@ -496,7 +496,7 @@
     el.toast.classList.toggle("has-action", !!action);
     el.toast.classList.add("show");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => el.toast.classList.remove("show"), action ? 6000 : 2400);
+    toastTimer = setTimeout(() => el.toast.classList.remove("show"), ms || (action ? 6000 : 2400));
   }
 
 
@@ -1884,6 +1884,79 @@
     window.Cloud && window.Cloud.flush();
     toast("Collection reset");
   });
+
+  // ---------- App: offline, updates, install ----------
+  // The service worker (sw.js) makes ShinyCheck open offline. Not on localhost unless ?sw,
+  // so development always gets fresh files.
+  const swOk = "serviceWorker" in navigator && (location.hostname !== "localhost" || new URLSearchParams(location.search).has("sw"));
+  if (swOk) {
+    let reloading = false;
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (reloading) return;
+      reloading = true;
+      location.reload();
+    });
+    const launchedAt = Date.now();
+    navigator.serviceWorker.register(BASE + "sw.js", { scope: BASE }).then(reg => {
+      const offer = worker => {
+        // Just opened the app? Take the update right away — nothing to lose yet.
+        if (Date.now() - launchedAt < 4000) return worker.postMessage("skipWaiting");
+        toast("A new version of ShinyCheck is ready", { label: "Update", run: () => worker.postMessage("skipWaiting") }, 15000);
+      };
+      if (reg.waiting && navigator.serviceWorker.controller) offer(reg.waiting);
+      reg.addEventListener("updatefound", () => {
+        const w = reg.installing;
+        w.addEventListener("statechange", () => {
+          if (w.state === "installed" && navigator.serviceWorker.controller) offer(w);
+        });
+      });
+      // Check for a new version when the app comes back to the foreground, at most every 30 min.
+      let lastCheck = Date.now();
+      document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "visible" && Date.now() - lastCheck > 18e5) { lastCheck = Date.now(); reg.update().catch(() => {}); }
+      });
+    }).catch(err => console.warn("Service worker not registered:", err));
+  }
+
+  addEventListener("offline", () => toast("You're offline — everything keeps working and syncs when you're back", null, 4000));
+  addEventListener("online", () => toast("Back online ✦"));
+
+  // Install: Chrome / Edge / Android fire beforeinstallprompt; iPhone and iPad (Safari) don't,
+  // so there the button explains Share → Add to Home Screen.
+  const INSTALL_DISMISSED = "shinycheck-v3-install-dismissed";
+  const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+  let installEvent = null;
+  function paintInstall() {
+    const can = !standalone() && (!!installEvent || isIOS);
+    $("#installSide").hidden = !can;
+    $("#installBanner").hidden = !can || !!safe(() => localStorage.getItem(INSTALL_DISMISSED)) || !matchMedia("(max-width: 900px)").matches;
+  }
+  async function install() {
+    if (installEvent) {
+      installEvent.prompt();
+      const { outcome } = await installEvent.userChoice;
+      installEvent = null;
+      if (outcome === "accepted") safe(() => localStorage.setItem(INSTALL_DISMISSED, "1"));
+      paintInstall();
+    } else if (isIOS) {
+      document.body.classList.remove("menu-open");
+      $("#installHelp").hidden = false;
+      document.body.classList.add("drawer-open");
+    }
+  }
+  addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvent = e; paintInstall(); });
+  addEventListener("appinstalled", () => { installEvent = null; paintInstall(); toast("ShinyCheck is installed ✦ Open it from your home screen"); });
+  $("#installSide").addEventListener("click", install);
+  $("#installBannerGo").addEventListener("click", install);
+  $("#installBannerClose").addEventListener("click", () => { safe(() => localStorage.setItem(INSTALL_DISMISSED, "1")); paintInstall(); });
+  $("#installHelp").addEventListener("click", e => {
+    if (e.target.closest("[data-installclose]") || e.target === e.currentTarget) {
+      $("#installHelp").hidden = true;
+      document.body.classList.remove("drawer-open");
+    }
+  });
+  paintInstall();
 
   route();
 })();

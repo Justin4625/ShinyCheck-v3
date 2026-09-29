@@ -1454,3 +1454,33 @@ button, a, label, .pcard, .region { touch-action: manipulation; -webkit-tap-high
   .ghost-btn.square { flex-basis: 44px; }
   .en-row { min-height: 52px; }
 }
+
+/* ---------- Install as an app ---------- */
+.install-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px; height: 42px; border: 0; border-radius: 13px; cursor: pointer;
+  font-weight: 800; font-size: 14px; color: #14121f; background: var(--holo); transition: filter .2s, transform .1s;
+}
+.install-btn[hidden] { display: none; }
+.install-btn:hover { filter: brightness(1.05); }
+.install-btn:active { transform: scale(.97); }
+.install-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.install-banner > img { width: 36px; height: 36px; border-radius: 10px; flex: none; }
+.install-steps { list-style: none; margin: 4px 0 14px; padding: 0; display: flex; flex-direction: column; gap: 10px; text-align: left; }
+.install-steps li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); font-size: 14px; color: var(--muted); }
+.install-steps b { color: var(--text); }
+.install-ico { flex: none; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 10px; background: var(--surface); border: 1px solid var(--border-2); color: #3b82f6; }
+.install-ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.install-ico img { width: 26px; height: 26px; border-radius: 7px; }
+/* Opened from the Home Screen: no browser chrome, so the install prompts never show. */
+@media (display-mode: standalone) { .install-btn, .install-banner { display: none !important; } }
+@media (max-width: 560px) {
+  .install-banner { gap: 10px; padding: 12px; }
+  .install-banner p { font-size: 13px; }
+}
+@media (max-width: 560px) {
+  /* Toasts span the screen width and sit above the Hunt Deck's thumb dock when it's open. */
+  .toast { left: 16px; right: 16px; max-width: none; transform: translateY(20px); text-align: left; }
+  .toast.show { transform: none; }
+  .toast.has-action { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  body.drawer-open .toast { bottom: calc(160px + env(safe-area-inset-bottom)); }
+}

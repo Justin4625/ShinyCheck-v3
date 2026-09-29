@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260929230513">
+  <link rel="stylesheet" href="style.css?v=20260929231639">
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -67,6 +67,10 @@
       </nav>
 
       <div class="side-foot">
+        <button class="install-btn" id="installSide" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M5 21h14"/></svg>
+          Install app
+        </button>
         <div id="account"></div>
         <div class="side-actions">
           <button class="ghost-btn" id="export" title="Download a backup of your shiny collection">↓ Export</button>
@@ -112,6 +116,13 @@
           <p id="v2BannerText"></p>
           <button class="v2-banner-go" id="v2BannerOpen">Review & import</button>
           <button class="dr-icon" id="v2BannerClose" title="Don't show again" aria-label="Dismiss">✕</button>
+        </div>
+
+        <div class="v2-banner install-banner" id="installBanner" hidden>
+          <img src="icons/icon-192.png" alt="" width="36" height="36">
+          <p><b>Install ShinyCheck</b> on your home screen — full screen, works offline.</p>
+          <button class="v2-banner-go" id="installBannerGo">Install</button>
+          <button class="dr-icon" id="installBannerClose" title="Don't show again" aria-label="Dismiss">✕</button>
         </div>
 
         <div class="regions" id="regions"></div>
@@ -393,6 +404,22 @@
     </div>
   </div>
 
+  <!-- Install on iPhone / iPad: Safari has no install prompt, so explain the two taps -->
+  <div class="roulette v2-import" id="installHelp" hidden>
+    <div class="rl-card v2-card" role="dialog" aria-modal="true" aria-labelledby="installTitle">
+      <button class="dr-icon rl-close" data-installclose aria-label="Close">✕</button>
+      <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> ShinyCheck app</p>
+      <h3 class="v2-title" id="installTitle">Add to Home Screen</h3>
+      <ol class="install-steps">
+        <li><span class="install-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 00-1 1v8a1 1 0 001 1h14a1 1 0 001-1v-8a1 1 0 00-1-1h-1"/></svg></span><span>Tap <b>Share</b> in Safari's toolbar.</span></li>
+        <li><span class="install-ico"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M12 8v8M8 12h8"/></svg></span><span>Choose <b>Add to Home Screen</b>.</span></li>
+        <li><span class="install-ico"><img src="icons/icon-192.png" alt=""></span><span>Tap <b>Add</b> — ShinyCheck opens full screen from its own icon.</span></li>
+      </ol>
+      <p class="v2-fine">Your shinies and hunts stay synced with your account, and the app keeps working offline.</p>
+      <div class="rl-actions"><button class="rl-go v2-go" data-installclose style="opacity:1;pointer-events:auto">Got it ✦</button></div>
+    </div>
+  </div>
+
   <!-- Import from ShinyCheck V2 -->
   <div class="roulette v2-import" id="v2Import" hidden>
     <div class="rl-card v2-card" role="dialog" aria-modal="true" aria-labelledby="v2Title">
@@ -409,9 +436,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=20260929230513"></script>
-  <script src="evo.js?v=20260929230513"></script>
-  <script src="app.js?v=20260929230513"></script>
-  <script type="module" src="cloud.js?v=20260929230513"></script>
+  <script src="data.js?v=20260929231639"></script>
+  <script src="evo.js?v=20260929231639"></script>
+  <script src="app.js?v=20260929231639"></script>
+  <script type="module" src="cloud.js?v=20260929231639"></script>
 </body>
 </html>
