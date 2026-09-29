@@ -125,7 +125,7 @@
   };
   // page: "" = Living Dex, otherwise a game id. tab = regional dex on a game page.
   // huntsView: the Active hunts page (/hunts); page stays "" there.
-  const state = { huntsView: false, page: "", gen: 0, tab: "", missing: false, forms: true, gMissing: false, gForms: true };
+  const state = { huntsView: false, page: "", gen: 0, tab: "", missing: false, forms: true, gMissing: false, gOutside: false };
 
   const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   const matchText = (m, input) => {
@@ -245,8 +245,15 @@
   const outsideOnly = (m, gid) => codes(m, gid).every(c => gamePrefix(c) === "O");
   const isExtraForm = (m, gid) => EXTRA[gid].has(m.id) || outsideOnly(m, gid);
   const whereIn = (m, gid) => (m.where && m.where[gid]) || "";
-  const codeLabel = (m, gid) => outsideOnly(m, gid) ? "outside the dex" : codes(m, gid).join(" / ");
-  const inGamePool = (m, gid) => state.gForms || !isExtraForm(m, gid);
+  const codeLabel = (m, gid) => isExtraForm(m, gid) ? "outside the dex" : codes(m, gid).join(" / ");
+  // Every game with such entries gets an "Outside the dex" tab: Pokémon you can have in the
+  // game beyond its regional dex (other forms of a dex number, Dynamax Adventure legends…).
+  for (const gid of GAMES) {
+    const s = GAME_INFO[gid].sections;
+    if (!s.some(([p]) => p === "O") && mons.some(m => m.games[gid] && isExtraForm(m, gid))) s.push(["O", "Outside the dex"]);
+  }
+  // They only count towards totals when "Count outside the dex" is on.
+  const inGamePool = (m, gid) => state.gOutside || !isExtraForm(m, gid);
   const homeMatch = m => homeScope(m) && matchText(m, el.q) && !(state.missing && has(m)) && (state.forms || !m.variant);
 
   function renderHome() {
@@ -294,14 +301,14 @@
   }
 
   // ---------- Game page ----------
-  const inTab = (gid, p) => m => !!codeIn(m, gid, p);
+  const inTab = (gid, p) => m => p === "O" ? !!m.games[gid] && isExtraForm(m, gid) : !!codeIn(m, gid, p) && !isExtraForm(m, gid);
 
   function renderGame() {
     const gid = state.page, g = GAME_INFO[gid];
-    // The Forms toggle only makes sense for games that have alternate forms.
-    $("#gForms").hidden = !mons.some(m => m.games[gid] && isExtraForm(m, gid));
+    $("#gForms").hidden = !g.sections.some(([p]) => p === "O");
     if (state.tab !== "hunts" && !g.sections.some(([p]) => p === state.tab)) state.tab = g.sections[0][0];
-    const all = mons.filter(m => m.games[gid] && inGamePool(m, gid));
+    // Tabs always show everything; only the totals follow "Count outside the dex".
+    const all = mons.filter(m => m.games[gid]);
     for (const [k, v] of [["--accent", g.accent], ["--accent2", g.accent2], ["--g", gameGrad(g)]]) el.game.style.setProperty(k, v);
     $("#bannerLogo").innerHTML = g.logo ? `<img src="${g.logo}" alt="${esc(g.name)}">` : `<span class="wordmark">${esc(g.short || g.name)}</span>`;
     $("#gameTitle").textContent = g.name;
@@ -328,8 +335,9 @@
     const section = g.sections.find(([p]) => p === state.tab);
     const tabAll = all.filter(inTab(gid, state.tab));
     const items = tabAll
-      .filter(m => matchText(m, el.gq) && !(state.gMissing && gHas(gid)(m)) && inGamePool(m, gid))
-      .sort((x, y) => gameNum(codeIn(x, gid, state.tab)) - gameNum(codeIn(y, gid, state.tab)) || x.id - y.id);
+      .filter(m => matchText(m, el.gq) && !(state.gMissing && gHas(gid)(m)))
+      .sort(state.tab === "O" ? (x, y) => +x.dex - +y.dex || x.id - y.id
+        : (x, y) => gameNum(codeIn(x, gid, state.tab)) - gameNum(codeIn(y, gid, state.tab)) || x.id - y.id);
     $("#gCount").textContent = `${items.length} shown`;
     el.gameCards.className = "game-mode";
     el.gameCards.innerHTML = items.length
@@ -340,21 +348,21 @@
 
   function renderGameStats() {
     const gid = state.page, g = GAME_INFO[gid];
-    const all = mons.filter(m => m.games[gid] && inGamePool(m, gid)), f = gHas(gid);
+    const full = mons.filter(m => m.games[gid]), all = full.filter(m => inGamePool(m, gid)), f = gHas(gid);
     const p = pct(all, f), left = all.length - done(all, f);
     $("#gamePct").textContent = fmtPct(p);
     $("#gameCount").textContent = `${done(all, f)} / ${all.length}`;
     setRing($("#gameRing"), p);
     $("#gameSub").innerHTML = left
-      ? `<b>${left}</b> shinies still to log across ${(() => { const dx = g.sections.filter(([p]) => p !== "O"); return (dx.length > 1 ? dx.length + " regional dexes" : "the " + dx[0][1] + " Dex") + (dx.length < g.sections.length ? " and beyond" : ""); })()}.`
+      ? `<b>${left}</b> shinies still to log across ${(() => { const dx = g.sections.filter(([p]) => p !== "O"); return (dx.length > 1 ? dx.length + " regional dexes" : "the " + dx[0][1] + " Dex") + (state.gOutside && dx.length < g.sections.length ? " and beyond" : ""); })()}.`
       : `<b>Complete!</b> Every shiny from ${esc(g.name)} is logged. ✦`;
     for (const [p2] of g.sections) {
-      const l = all.filter(inTab(gid, p2));
+      const l = full.filter(inTab(gid, p2));
       const n = el.dexTabs.querySelector(`[data-tabcount="${p2}"]`);
       if (n) n.textContent = `${done(l, f)}/${l.length}`;
     }
-    updateSection(el.gameCards, "tab", all.filter(inTab(gid, state.tab)), f);
-    const live = all.filter(m => isActive(hunts[hk(gid, m.id)]));
+    updateSection(el.gameCards, "tab", full.filter(inTab(gid, state.tab)), f);
+    const live = full.filter(m => isActive(hunts[hk(gid, m.id)]));
     const seg = el.dexTabs.querySelector(".seg-hunts");
     if (seg) {
       seg.querySelector("small").textContent = live.length;
@@ -756,7 +764,7 @@
     GAME_INFO[gid].sections.forEach(([p], si) => {
       for (const m of mons) {
         const c = codeIn(m, gid, p);
-        if (c) list.push({ m, code: p === "O" ? "Outside dex" : c, key: si * 10000 + gameNum(c) });
+        if (c) list.push({ m, code: p === "O" || isExtraForm(m, gid) ? "Outside dex" : c, key: (isExtraForm(m, gid) ? 90000 : si * 10000) + gameNum(c) });
       }
     });
     const seen = new Set();
@@ -764,7 +772,7 @@
   }
   function renderPhaseList() {
     const q = norm($("#drPhaseQ").value.trim());
-    const pool = gameDexOrder(curGame).filter(({ m, code }) => m.id !== cur.id && inGamePool(m, curGame)
+    const pool = gameDexOrder(curGame).filter(({ m, code }) => m.id !== cur.id
       && (!q || norm(m.name).includes(q) || norm(m.form).includes(q) || norm(code).includes(q) || m.dex.includes(q)));
     $("#drPhaseList").innerHTML = pool.slice(0, 60).map(({ m, code }) => `<button data-phase="${m.id}">${m.sprite ? `<img src="${m.sprite}" alt="">` : ""}<span><small>${esc(code)}</small>${esc(m.name)}${m.form && m.form !== "Original" ? ` <em>${esc(m.form)}</em>` : ""}</span></button>`).join("")
       || `<p class="dr-phase-none">No Pokémon in ${esc(GAME_INFO[curGame].name)} match</p>`;
@@ -1413,7 +1421,7 @@
     toast(sharing() ? "Shinies now count in every game they appear in ✦" : "Each game counts only its own shinies again");
   });
 
-  for (const [id, key] of [["#fMissing", "missing"], ["#fForms", "forms"], ["#gMissing", "gMissing"], ["#gForms", "gForms"]]) {
+  for (const [id, key] of [["#fMissing", "missing"], ["#fForms", "forms"], ["#gMissing", "gMissing"], ["#gForms", "gOutside"]]) {
     $(id).addEventListener("click", e => {
       state[key] = !state[key];
       e.currentTarget.setAttribute("aria-pressed", state[key]);
