@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260929185840">
+  <link rel="stylesheet" href="style.css?v=20260929194249">
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -210,6 +210,15 @@
             <button class="dr-minus" id="drMinus">−1</button>
             <button class="dr-plus" id="drPlus"><span id="drPlusLabel">+1</span><kbd>space</kbd></button>
           </div>
+          <div class="dr-phase-row">
+            <span class="dr-phase-count" id="drPhaseCount"></span>
+            <button class="dr-phase-btn" id="drPhase" title="Log a shiny that isn't the one you're hunting — the hunt keeps going">Found a different shiny? <b>Log phase</b></button>
+          </div>
+          <div class="dr-phase-pick" id="drPhasePick" hidden>
+            <input type="search" id="drPhaseQ" placeholder="Which Pokémon was shiny?" autocomplete="off">
+            <div class="dr-phase-list" id="drPhaseList"></div>
+          </div>
+          <ul class="dr-phases" id="drPhases"></ul>
         </section>
 
         <section class="dr-card dr-row">
@@ -371,9 +380,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=20260929185840"></script>
-  <script src="evo.js?v=20260929185840"></script>
-  <script src="app.js?v=20260929185840"></script>
-  <script type="module" src="cloud.js?v=20260929185840"></script>
+  <script src="data.js?v=20260929194249"></script>
+  <script src="evo.js?v=20260929194249"></script>
+  <script src="app.js?v=20260929194249"></script>
+  <script type="module" src="cloud.js?v=20260929194249"></script>
 </body>
 </html>

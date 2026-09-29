@@ -1126,3 +1126,36 @@ body.recaptcha .gate-legal { display: block; }
 .hs-switch[aria-checked="true"] { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
 .hs-switch[aria-checked="true"] i { transform: translateX(18px); }
 .hs-methods:empty { display: none; }
+
+/* Phases */
+.dr-phase-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.dr-phase-count { font: 800 12px/1 var(--mono); color: var(--accent); letter-spacing: .06em; text-transform: uppercase; }
+.dr-phase-btn { margin-left: auto; border: 0; background: none; cursor: pointer; font-size: 12.5px; color: var(--muted); padding: 4px 0; }
+.dr-phase-btn b { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.dr-phase-btn[hidden] { display: none; }
+.dr-phase-pick { margin-top: 10px; text-align: left; }
+.dr-phase-pick[hidden] { display: none; }
+.dr-phase-pick input {
+  width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2);
+  font: 500 14px/1 var(--font); color: var(--text); outline: none;
+}
+.dr-phase-pick input:focus { border-color: var(--accent); }
+.dr-phase-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; max-height: 220px; overflow-y: auto; margin-top: 8px; }
+.dr-phase-list button {
+  display: flex; align-items: center; gap: 6px; padding: 4px 8px 4px 4px; border-radius: 10px; cursor: pointer; text-align: left;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 12.5px; font-weight: 650;
+}
+.dr-phase-list button:hover { border-color: var(--accent); }
+.dr-phase-list img { width: 30px; height: 30px; object-fit: contain; flex: none; }
+.dr-phase-list em { font-style: normal; font: 700 9px/1 var(--mono); color: var(--muted); text-transform: uppercase; }
+.dr-phase-none { margin: 6px 0; color: var(--muted); font-size: 13px; }
+.dr-phases { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; text-align: left; }
+.dr-phases:empty { display: none; }
+.dr-phases li { display: flex; align-items: center; gap: 8px; padding: 4px 8px 4px 4px; border-radius: 10px; background: var(--surface-2); font-size: 12.5px; }
+.dr-phases img { width: 28px; height: 28px; object-fit: contain; }
+.dr-phases span { flex: 1; }
+.dr-phases small { font: 700 10px/1 var(--mono); color: var(--faint); }
+@media (max-height: 640px), (max-width: 420px) {
+  .dr-counter { flex-wrap: wrap; }
+  .dr-phase-row, .dr-phase-pick, .dr-phases { flex-basis: 100%; }
+}

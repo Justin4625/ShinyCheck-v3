@@ -610,6 +610,7 @@
     $("#drCancel").hidden = !isActive(hunts[curKey()]);
     $("#drTimeHint").textContent = h.since ? "Running — keeps going when you close this" : s ? "Paused — press + to resume" : "Press + to start the hunt";
     paintSetup(h);
+    paintPhases(h);
     const inputs = { drInc: h.inc, drSetCount: h.count, drH: Math.floor(s / 3600), drM: Math.floor(s / 60) % 60, drS: s % 60 };
     for (const [id, v] of Object.entries(inputs)) if (document.activeElement !== $("#" + id)) $("#" + id).value = v;
     // Chance that a hunter would have hit the shiny by now: 1 - (1 - 1/odds)^n.
@@ -629,7 +630,7 @@
     dr.log.innerHTML = list.length
       ? list.map((s, i) => `<li>
           <span class="log-n">${sparkSvg()}${i + 1}</span>
-          <span class="log-main"><b>${nf(s.count)}</b> encounters · ${fmtShort(s.time)}<small>${fmtDate(s.ts)}${s.method ? ` · ${esc(s.method)}` : ""}${s.odds ? ` · 1/${s.odds}` : ""}</small></span>
+          <span class="log-main"><b>${nf(s.count)}</b> encounters · ${fmtShort(s.time)}<small>${fmtDate(s.ts)}${s.method ? ` · ${esc(s.method)}` : ""}${s.odds ? ` · 1/${s.odds}` : ""}${s.phases ? ` · after ${s.phases} ${s.phases === 1 ? "phase" : "phases"}` : ""}</small></span>
           <button class="log-del" data-del="${i}" title="Delete entry">✕</button>
         </li>`).join("")
       : `<li class="log-empty">No shinies logged yet. Hit <b>Gotcha!</b> when it sparkles.</li>`;
@@ -690,7 +691,8 @@
     const h = hunt();
     const k = curKey();
     const method = h.setup ? evalSetup(curGame, h.setup).label : "";
-    (shinies[k] = shinies[k] || []).push({ count: h.count, time: elapsed(h), odds: h.odds, ...(method ? { method } : {}), ts: Date.now() });
+    const phases = (h.phases || []).length;
+    (shinies[k] = shinies[k] || []).push({ count: h.count, time: elapsed(h), odds: h.odds, ...(method ? { method } : {}), ...(phases ? { phases } : {}), ts: Date.now() });
     saveShinies();
     delete hunts[k];
     saveHunts();
@@ -699,6 +701,47 @@
     refreshCard();
     celebrate();
   }
+
+  // ---------- Phases: a shiny that isn't the target, logged while the hunt goes on ----------
+  function paintPhases(h) {
+    const list = h.phases || [];
+    $("#drPhaseCount").textContent = list.length ? `Phase ${list.length + 1}` : "";
+    $("#drPhases").innerHTML = list.map((p, i) => {
+      const m = mons.find(x => x.id === p.id);
+      return `<li>${m && m.sprite ? `<img src="${m.sprite}" alt="">` : ""}<span><b>Phase ${i + 1}</b> ${esc(m ? m.name : "?")}${m && m.form && m.form !== "Original" ? ` (${esc(m.form)})` : ""}</span><small>${nf(p.count)} enc.</small></li>`;
+    }).join("");
+    $("#drPhase").hidden = !isActive(hunts[curKey()]);
+  }
+  function renderPhaseList() {
+    const q = norm($("#drPhaseQ").value.trim());
+    const pool = mons.filter(m => m.games[curGame] && m.id !== cur.id && (!q || norm(m.name).includes(q) || norm(m.form).includes(q) || m.dex.includes(q)));
+    $("#drPhaseList").innerHTML = pool.slice(0, 40).map(m => `<button data-phase="${m.id}">${m.sprite ? `<img src="${m.sprite}" alt="">` : ""}<span>${esc(m.name)}${m.form && m.form !== "Original" ? ` <em>${esc(m.form)}</em>` : ""}</span></button>`).join("")
+      || `<p class="dr-phase-none">No Pokémon found</p>`;
+  }
+  function logPhase(id) {
+    const h = hunt(), m = mons.find(x => x.id === id);
+    const phases = h.phases || [], last = phases.at(-1) || { at: 0, time: 0 };
+    const count = Math.max(0, h.count - last.at), time = Math.max(0, elapsed(h) - last.time);
+    const method = h.setup ? evalSetup(curGame, h.setup).label : "";
+    const k = hk(curGame, m.id);
+    (shinies[k] = shinies[k] || []).push({ count, time, odds: h.odds, method: `${method ? method + " · " : ""}Phase ${phases.length + 1}`, ts: Date.now() });
+    saveShinies();
+    setHunt({ phases: [...phases, { id: m.id, at: h.count, time: elapsed(h), count }] });
+    $("#drPhasePick").hidden = true;
+    $("#drPhaseQ").value = "";
+    renderGameStats();
+    toast(`Phase ${phases.length + 1}: shiny ${m.name} logged ✦ — keep going!`);
+  }
+  $("#drPhase").addEventListener("click", () => {
+    const pick = $("#drPhasePick");
+    pick.hidden = !pick.hidden;
+    if (!pick.hidden) { renderPhaseList(); $("#drPhaseQ").focus(); }
+  });
+  $("#drPhaseQ").addEventListener("input", renderPhaseList);
+  $("#drPhaseList").addEventListener("click", e => {
+    const b = e.target.closest("[data-phase]");
+    if (b) logPhase(+b.dataset.phase);
+  });
 
   function celebrate() {
     dr.celebrate.innerHTML = `<b>✦ Shiny ${esc(cur.name)}!</b><span>${nf((shinies[curKey()].at(-1)).count)} encounters · logged</span>`;
@@ -894,7 +937,7 @@
           <span class="en-main">
             <b>${esc(l.m.name)}${l.m.form ? ` <em>${esc(l.m.form)}</em>` : ""}</b>
             <span class="en-game">${esc(g.name)}</span>
-            <small>${fmtDate(l.ts)}${l.method ? ` · ${esc(l.method)}` : ""}${l.odds && !GAME_INFO[l.g].noOdds ? ` · 1/${l.odds}` : ""}</small>
+            <small>${fmtDate(l.ts)}${l.method ? ` · ${esc(l.method)}` : ""}${l.odds && !GAME_INFO[l.g].noOdds ? ` · 1/${l.odds}` : ""}${l.phases ? ` · after ${l.phases} ${l.phases === 1 ? "phase" : "phases"}` : ""}</small>
           </span>
           <span class="en-nums"><b>${nf(l.count)}</b><small>${fmtShort(l.time)}</small></span>
         </button>
