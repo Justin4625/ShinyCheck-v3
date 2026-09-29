@@ -910,3 +910,5 @@ body.gated { overflow: hidden; }
 .gate-google-slot { display: flex; justify-content: center; min-height: 44px; color-scheme: light; }
 .gate-google-slot[hidden] { display: none; }
 .gate-google[hidden] { display: none; }
+.gate-confirm { display: none !important; }
+.gate[data-mode="up"] .gate-confirm { display: flex !important; }

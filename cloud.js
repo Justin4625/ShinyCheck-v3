@@ -154,6 +154,9 @@ async function start() {
     $("#gateSubmit").textContent = { in: "Sign in", up: "Create account", reset: "Send reset link" }[m];
     $("#gateTitle").textContent = { in: "Welcome back, Trainer", up: "Start your journey", reset: "Reset your password" }[m];
     $("#gatePassword").required = m !== "reset";
+    $("#gatePassword").autocomplete = m === "up" ? "new-password" : "current-password";
+    $("#gateConfirm").required = m === "up";
+    $("#gateConfirm").value = "";
     setError("");
   };
   gate.addEventListener("click", e => {
@@ -194,6 +197,11 @@ async function start() {
   form.onsubmit = async e => {
     e.preventDefault();
     const email = $("#gateEmail").value.trim(), pw = $("#gatePassword").value;
+    if (mode === "up" && pw !== $("#gateConfirm").value) {
+      setError("The passwords don't match.");
+      $("#gateConfirm").focus();
+      return;
+    }
     const btn = $("#gateSubmit");
     btn.disabled = true;
     setError("");
