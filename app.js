@@ -1321,17 +1321,22 @@
     return m ? { m } : { reason: `${f} isn't in the Shiny Dex` };
   }
 
-  function scanV2() {
+  // V2 data source: this browser's localStorage (same origin as V2), or the key/value
+  // map V2's bridge page sends back when V3 runs on its own domain.
+  const localV2 = () => ({ keys: safe(() => Object.keys(localStorage)) || [], get: k => safe(() => localStorage.getItem(k)) });
+  const remoteV2 = map => ({ keys: Object.keys(map), get: k => (k in map ? String(map[k]) : null) });
+
+  function scanV2(src = localV2()) {
     const plan = { shinies: [], hunts: [], skipped: [], already: 0, perGame: {} };
     const imported = new Set(Object.values(shinies).flat().map(s => s.v2).filter(Boolean));
-    const keys = safe(() => Object.keys(localStorage)) || [];
-    const read = k => safe(() => JSON.parse(localStorage.getItem(k)));
+    const keys = src.keys;
+    const read = k => safe(() => JSON.parse(src.get(k)));
     const bump = (gid, what) => { const p = plan.perGame[gid] = plan.perGame[gid] || { shinies: 0, hunts: 0 }; p[what]++; };
     // Shinies: every <game>_shiny_<id> count, with data entries where V2 has them.
     for (const k of keys) {
       const mt = k.match(/^(plza|sv|pla|pogo)_shiny_(\d+)$/);
       if (!mt) continue;
-      const [, prefix, id] = mt, gid = V2_GAMES[prefix], count = +localStorage.getItem(k) || 0;
+      const [, prefix, id] = mt, gid = V2_GAMES[prefix], count = +src.get(k) || 0;
       const target = v2Entry(id);
       for (let n = 1; n <= count; n++) {
         const d = read(`${prefix}_shinyData_${id}_${n}`);
@@ -1364,9 +1369,53 @@
     return plan;
   }
 
-  const v2 = { root: $("#v2Import"), plan: null };
+  const v2 = { root: $("#v2Import"), plan: null, waiting: null };
+  // V2 still runs at justin4625.github.io/ShinyCheck/. On any other origin (shinycheck.nl)
+  // its data is reached through a small bridge page opened in a popup — a popup, because
+  // browsers partition the storage of cross-site iframes.
+  const V2_ORIGIN = "https://justin4625.github.io";
+  const V2_BRIDGE = V2_ORIGIN + "/ShinyCheck/v2-bridge.html";
+  const onV2Origin = location.origin === V2_ORIGIN;
+
+  function showV2Dialog() {
+    v2.root.hidden = false;
+    document.body.classList.add("drawer-open");
+  }
   function openV2() {
-    const plan = v2.plan = scanV2();
+    const local = scanV2();
+    const found = local.shinies.length + local.hunts.length + local.already + local.skipped.length;
+    if (found || onV2Origin) return previewV2(local);
+    // Not on V2's origin and nothing local: offer to connect through the bridge.
+    v2.plan = null;
+    $("#v2Body").innerHTML = `<p class="v2-fine" style="font-size:14px">Your V2 shinies are stored in the browser on V2's own address. ShinyCheck can fetch them through a small window that opens for a second and closes by itself.</p>
+      <p class="v2-fine">Use the same browser and device where you used V2.</p>
+      <button class="v2-connect" id="v2Connect">Connect to ShinyCheck V2 ✦</button>
+      <p class="v2-fine" id="v2Status"></p>`;
+    $("#v2Go").hidden = true;
+    $("#v2Connect").onclick = connectV2;
+    showV2Dialog();
+  }
+  function connectV2() {
+    const w = window.open(V2_BRIDGE, "shinycheck-v2", "popup,width=420,height=320");
+    const status = $("#v2Status");
+    if (!w) { status.textContent = "Your browser blocked the window. Allow pop-ups for this site and try again."; return; }
+    status.textContent = "Waiting for V2…";
+    clearTimeout(v2.waiting);
+    v2.waiting = setTimeout(() => {
+      if ($("#v2Status")) $("#v2Status").textContent = "No answer from V2. Close the small window if it's still open and try again.";
+    }, 15000);
+  }
+  addEventListener("message", e => {
+    if (e.origin !== V2_ORIGIN || !e.data || e.data.type !== "shinycheck-v2-data" || typeof e.data.data !== "object") return;
+    clearTimeout(v2.waiting);
+    // Only V2's own keys are used; values are parsed defensively by scanV2.
+    const map = {};
+    for (const [k, v] of Object.entries(e.data.data)) if (/^(plza|sv|pla|pogo)_(shiny|shinyData|hunt)_\d+(_\d+)?$/.test(k) && typeof v === "string") map[k] = v;
+    previewV2(scanV2(remoteV2(map)));
+  });
+
+  function previewV2(plan) {
+    v2.plan = plan;
     const total = plan.shinies.length + plan.hunts.length;
     const rows = Object.entries(plan.perGame)
       .sort(([a], [b]) => (GAME_INFO[b].released || "").localeCompare(GAME_INFO[a].released || ""))
@@ -1379,8 +1428,7 @@
       : `<p class="v2-empty">No ShinyCheck V2 data found in this browser. Open this page in the browser (and device) where you used V2.</p>`;
     $("#v2Go").hidden = !total;
     $("#v2Go").textContent = `Import ${plan.shinies.length} ${plan.shinies.length === 1 ? "shiny" : "shinies"}${plan.hunts.length ? ` & ${plan.hunts.length} ${plan.hunts.length === 1 ? "hunt" : "hunts"}` : ""} ✦`;
-    v2.root.hidden = false;
-    document.body.classList.add("drawer-open");
+    showV2Dialog();
   }
   function closeV2() {
     v2.root.hidden = true;
@@ -1388,6 +1436,7 @@
   }
   function runV2() {
     const plan = v2.plan;
+    if (!plan) return;
     for (const { gid, m, entry } of plan.shinies) {
       const k = hk(gid, m.id);
       (shinies[k] = shinies[k] || []).push(entry);
