@@ -566,6 +566,8 @@
     cur = mons.find(m => m.id === id);
     curGame = gid;
     const g = GAME_INFO[curGame];
+    $("#drPhasePick").hidden = true;
+    $("#drPhaseQ").value = "";
     for (const [k, v] of [["--accent", g.accent], ["--accent2", g.accent2]]) dr.root.style.setProperty(k, v);
     $("#drGame").textContent = g.name;
     $("#drMeta").textContent = `#${cur.dex} · ${g.short || g.name} ${codes(cur, curGame).join(" / ")}`;
@@ -712,11 +714,25 @@
     }).join("");
     $("#drPhase").hidden = !isActive(hunts[curKey()]);
   }
+  // The picker follows the hunt's game: its regional dexes in order (e.g. Paldea, then
+  // Kitakami, then Blueberry), with their numbers, and the page's Extra setting.
+  function gameDexOrder(gid) {
+    const list = [];
+    GAME_INFO[gid].sections.forEach(([p], si) => {
+      for (const m of mons) {
+        const c = codeIn(m, gid, p);
+        if (c) list.push({ m, code: c, key: si * 10000 + gameNum(c) });
+      }
+    });
+    const seen = new Set();
+    return list.sort((x, y) => x.key - y.key || x.m.id - y.m.id).filter(x => !seen.has(x.m.id) && seen.add(x.m.id));
+  }
   function renderPhaseList() {
     const q = norm($("#drPhaseQ").value.trim());
-    const pool = mons.filter(m => m.games[curGame] && m.id !== cur.id && (!q || norm(m.name).includes(q) || norm(m.form).includes(q) || m.dex.includes(q)));
-    $("#drPhaseList").innerHTML = pool.slice(0, 40).map(m => `<button data-phase="${m.id}">${m.sprite ? `<img src="${m.sprite}" alt="">` : ""}<span>${esc(m.name)}${m.form && m.form !== "Original" ? ` <em>${esc(m.form)}</em>` : ""}</span></button>`).join("")
-      || `<p class="dr-phase-none">No Pokémon found</p>`;
+    const pool = gameDexOrder(curGame).filter(({ m, code }) => m.id !== cur.id && inGamePool(m, curGame)
+      && (!q || norm(m.name).includes(q) || norm(m.form).includes(q) || norm(code).includes(q) || m.dex.includes(q)));
+    $("#drPhaseList").innerHTML = pool.slice(0, 60).map(({ m, code }) => `<button data-phase="${m.id}">${m.sprite ? `<img src="${m.sprite}" alt="">` : ""}<span><small>${esc(code)}</small>${esc(m.name)}${m.form && m.form !== "Original" ? ` <em>${esc(m.form)}</em>` : ""}</span></button>`).join("")
+      || `<p class="dr-phase-none">No Pokémon in ${esc(GAME_INFO[curGame].name)} match</p>`;
   }
   function logPhase(id) {
     const h = hunt(), m = mons.find(x => x.id === id);
