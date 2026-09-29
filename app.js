@@ -1969,7 +1969,7 @@
       : !api || !swOk || api.permission() === "unsupported" ? ["warn", "This browser can't show notifications.", close]
       : !(window.Cloud.backups && window.Cloud.backups.available()) ? ["warn", "Sign in to turn on notifications.", close]
       : api.permission() === "denied" ? ["warn", "Notifications are blocked for ShinyCheck. Allow them in your browser or phone settings, then come back here.", close]
-      : api.enabled() ? ["ok", "<b>On</b> for this device ✦", `<button class="rl-again" data-push="off">Turn off</button><button class="rl-go" data-push="test">Show a test</button>`]
+      : api.enabled() ? ["ok", "<b>On</b> for this device ✦", `<button class="rl-again" data-push="off">Turn off</button><button class="rl-go" data-pushclose>Done</button>`]
       : ["", "Off for this device.", close + `<button class="rl-go" data-push="on">Turn on ✦</button>`];
     $("#pushState").innerHTML = `<p class="v2-note ${cls}">${msg}</p>`;
     $("#pushActions").innerHTML = actions;
@@ -1991,10 +1991,6 @@
     try {
       if (act === "on") { b.textContent = "Turning on…"; await api.enable(); toast("Notifications on ✦ You'll hear about new updates"); }
       if (act === "off") { await api.disable(); toast("Notifications off"); }
-      if (act === "test") {
-        const reg = await navigator.serviceWorker.getRegistration();
-        await reg.showNotification("ShinyCheck", { body: "Notifications are working ✦", icon: BASE + "icons/icon-192.png", tag: "shinycheck-test" });
-      }
     } catch (err) {
       console.error(err);
       toast(PUSH_ERR[err.code] || `Couldn't turn on notifications (${err.code || err.message})`);
