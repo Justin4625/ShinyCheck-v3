@@ -654,6 +654,16 @@
     dr.panel.querySelector(".dr-scroll").scrollTop = 0;
   }
 
+  // Phones: −1 / +1 move to a thumb dock at the bottom of the Hunt Deck (above Gotcha!).
+  const phoneDeck = matchMedia("(max-width: 560px)");
+  const placeCountActions = () => {
+    const acts = $(".dr-count-actions");
+    if (phoneDeck.matches) $(".dr-foot").prepend(acts);
+    else $("#drCount").after(acts);
+  };
+  phoneDeck.addEventListener("change", placeCountActions);
+  placeCountActions();
+
   function closeDrawer() {
     if (!dr.root.classList.contains("open")) return;
     dr.root.classList.remove("open");
@@ -661,10 +671,30 @@
     document.body.classList.remove("drawer-open");
     if (lastFocus) lastFocus.focus({ preventScroll: true });
     if (!pip) cur = null;
+    syncWakeLock();
   }
+
+  // Keep the screen on while a hunt's timer runs in the open Hunt Deck (or pop-out),
+  // so the phone doesn't lock mid-hunt. The browser drops the lock when the tab is hidden.
+  let wakeLock = null;
+  async function syncWakeLock() {
+    const want = !!(cur && hunt().since && (pip || dr.root.classList.contains("open"))) && document.visibilityState === "visible";
+    if (want && !wakeLock && "wakeLock" in navigator) {
+      wakeLock = "pending";
+      try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener("release", () => { wakeLock = null; });
+      } catch { wakeLock = null; }
+    } else if (!want && wakeLock && wakeLock !== "pending") {
+      wakeLock.release().catch(() => {});
+      wakeLock = null;
+    }
+  }
+  document.addEventListener("visibilitychange", syncWakeLock);
 
   function paintHunt() {
     if (!cur) return;
+    syncWakeLock();
     const h = hunt(), s = elapsed(h);
     dr.count.textContent = nf(h.count);
     dr.time.textContent = fmtTime(s);
@@ -719,6 +749,8 @@
     if (sign > 0 && !h.since) return togglePlay();
     setHunt({ count: Math.max(0, h.count + sign * h.inc) });
     if (sign > 0) {
+      // A short buzz confirms the tap on phones that support it (Android; iOS ignores it).
+      if (navigator.vibrate) navigator.vibrate(12);
       const f = document.createElement("span");
       f.textContent = `+${h.inc}`;
       f.style.left = 40 + Math.random() * 20 + "%";
@@ -1362,6 +1394,7 @@
     });
     pip.addEventListener("pagehide", () => {
       pip = null;
+      setTimeout(syncWakeLock);
       pipBtn.classList.remove("on");
       if (!dr.root.classList.contains("open")) cur = null;
     });
