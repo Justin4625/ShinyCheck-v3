@@ -1170,3 +1170,12 @@ body.recaptcha .gate-legal { display: block; }
 .bk-restore.armed { background: #ff9f43; border-color: transparent; color: #14121f; }
 #bkNow[hidden] { display: none; }
 .dr-phase-list span small { display: block; font: 700 9px/1.2 var(--mono); color: var(--faint); }
+
+/* Hunt method in "Add a shiny" */
+.en-setup { display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); }
+.en-setup[hidden] { display: none; }
+.en-setup-head { display: flex; justify-content: space-between; align-items: baseline; }
+.en-setup-head span { font: 700 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.en-setup-head b { font: 800 18px/1 var(--font); letter-spacing: -.03em; background: var(--holo); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.en-setup .hs-chip { --accent: #9d7bff; --accent2: #ff7ad9; }
+.en-setup .hs-switch { --accent: #9d7bff; --accent2: #ff7ad9; }

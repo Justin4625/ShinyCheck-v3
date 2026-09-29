@@ -525,8 +525,9 @@
   }
   const defaultSetup = gid => ({ m: HUNT_SETUP[gid] ? HUNT_SETUP[gid].methods[0][0] : "wild" });
 
-  function paintSetup(h) {
-    const gid = curGame, conf = HUNT_SETUP[gid], setup = h.setup || defaultSetup(gid);
+  // Method chips + bonus rows for a game's setup; shared by the Hunt Deck and "Add a shiny".
+  function setupHtml(gid, setup) {
+    const conf = HUNT_SETUP[gid];
     const chip = (attr, on, text) => `<button class="hs-chip ${on ? "on" : ""}" ${attr}>${text}</button>`;
     // A single method needs no picker (Legends: Z-A).
     const methods = conf && conf.methods.length > 1 ? conf.methods.map(([id, label]) => chip(`data-hm="${id}"`, setup.m === id, esc(label))).join("") : "";
@@ -537,16 +538,30 @@
         ? `<div class="hs-row"><span>${esc(b.label)}</span><button class="hs-switch" role="switch" aria-checked="${!!setup[b.id]}" data-hb="${b.id}"><i></i></button></div>`
         : `<div class="hs-row"><span>${esc(b.label)}</span><div class="hs-seg">${b.levels.map(([lv], i) => chip(`data-hl="${b.id}:${i}"`, (setup[b.id] || 0) === i, esc(lv))).join("")}</div></div>`).join("");
     }
-    $("#drSetup").innerHTML = `<div class="hs-methods">${methods}</div>${rows}`;
+    return `<div class="hs-methods">${methods}</div>${rows}`;
+  }
+  function paintSetup(h) {
+    $("#drSetup").innerHTML = setupHtml(curGame, h.setup || defaultSetup(curGame));
     $("#drOddsShow").textContent = `1/${nf(h.odds)}`;
   }
-  function changeSetup(patch) {
-    const h = hunt(), setup = { ...(h.setup || defaultSetup(curGame)), ...patch };
+  function patchSetup(gid, setup, patch) {
+    const next = { ...setup, ...patch };
     // Legends: Arceus gives the Shiny Charm only once every species is at research level 10.
-    if (curGame === "pla") {
-      if (patch.charm && !setup.research) setup.research = 1;
-      if ("research" in patch && !patch.research && setup.charm) setup.research = 1;
+    if (gid === "pla") {
+      if (patch.charm && !next.research) next.research = 1;
+      if ("research" in patch && !patch.research && next.charm) next.research = 1;
     }
+    return next;
+  }
+  // Turn a click on a setup chip/switch into a patch (or null).
+  function setupPatch(t, setup) {
+    if (t.dataset.hm) return { m: t.dataset.hm };
+    if (t.dataset.hb) return { [t.dataset.hb]: !setup[t.dataset.hb] };
+    if (t.dataset.hl) { const [id, i] = t.dataset.hl.split(":"); return { [id]: +i }; }
+    return null;
+  }
+  function changeSetup(patch) {
+    const setup = patchSetup(curGame, hunt().setup || defaultSetup(curGame), patch);
     const { odds } = evalSetup(curGame, setup);
     setHunt({ setup, odds });
   }
@@ -788,11 +803,8 @@
   dr.gotcha.addEventListener("click", gotcha);
   $("#drSetup").addEventListener("click", e => {
     const t = e.target.closest("button");
-    if (!t) return;
-    const setup = hunt().setup || defaultSetup(curGame);
-    if (t.dataset.hm) changeSetup({ m: t.dataset.hm });
-    else if (t.dataset.hb) changeSetup({ [t.dataset.hb]: !setup[t.dataset.hb] });
-    else if (t.dataset.hl) { const [id, i] = t.dataset.hl.split(":"); changeSetup({ [id]: +i }); }
+    const patch = t && setupPatch(t, hunt().setup || defaultSetup(curGame));
+    if (patch) changeSetup(patch);
   });
   $("#drInc").addEventListener("change", e => setHunt({ inc: Math.max(1, +e.target.value || 1) }));
   $("#drSetCount").addEventListener("change", e => setHunt({ count: Math.max(0, +e.target.value || 0) }));
@@ -866,7 +878,16 @@
   // ---------- Dex Entry (Living Dex): all shinies of a species across games ----------
   const en = { root: $("#entry"), panel: $("#entry .drawer-panel"), log: $("#enLog") };
   let entryMon = null, entryFocus = null, editing = null, pendingHunt = null, adding = false;
-  const ODDS = [8192, 4096, 2048, 1365, 1024, 683, 512, 256, 128];
+  // Setup for "Add a shiny": starts from the game's remembered hunt setup.
+  let addSetup = null;
+  const addSetupFor = g => ({ ...defaultSetup(g), ...((prefs[g] || {}).setup || {}) });
+  function paintAddSetup(g) {
+    const box = $("#enSetup");
+    if (!box) return;
+    box.hidden = !!GAME_INFO[g].noOdds || !HUNT_SETUP[g];
+    if (box.hidden) return;
+    box.innerHTML = `<div class="en-setup-head"><span>Hunt method</span><b>1/${nf(evalSetup(g, addSetup).odds)}</b></div>${setupHtml(g, addSetup)}`;
+  }
   const speciesOf = m => mons.filter(x => x.dex === m.dex);
 
   // Next evolution entries for a form. PokeAPI chains are per species, so regional
@@ -994,13 +1015,14 @@
     // Otherwise the newest main-series game this form is in.
     const newest = addGames.filter(g => !GAME_INFO[g].logOnly).sort((x, y) => GAME_INFO[y].released.localeCompare(GAME_INFO[x].released))[0];
     const preset = (EVENT_ONLY[+m.dex] || "").includes("Pokémon HOME gift") ? "home" : newest || addGames[0];
+    if (adding && !addSetup) addSetup = addSetupFor(preset);
     const now = new Date(), nowLocal = new Date(now - now.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
     $("#enAdd").innerHTML = adding ? `<div class="en-add-form">
         <div class="wide">${gamePicker(addGames, preset)}</div>
         <label>Encounters<input type="number" min="0" name="count" value="0"></label>
         <label>Hours<input type="number" min="0" name="h" value="0"></label>
         <label>Min<input type="number" min="0" max="59" name="m" value="0"></label>
-        <label class="en-odds" ${GAME_INFO[preset].noOdds ? "hidden" : ""}>Odds<select name="odds">${ODDS.map(o => `<option value="${o}" ${o === 4096 ? "selected" : ""}>1/${o}</option>`).join("")}</select></label>
+        <div class="wide en-setup" id="enSetup"></div>
         <label class="wide">Caught on<input type="datetime-local" name="ts" value="${nowLocal}"></label>
         <div class="en-edit-actions">
           <button class="en-save" data-add-save>Add ${esc(m.name)}${m.form && m.form !== "Original" ? ` (${esc(m.form)})` : ""} ✦</button>
@@ -1008,6 +1030,7 @@
         </div>
       </div>`
       : `<button class="en-add-btn" data-add-open><span>+</span> Add a shiny manually</button>`;
+    if (adding) paintAddSetup(preset);
 
     const games = GAMES.filter(gid => m.games[gid]);
     $("#enGames").innerHTML = games.length
@@ -1019,12 +1042,11 @@
       : `<p class="en-none">Not obtainable in the tracked games.</p>`;
   }
 
-  // GO and HOME have no odds to pick; main-series games default to the odds last used there.
+  // Picking a game loads its setup (GO and HOME have none); defaults to the setup last used there.
   en.root.addEventListener("change", e => {
     if (e.target.name !== "game" || !e.target.closest(".en-add-form")) return;
-    const form = e.target.closest(".en-add-form"), go = !!GAME_INFO[e.target.value].noOdds;
-    form.querySelector(".en-odds").hidden = go;
-    if (!go) form.querySelector('[name="odds"]').value = (prefs[e.target.value] || {}).odds || 4096;
+    addSetup = addSetupFor(e.target.value);
+    paintAddSetup(e.target.value);
   });
 
   en.root.addEventListener("input", e => {
@@ -1037,14 +1059,20 @@
 
   en.root.addEventListener("click", e => {
     if (e.target.closest("[data-eclose]")) return closeEntry();
-    if (e.target.closest("[data-add-open]")) { adding = true; editing = null; return paintEntry(); }
+    if (e.target.closest("[data-add-open]")) { adding = true; addSetup = null; editing = null; return paintEntry(); }
     if (e.target.closest("[data-add-cancel]")) { adding = false; return paintEntry(); }
+    const setupBtn = e.target.closest("#enSetup button");
+    if (setupBtn) {
+      const g = en.root.querySelector('.en-add-form [name="game"]:checked').value, patch = setupPatch(setupBtn, addSetup);
+      if (patch) { addSetup = patchSetup(g, addSetup, patch); paintAddSetup(g); }
+      return;
+    }
     const addBtn = e.target.closest("[data-add-save]");
     if (addBtn) {
       const f = addBtn.closest(".en-add-form"), val = n => f.querySelector(`[name="${n}"]:not([type="radio"]), [name="${n}"]:checked`).value;
       const g = val("game"), ts = new Date(val("ts")).getTime(), num = n => Math.max(0, +val(n) || 0);
       const k = hk(g, entryMon.id);
-      (shinies[k] = shinies[k] || []).push({ count: num("count"), time: num("h") * 3600 + num("m") * 60, odds: GAME_INFO[g].noOdds ? null : +val("odds"), ts: isNaN(ts) ? Date.now() : ts, manual: true });
+      (shinies[k] = shinies[k] || []).push({ count: num("count"), time: num("h") * 3600 + num("m") * 60, ...(GAME_INFO[g].noOdds || !HUNT_SETUP[g] ? { odds: null } : { odds: evalSetup(g, addSetup).odds, method: evalSetup(g, addSetup).label }), ts: isNaN(ts) ? Date.now() : ts, manual: true });
       shinies[k].sort((x, y) => x.ts - y.ts);
       saveShinies();
       adding = false;
