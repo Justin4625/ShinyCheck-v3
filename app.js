@@ -304,7 +304,8 @@
   function renderSidebar() {
     $("#sideDexPct").textContent = fmtPct(pct(mons));
     $("#sideDexBar").style.width = pct(mons) + "%";
-    el.sideGames.innerHTML = GAMES.map(id => {
+    // Newest release first (GAMES itself runs oldest → newest).
+    el.sideGames.innerHTML = [...GAMES].reverse().map(id => {
       const g = GAME_INFO[id], l = mons.filter(m => m.games[id]);
       return `<a class="side-item ${state.page === id ? "active" : ""}" href="#/${id}" style="--c:${g.accent};--g:${gameGrad(g)}">
         <span class="side-icon"></span>
