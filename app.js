@@ -71,19 +71,19 @@
     1007: "Only via an event distribution (2025).",
     1008: "Only via an event distribution (2025).",
   };
-  // Shiny locks within one game (Serebii's shiny-lock table, Sept 2026): every way to get the
-  // Pokémon in that game is locked. Species you can breed there aren't locked (the egg can be
-  // shiny). "dex:Form" locks only that form. Evolutions of a locked-only line are locked too.
+  // Shiny locks within one game (Serebii's shiny-lock table, Sept 2026), kept only when every way
+  // to get the Pokémon in that game is locked — checked against Serebii's locations. A locked
+  // gift doesn't count if it's also wild or breedable there (e.g. the Z-A starters in Wild
+  // Zone 20, the PLA starters in outbreaks). "dex:Form" locks only that form; evolutions of a
+  // locked-only line are locked too.
   const GAME_LOCKS = {
     usum: [718, 785, 786, 787, 788, 791, 792, 800],
     swsh: [772, 773, 803, 804, 888, 889, "144:Galarian", "145:Galarian", "146:Galarian"],
     bdsp: [151, 385],
-    pla: [155, 156, "157:Hisuian", 501, 502, "503:Hisuian", 722, 723, "724:Hisuian", "37:Alolan", "38:Alolan",
-      480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 641, 642, 645, 905],
+    pla: [480, 481, 482, 483, 484, 485, 486, 487, 488, 489, 490, 491, 492, 493, 641, 642, 645, 905],
     sv: [999, 1000, 144, 145, 146, 243, 244, 245, 249, 250, 380, 381, 382, 383, 384,
       638, 639, 640, 643, 644, 646, 791, 792, 800],
-    lza: [1, 2, 3, 4, 5, 6, 7, 8, 9, 150, 152, 153, 154, 158, 159, 160, 498, 499, 500, 716, 717, 718,
-      382, 383, 384, 485, 491, 647, 648, 649, 720, 721, 801, 802, 807, 808, 809, 999, 1000],
+    lza: [150, 716, 717, 718, 382, 383, 384, 485, 491, 647, 648, 649, 720, 721, 801, 802, 807, 808, 809],
   };
   const lockedIn = (m, gid) => !!gid && (SHINY_LOCKED.has(+m.dex)
     || (GAME_LOCKS[gid] || []).some(k => k === +m.dex || k === `${+m.dex}:${m.form}`));
