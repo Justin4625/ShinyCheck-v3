@@ -1022,6 +1022,7 @@
         <label>Encounters<input type="number" min="0" name="count" value="0"></label>
         <label>Hours<input type="number" min="0" name="h" value="0"></label>
         <label>Min<input type="number" min="0" max="59" name="m" value="0"></label>
+        <label>Sec<input type="number" min="0" max="59" name="s" value="0"></label>
         <div class="wide en-setup" id="enSetup"></div>
         <label class="wide">Caught on<input type="datetime-local" name="ts" value="${nowLocal}"></label>
         <div class="en-edit-actions">
@@ -1072,7 +1073,7 @@
       const f = addBtn.closest(".en-add-form"), val = n => f.querySelector(`[name="${n}"]:not([type="radio"]), [name="${n}"]:checked`).value;
       const g = val("game"), ts = new Date(val("ts")).getTime(), num = n => Math.max(0, +val(n) || 0);
       const k = hk(g, entryMon.id);
-      (shinies[k] = shinies[k] || []).push({ count: num("count"), time: num("h") * 3600 + num("m") * 60, ...(GAME_INFO[g].noOdds || !HUNT_SETUP[g] ? { odds: null } : { odds: evalSetup(g, addSetup).odds, method: evalSetup(g, addSetup).label }), ts: isNaN(ts) ? Date.now() : ts, manual: true });
+      (shinies[k] = shinies[k] || []).push({ count: num("count"), time: num("h") * 3600 + num("m") * 60 + num("s"), ...(GAME_INFO[g].noOdds || !HUNT_SETUP[g] ? { odds: null } : { odds: evalSetup(g, addSetup).odds, method: evalSetup(g, addSetup).label }), ts: isNaN(ts) ? Date.now() : ts, manual: true });
       shinies[k].sort((x, y) => x.ts - y.ts);
       saveShinies();
       adding = false;
