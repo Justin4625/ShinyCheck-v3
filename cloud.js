@@ -1,7 +1,7 @@
 // Accounts + cloud sync (Firebase Auth + Firestore).
 // The app keeps working from localStorage; this module mirrors that state into one
 // Firestore document per account (users/{uid}) and pulls changes from other devices.
-import { firebaseConfig } from "./firebase-config.js";
+import { firebaseConfig, googleClientId } from "./firebase-config.js";
 
 const $ = s => document.querySelector(s);
 const gate = $("#gate");
@@ -27,7 +27,7 @@ async function start() {
     import(`https://www.gstatic.com/firebasejs/${V}/firebase-firestore.js`),
   ]);
   const {
-    getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider, signOut,
+    getAuth, onAuthStateChanged, signInWithPopup, signInWithCredential, GoogleAuthProvider, signOut,
     signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail,
   } = authMod;
   const {
@@ -160,11 +160,37 @@ async function start() {
     const t = e.target.closest("[data-mode]");
     if (t && t !== gate) setMode(t.dataset.mode);
   });
+  // Google sign-in. With a client ID we use Google's own "Sign in with Google" button:
+  // it runs on this domain and hands Firebase an ID token, which avoids Firebase's
+  // redirect through firebaseapp.com that mobile browsers break (storage partitioning).
+  // Without one, fall back to Firebase's popup (fine on desktop).
   $("#gateGoogle").onclick = async () => {
     setError("");
     try { await signInWithPopup(auth, new GoogleAuthProvider()); }
     catch (err) { setError(friendly(err)); }
   };
+  if (googleClientId) {
+    loadScript("https://accounts.google.com/gsi/client").then(() => {
+      google.accounts.id.initialize({
+        client_id: googleClientId,
+        callback: async ({ credential }) => {
+          setError("");
+          try { await signInWithCredential(auth, GoogleAuthProvider.credential(credential)); }
+          catch (err) { setError(friendly(err)); }
+        },
+        ux_mode: "popup",
+        use_fedcm_for_button: true,
+      });
+      const slot = $("#gateGoogleSlot");
+      google.accounts.id.renderButton(slot, {
+        type: "standard", shape: "pill", size: "large", text: "continue_with", locale: "en",
+        theme: matchMedia("(prefers-color-scheme: dark)").matches || document.documentElement.dataset.theme === "dark" ? "filled_black" : "outline",
+        width: Math.min(360, slot.clientWidth || 360),
+      });
+      $("#gateGoogle").hidden = true;
+      slot.hidden = false;
+    }).catch(() => { /* keep the Firebase popup button */ });
+  }
   form.onsubmit = async e => {
     e.preventDefault();
     const email = $("#gateEmail").value.trim(), pw = $("#gatePassword").value;
@@ -184,6 +210,13 @@ async function start() {
     btn.disabled = false;
   };
   setMode("in");
+}
+
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    const s = Object.assign(document.createElement("script"), { src, async: true, onload: resolve, onerror: reject });
+    document.head.append(s);
+  });
 }
 
 function friendly(err) {

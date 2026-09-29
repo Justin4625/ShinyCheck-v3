@@ -10,3 +10,7 @@ export const firebaseConfig = {
   messagingSenderId: "723087237579",
   appId: "1:723087237579:web:caa93a12ff6e1da0ccd64e",
 };
+
+// OAuth "Web client ID" for Google sign-in (Firebase → Authentication → Sign-in method →
+// Google → Web SDK configuration). Makes Google sign-in work on mobile. null = popup only.
+export const googleClientId = "723087237579-gk9gi4c1dhtgkhmfvoiudhjb0ktrnp3i.apps.googleusercontent.com";
