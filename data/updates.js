@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "xy-2026-09",
+    date: "2026-09-30",
+    title: "X & Y",
+    text: "Kalos is in: the Central, Coastal and Mountain Kalos dexes, the Pokémon you can get beyond them (Friend Safari, fossils) and hunts with the Poké Radar, the Friend Safari, chain fishing and hordes.",
+    steps: [
+      "Open **X & Y** in the menu.",
+      "Start a hunt and pick **Poké Radar**, **Friend Safari** or **Chain fishing**, then set your chain.",
+      "Turn on **Count outside the dex** to count the Friend Safari Pokémon and fossils too.",
+    ],
+    shot: "shots/updates/xy.webp",
+    action: { label: "Open X & Y", go: "xy" },
+  },
+  {
     id: "oras-2026-09",
     date: "2026-09-30",
     title: "Omega Ruby & Alpha Sapphire",

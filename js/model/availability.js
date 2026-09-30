@@ -27,6 +27,8 @@ export const EVENT_ONLY = {
 // Zone 20, the PLA starters in outbreaks). "dex:Form" locks only that form; evolutions of a
 // locked-only line are locked too.
 const GAME_LOCKS = {
+  // Bulbapedia's shiny-lock table: in X & Y the legendary birds, Mewtwo and the Kalos trio can't be shiny.
+  xy: [144, 145, 146, 150, 716, 717, 718],
   // Kyogre and Groudon are each only in one version, both locked there.
   oras: [382, 383, 384, 386],
   sm: [718, 785, 786, 787, 788, 791, 792, 793, 794, 795, 796, 797, 798, 799, 800],

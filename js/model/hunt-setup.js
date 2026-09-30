@@ -10,6 +10,8 @@
 // chosen level reads in the method label; default "<label> <level>").
 const CHARM = { id: "charm", label: "Shiny Charm", type: "toggle" };
 const pctToOdds = pct => Math.round(1000 / pct) / 10;
+// Chain fishing (X & Y, Omega Ruby & Alpha Sapphire): 2 extra rolls per hook in a row, up to 20.
+const FISH = { id: "fish", label: "Chain", type: "level", levels: [["–", 0], ["5+", 10], ["10+", 20], ["15+", 30], ["20+", 40]] };
 // DexNav (Omega Ruby & Alpha Sapphire), after RotomLabs' DexNav calculator: the search level gives a
 // chance p per extra roll; the next Pokémon gets 1 (3 with the charm) extra rolls, +4 on every 5th in the
 // chain (a guaranteed boost; otherwise a 4% chance of one), +5 on the 50th and +10 on the 100th.
@@ -38,7 +40,17 @@ export const HUNT_SETUP = {
         levels: [["0", 0], ["10+", 10], ["25+", 25], ["50+", 50], ["100+", 100], ["200+", 200], ["400+", 400], ["600+", 600], ["800+", 800], ["999", 999]] },
       { id: "dchain", label: "Chain", type: "level", tag: lv => lv === "–" ? "" : `${lv} in chain`,
         levels: [["–", 0], ["Every 5th", 4], ["50th", 49], ["100th", 99]] },
-      { id: "fish", label: "Chain", type: "level", levels: [["–", 0], ["5+", 10], ["10+", 20], ["15+", 30], ["20+", 40]] }] },
+      FISH] },
+  // X & Y (RotomLabs / PokéTools): the Shiny Charm adds 2 rolls, 1 for regular eggs; chain fishing and
+  // hordes as in ORAS. The Friend Safari gives 5 rolls (1/820, 1/586 with the charm). Poké Radar: the
+  // chance a patch is shiny, ⌈65535 / (8200 − 200 × chain)⌉ / 65536, up to 1/200 at 40; below a chain
+  // of 30 that's no better than a normal encounter. The Shiny Charm isn't counted for the radar.
+  xy: { methods: [["wild", "Wild", 1, ["charm"]], ["radar", "Poké Radar", lv => lv("rchain"), ["rchain"]],
+    ["fish", "Chain fishing", 1, ["fish", "charm"]], ["horde", "Horde", 5, ["charm:10"]], ["safari", "Friend Safari", 5, ["charm"]],
+    ["breed", "Breeding", 1, ["charm:1"]], ["masuda", "Masuda", 6, ["charm"]]],
+    bonus: [{ ...CHARM, rolls: 2 }, FISH,
+      { id: "rchain", label: "Chain", type: "level", def: 7, tag: lv => `chain ${lv}`,
+        levels: [["0–29", 4096], ["30+", 2185], ["35", 1192], ["36", 993], ["37", 799], ["38", 596], ["39", 400], ["40", 200]] }] },
   // Allowed bonuses may override their rolls per method ("charm:1"). Checked against
   // RotomLabs: in SwSh the charm adds 2 rolls in the wild and in Masuda, 1 for regular
   // eggs; in BD & SP it does nothing in the wild, Grand Underground or Poké Radar.
