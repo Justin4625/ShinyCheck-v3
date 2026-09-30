@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "emerald-2026-09",
+    date: "2026-09-30",
+    title: "Emerald",
+    text: "Emerald is in: the Hoenn dex and every Pokémon you can get beyond it (the Safari Zone extension, the Johto starters from Professor Birch, the Battle Frontier). Hunts use Gen 3's odds of 1 in 8,192.",
+    steps: [
+      "Open **Emerald** in the menu.",
+      "Start a hunt: **Wild** or **Breeding**.",
+      "Turn on **Count outside the dex** to count the Johto Pokémon too.",
+    ],
+    shot: "shots/updates/emerald.webp",
+    action: { label: "Open Emerald", go: "emerald" },
+  },
+  {
     id: "pt-2026-09",
     date: "2026-09-30",
     title: "Platinum",

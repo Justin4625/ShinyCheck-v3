@@ -27,6 +27,9 @@ export const EVENT_ONLY = {
 // Zone 20, the PLA starters in outbreaks). "dex:Form" locks only that form; evolutions of a
 // locked-only line are locked too.
 const GAME_LOCKS = {
+  // Emerald: Meditite, Roselia, Zangoose and Lunatone (and Medicham) are in its Hoenn dex but only come by
+  // trading from Ruby & Sapphire; Jirachi and Deoxys only through events (Birth Island needs a ticket).
+  emerald: [307, 308, 315, 335, 337, 385, 386],
   // Diamond & Pearl: Manaphy is in the Sinnoh dex but only hatches from the Pokémon Ranger egg.
   dp: [490],
   // Platinum: Manaphy too, and Murkrow, Misdreavus, Glameow and Stunky (and their evolutions) are in its
