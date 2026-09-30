@@ -30,6 +30,8 @@ function dexNavOdds(level, chain, charm) {
   return Math.round(1 / ((1 - h) * base + h));
 }
 export const HUNT_SETUP = {
+  // FireRed & LeafGreen (RotomLabs): 1/8192 in the wild and for eggs; no Masuda Method or Shiny Charm yet.
+  frlg: { rate: 8192, methods: [["wild", "Wild", 1, []], ["breed", "Breeding", 1, []]], bonus: [] },
   // Emerald (RotomLabs): 1/8192 in the wild and for eggs; no Masuda Method or Shiny Charm yet.
   emerald: { rate: 8192, methods: [["wild", "Wild", 1, []], ["breed", "Breeding", 1, []]], bonus: [] },
   // Diamond & Pearl (RotomLabs, PokéTools): 1/8192, Masuda 5 rolls (1/1639), no Shiny Charm. Poké Radar: the

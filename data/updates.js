@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "frlg-2026-09",
+    date: "2026-09-30",
+    title: "FireRed & LeafGreen",
+    text: "Kanto is back: the Kanto dex and every Pokémon you can get beyond it on the Sevii Islands (Johto Pokémon, the legendary beasts, Togepi's egg). Hunts use Gen 3's odds of 1 in 8,192.",
+    steps: [
+      "Open **FireRed & LeafGreen** in the menu.",
+      "Start a hunt: **Wild** or **Breeding**.",
+      "Turn on **Count outside the dex** to count the Sevii Islands Pokémon too.",
+    ],
+    shot: "shots/updates/frlg.webp",
+    action: { label: "Open FireRed & LeafGreen", go: "frlg" },
+  },
+  {
     id: "emerald-2026-09",
     date: "2026-09-30",
     title: "Emerald",

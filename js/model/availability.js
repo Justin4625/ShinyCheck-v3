@@ -27,6 +27,8 @@ export const EVENT_ONLY = {
 // Zone 20, the PLA starters in outbreaks). "dex:Form" locks only that form; evolutions of a
 // locked-only line are locked too.
 const GAME_LOCKS = {
+  // FireRed & LeafGreen: Mew is in the Kanto dex but only came through events.
+  frlg: [151],
   // Emerald: Meditite, Roselia, Zangoose and Lunatone (and Medicham) are in its Hoenn dex but only come by
   // trading from Ruby & Sapphire; Jirachi and Deoxys only through events (Birth Island needs a ticket).
   emerald: [307, 308, 315, 335, 337, 385, 386],
