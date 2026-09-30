@@ -275,6 +275,8 @@ step("hunt deck: more hunt methods", async () => {
   await key("Escape");
   await open("bdsp", "bidoof");
   await click('#drSetup [data-hm="radar"]');
+  expect((await odds()) === "1/4,096", `a new radar chain starts at 0 (1/4,096), got ${await odds()}`);
+  await click('#drSetup [data-hl="chain:8"]');
   expect((await odds()) === "1/99", `radar chain 40 is 1/99, got ${await odds()}`);
   await click('#drSetup [data-hl="chain:6"]');
   expect((await odds()) === "1/400", `radar chain 38 is 1/400, got ${await odds()}`);
@@ -305,7 +307,18 @@ step("hunt deck: more hunt methods", async () => {
   await key("Escape");
   await open("xy", "pikachu");
   await click('#drSetup [data-hm="radar"]');
-  expect((await odds()) === "1/200", `Poké Radar at chain 40 is 1/200, got ${await odds()}`);
+  expect((await text("#drChainN")) === "0" && (await odds()) === "1/4,096", `a new radar chain starts at 0 (1/4,096), got ${await text("#drChainN")} at ${await odds()}`);
+  await click("#drPlus"); for (let i = 0; i < 35; i++) await click("#drPlus", 20);
+  expect((await text("#drChainN")) === "35" && (await odds()) === "1/1,192", `35 encounters make a chain of 35 (1/1,192), got ${await text("#drChainN")} at ${await odds()}`);
+  await capture("hunt deck radar chain");
+  await click("#drChainBreak");
+  expect((await text("#drChainN")) === "0" && (await text("#drCount")) === "35", `Chain broke resets the chain, not the count (${await text("#drChainN")}, ${await text("#drCount")})`);
+  expect((await text("#drChainNote")).includes("broke 1×") && (await text("#drChainNote")).includes("longest 35"), `chain note, got ${await text("#drChainNote")}`);
+  await click(".toast-action");
+  expect((await text("#drChainN")) === "35", `Undo brings the chain back, got ${await text("#drChainN")}`);
+  await click('#drSetup [data-hl="rchain:7"]');
+  expect((await text("#drChainN")) === "40" && (await odds()) === "1/200", `picking 40 jumps the chain there (1/200), got ${await text("#drChainN")} at ${await odds()}`);
+  await click("#drReset"); await click("#drReset");
   await click('#drSetup [data-hm="safari"]'); await click('#drSetup [data-hb="charm"]');
   expect((await odds()) === "1/586", `Friend Safari with charm is 1/586, got ${await odds()}`);
   await click('#drSetup [data-hm="wild"]'); await click('#drSetup [data-hb="charm"]');
@@ -461,6 +474,8 @@ step("phone layout", async () => {
   await js(`document.getElementById("drSetup").scrollIntoView({ block: "center" })`, 200);
   const wideRadar = await js(`[...document.querySelectorAll("#drSetup *")].filter(e => { const r = e.getBoundingClientRect(); return r.width && r.right > innerWidth + 1; }).length`);
   expect(wideRadar === 0, `X & Y method and radar chips fit a 360px phone (${wideRadar})`);
+  const chainRow = await js(`(() => { const r = document.getElementById("drChain").getBoundingClientRect(), b = document.getElementById("drChainBreak").getBoundingClientRect(); return r.width > 0 && r.right <= innerWidth && b.height >= 40; })()`);
+  expect(chainRow, "radar chain row fits a 360px phone with a 40px+ button");
   await capture("phone xy radar 360");
   await click('#drSetup [data-hm="wild"]');
   await key("Escape");

@@ -1,0 +1,18 @@
+/* Poké Radar chain in the Hunt Deck (js/features/hunt-deck/chain.js): the chain length, how often it
+   broke, and the "Chain broke" button. */
+.dr-chain {
+  display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 8px 8px 8px 14px; text-align: left;
+  border-radius: 14px; border: 1px solid var(--border); background: var(--surface-2);
+}
+.dr-chain[hidden] { display: none; }
+.dr-chain-val { display: flex; flex-direction: column; gap: 3px; flex: none; }
+.dr-chain-val span { font: 700 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.dr-chain-val b { font: 800 24px/1 var(--font); letter-spacing: -.03em; color: var(--accent); font-variant-numeric: tabular-nums; }
+.dr-chain-note { flex: 1; min-width: 0; font-size: 12px; color: var(--muted); }
+.dr-chain-break {
+  flex: none; min-height: 42px; padding: 0 14px; border-radius: 12px; cursor: pointer; font-weight: 750; font-size: 13px;
+  border: 1px solid var(--border-2); background: var(--surface); color: var(--text); transition: color .2s, border-color .2s;
+}
+.dr-chain-break:disabled { opacity: .45; cursor: default; }
+@media (hover: hover) { .dr-chain-break:not(:disabled):hover { color: #ff5f7a; border-color: #ff5f7a; } }
+@media (max-height: 640px), (max-width: 420px) { .dr-chain { flex-basis: 100%; } }

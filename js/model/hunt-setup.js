@@ -7,7 +7,8 @@
 // checked against RotomLabs and PokéTools. Some methods have a fixed rate ({ odds, charm }) or a table/formula of their
 // own (a function of the chosen levels) instead. A new game only needs its parts.
 // A level bonus may set `def` (the level used when a setup hasn't picked one yet) and `tag` (how the
-// chosen level reads in the method label; default "<label> <level>").
+// chosen level reads in the method label; default "<label> <level>"). A `live` level bonus is a chain the
+// Hunt Deck counts itself (see liveChain).
 const CHARM = { id: "charm", label: "Shiny Charm", type: "toggle" };
 const pctToOdds = pct => Math.round(1000 / pct) / 10;
 // Chain fishing (X & Y, Omega Ruby & Alpha Sapphire): 2 extra rolls per hook in a row, up to 20.
@@ -57,7 +58,7 @@ export const HUNT_SETUP = {
     ["fish", "Chain fishing", 1, ["fish", "charm"]], ["horde", "Horde", 5, ["charm:10"]], ["safari", "Friend Safari", 5, ["charm"]],
     ["breed", "Breeding", 1, ["charm:1"]], ["masuda", "Masuda", 6, ["charm"]]],
     bonus: [{ ...CHARM, rolls: 2 }, FISH,
-      { id: "rchain", label: "Chain", type: "level", def: 7, tag: lv => `chain ${lv}`,
+      { id: "rchain", label: "Chain", type: "level", def: 7, live: true, tag: lv => `chain ${lv}`,
         levels: [["0–29", 4096], ["30+", 2185], ["35", 1192], ["36", 993], ["37", 799], ["38", 596], ["39", 400], ["40", 200]] }] },
   // Allowed bonuses may override their rolls per method ("charm:1"). Checked against
   // RotomLabs: in SwSh the charm adds 2 rolls in the wild and in Masuda, 1 for regular
@@ -97,7 +98,7 @@ export const HUNT_SETUP = {
   bdsp: { methods: [["wild", "Wild", 1, []], ["gu", "Grand Underground", 1, ["diglett"]], ["breed", "Breeding", 1, ["charm:1"]],
     ["masuda", "Masuda", 6, ["charm"]], ["radar", "Poké Radar", lv => lv("chain"), ["chain"]]],
     bonus: [{ ...CHARM, rolls: 2 }, { id: "diglett", label: "Diglett bonus", type: "toggle", rolls: 1 },
-      { id: "chain", label: "Chain", type: "level", def: 8, tag: lv => `chain ${lv}`,
+      { id: "chain", label: "Chain", type: "level", def: 8, live: true, tag: lv => `chain ${lv}`,
         levels: [["0–9", 4096], ["10+", 2521], ["20+", 1820], ["30+", 1310], ["36", 993], ["37", 799], ["38", 400], ["39", 200], ["40+", 99]] }] },
   pla: { methods: [["wild", "Wild", 1, ["charm", "research"]], ["mo", "Mass outbreak", 26, ["charm", "research"]], ["mmo", "Massive mass outbreak", 13, ["charm", "research"]]],
     bonus: [{ ...CHARM, rolls: 3 }, { id: "research", label: "Research", type: "level", levels: [["–", 0], ["Lv 10", 1], ["Perfect", 3]] }] },
@@ -128,7 +129,9 @@ export function evalSetup(gid, setup) {
     const lv = id => { const b = active.find(x => x.id === id); return b.type === "toggle" ? !!setup[id] : (b.levels[levelOf(b, setup)] || b.levels[0])[1]; };
     for (const b of active) {
       if (b.type === "toggle") { if (setup[b.id]) parts.push(b.label); continue; }
-      const l = (b.levels[levelOf(b, setup)] || b.levels[0])[0], tag = b.tag ? b.tag(l) : `${b.label} ${l}`;
+      // A live chain reads as its real length ("chain 37"), not the level it falls in.
+      const l = b.live && setup[b.id + "N"] != null ? String(setup[b.id + "N"]) : (b.levels[levelOf(b, setup)] || b.levels[0])[0];
+      const tag = b.tag ? b.tag(l) : `${b.label} ${l}`;
       if (tag) parts.push(tag);
     }
     return { odds: base(lv), label: parts.join(" · ") };
@@ -145,9 +148,29 @@ export function evalSetup(gid, setup) {
   }
   return { odds: rollsToOdds(rolls, conf.rate), label: parts.join(" · ") };
 }
+// Live chains (the Poké Radar): the chain length itself is kept in setup[`${id}N`] and picks the level
+// (the last one it has reached, "36" from 36, "30+" from 30). Tapping a level jumps the chain to its
+// start. Setups from before live chains only have the level; their chain is that level's start.
+const levelStart = (b, i) => parseInt(b.levels[i][0], 10) || 0;
+export function liveChain(gid, setup = {}) {
+  const conf = HUNT_SETUP[gid];
+  if (!conf) return null;
+  const allowed = (conf.methods.find(([id]) => id === setup.m) || conf.methods[0])[3].map(x => x.split(":")[0]);
+  return conf.bonus.find(b => b.live && allowed.includes(b.id)) || null;
+}
+export const chainOf = (b, setup) => setup[b.id + "N"] ?? levelStart(b, levelOf(b, setup));
+const levelFor = (b, n) => b.levels.reduce((best, _, i) => levelStart(b, i) <= n ? i : best, 0);
 export const defaultSetup = gid => ({ m: HUNT_SETUP[gid] ? HUNT_SETUP[gid].methods[0][0] : "wild" });
 export function patchSetup(gid, setup, patch) {
   const next = { ...setup, ...patch };
+  const live = liveChain(gid, next);
+  if (live) {
+    const n = live.id + "N";
+    // Switching to the radar starts a fresh chain, unless this setup already counts one.
+    if ("m" in patch && patch.m !== setup.m && !(n in next)) { next[n] = 0; next[live.id] = 0; }
+    if (live.id in patch) next[n] = levelStart(live, patch[live.id]);
+    if (n in patch) next[live.id] = levelFor(live, next[n]);
+  }
   // Legends: Arceus gives the Shiny Charm only once every species is at research level 10.
   if (gid === "pla") {
     if (patch.charm && !next.research) next.research = 1;

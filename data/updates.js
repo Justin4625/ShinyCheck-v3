@@ -10,6 +10,18 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "radar-chain-2026-09",
+    date: "2026-09-30",
+    title: "Poké Radar chains",
+    text: "Hunting with the Poké Radar in X & Y or BD & SP? The Hunt Deck now counts your chain with every encounter and the odds follow it. Chain broke? One tap sets it back to 0, your encounters stay.",
+    steps: [
+      "Open a hunt in **X & Y** or **BD & SP** and pick **Poké Radar**.",
+      "Every **+1** adds one to your chain; the odds go up as it grows.",
+      "Chain broke? Tap **Chain broke**. Tapped it by accident? **Undo**.",
+    ],
+    action: { label: "Open X & Y", go: "xy" },
+  },
+  {
     id: "hgss-2026-09",
     date: "2026-09-30",
     title: "HeartGold & SoulSilver",

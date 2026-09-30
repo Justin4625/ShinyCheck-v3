@@ -13,6 +13,7 @@ import { el, state } from "../../core/state.js";
 import { elapsed, hk, hunts, isActive, prefs, saveHunts, savePrefs, saveShinies, shinies } from "../../core/store.js";
 import { $, esc } from "../../core/util.js";
 import { paintPace } from "./pace.js";
+import { chainStep, paintChain } from "./chain.js";
 import { paintPhases } from "./phases.js";
 import { paintPip, pip } from "./pop-out.js";
 import { openShare } from "../share-card.js";
@@ -154,6 +155,7 @@ export function paintHunt() {
   $("#drTimeHint").textContent = h.since ? "Running — keeps going when you close this" : s ? "Paused — press + to resume" : "Press + to start the hunt";
   paintSetup(h);
   paintPhases(h);
+  paintChain(h);
   const inputs = { drInc: h.inc, drSetCount: h.count, drH: Math.floor(s / 3600), drM: Math.floor(s / 60) % 60, drS: s % 60 };
   for (const [id, v] of Object.entries(inputs)) if (document.activeElement !== $("#" + id)) $("#" + id).value = v;
   // Chance that a hunter would have hit the shiny by now: 1 - (1 - 1/odds)^n.
@@ -195,7 +197,8 @@ function refreshCard() {
 export function addEncounter(sign = 1) {
   const h = hunt();
   if (sign > 0 && !h.since) return togglePlay();
-  setHunt({ count: Math.max(0, h.count + sign * h.inc) });
+  // On the Poké Radar the chain moves with every encounter (chain.js).
+  setHunt({ count: Math.max(0, h.count + sign * h.inc), ...(h.count || sign > 0 ? chainStep(h, sign) : {}) });
   if (sign > 0) {
     // A short buzz confirms the tap on phones that support it (Android; iOS ignores it).
     if (navigator.vibrate) navigator.vibrate(12);
