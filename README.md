@@ -4,7 +4,7 @@ Shiny Dex and shiny-hunt tracker for Pokémon. Plain HTML, CSS and JavaScript (E
 no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 
 - **Shiny Dex** — all 1,081 Pokémon and forms. A card glows once a shiny of it is logged in any game.
-- **Games** — Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
+- **Games** — Omega Ruby & Alpha Sapphire, Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, pace (encounters per hour, time to odds), Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
 - **Forms** — cosmetic forms, switchable forms and gender differences (Vivillon, Furfrou, Flabébé, Rotom, …) as a checklist in Dex Entry; pick the form when adding, editing or hunting. Any form counts the species; forms are extra.
@@ -131,5 +131,7 @@ Chrome (dark theme; desktop at 1280×800 @2x, phones at 390×844 @3x) and saved 
 ## Data sources
 
 - Pokémon, forms, sprites and regional dex numbers: a Pokémon HOME Living Dex spreadsheet.
+- Omega Ruby & Alpha Sapphire: Hoenn dex from PokeAPI (`updated-hoenn`), Outside the dex and locations from
+  Serebii's per-species pages (a trade with X & Y, transfer or event doesn't count).
 - Evolution chains: [PokeAPI](https://pokeapi.co) (`data/evolutions.js`).
 - Forms and their shiny HOME sprites: [PokeAPI](https://pokeapi.co) via `scripts/gen-forms.py` (`data/forms.js`, `sprites/forms/`).

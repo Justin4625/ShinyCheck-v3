@@ -198,7 +198,7 @@ step("home: search + region + filters", async () => {
   await click("#recShuffle");
 });
 step("home: share across games", async () => { await click("#fShare"); await click("#fShare"); });
-for (const g of ["sm", "usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"]) {
+for (const g of ["oras", "sm", "usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"]) {
   step(`game ${g}`, async () => {
     await nav(g, 500);
     expect(await exists(".dex-tabs .seg, #dexTabs .seg"), `${g}: dex tabs`);
@@ -283,6 +283,17 @@ step("hunt deck: more hunt methods", async () => {
   await open("swsh", "skwovet");
   await click('#drSetup [data-hm="brilliant"]'); await click('#drSetup [data-hb="charm"]'); await click('#drSetup [data-hl="ko:5"]');
   expect((await odds()) === "1/456", `Brilliant Aura, 500+ battled, charm is 1/456, got ${await odds()}`);
+  await click('#drSetup [data-hm="wild"]'); await click('#drSetup [data-hb="charm"]');
+  await key("Escape");
+  await open("oras", "ralts");
+  await click('#drSetup [data-hm="dexnav"]'); await click('#drSetup [data-hl="search:9"]');
+  expect((await odds()) === "1/476", `DexNav at search level 999 is 1/476, got ${await odds()}`);
+  await click('#drSetup [data-hb="charm"]'); await click('#drSetup [data-hl="dchain:2"]');
+  expect((await odds()) === "1/51", `DexNav 999, 50th in chain, charm is 1/51, got ${await odds()}`);
+  await js(`document.getElementById("drSetup").scrollIntoView({ block: "center" })`, 200);
+  await capture("hunt deck dexnav");
+  await click('#drSetup [data-hm="horde"]');
+  expect((await odds()) === "1/274", `horde with charm is 1/274, got ${await odds()}`);
   await click('#drSetup [data-hm="wild"]'); await click('#drSetup [data-hb="charm"]');
   await key("Escape");
 });
@@ -416,6 +427,16 @@ step("phone layout", async () => {
   const wideSetup = await js(`[...document.querySelectorAll("#drSetup *")].filter(e => { const r = e.getBoundingClientRect(); return r.width && r.right > innerWidth + 1; }).length`);
   expect(wideSetup === 0, `wormhole chips fit a 360px phone (${wideSetup})`);
   await capture("phone ultra wormhole 360");
+  await click('#drSetup [data-hm="wild"]');
+  await key("Escape");
+  await nav("oras", 400);
+  await capture("phone oras 360");
+  await type("#gq", "ralts"); await click("#gameCards .pcard", 500);
+  await click('#drSetup [data-hm="dexnav"]');
+  await js(`document.getElementById("drSetup").scrollIntoView({ block: "center" })`, 200);
+  const wideNav = await js(`[...document.querySelectorAll("#drSetup *")].filter(e => { const r = e.getBoundingClientRect(); return r.width && r.right > innerWidth + 1; }).length`);
+  expect(wideNav === 0, `DexNav chips fit a 360px phone (${wideNav})`);
+  await capture("phone dexnav 360");
   await click('#drSetup [data-hm="wild"]');
   await size(390, 844, true);
   await key("Escape");

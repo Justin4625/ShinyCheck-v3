@@ -27,6 +27,8 @@ export const EVENT_ONLY = {
 // Zone 20, the PLA starters in outbreaks). "dex:Form" locks only that form; evolutions of a
 // locked-only line are locked too.
 const GAME_LOCKS = {
+  // Kyogre and Groudon are each only in one version, both locked there.
+  oras: [382, 383, 384, 386],
   sm: [718, 785, 786, 787, 788, 791, 792, 793, 794, 795, 796, 797, 798, 799, 800],
   usum: [718, 785, 786, 787, 788, 791, 792, 800],
   swsh: [772, 773, 803, 804, 888, 889, "144:Galarian", "145:Galarian", "146:Galarian"],

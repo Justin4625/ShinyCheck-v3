@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "oras-2026-09",
+    date: "2026-09-30",
+    title: "Omega Ruby & Alpha Sapphire",
+    text: "Hoenn is in: the Hoenn dex, every Pokémon you can get beyond it (Mirage spots, Soaring, the other starters) and hunts with the DexNav, chain fishing and hordes.",
+    steps: [
+      "Open **Omega Ruby & Alpha Sapphire** in the menu.",
+      "Start a hunt and pick **DexNav**, then set your search level and where you are in the chain.",
+      "Turn on **Count outside the dex** to count the Mirage spot and Soaring Pokémon too.",
+    ],
+    shot: "shots/updates/oras.webp",
+    action: { label: "Open Omega Ruby & Alpha Sapphire", go: "oras" },
+  },
+  {
     id: "hunt-methods-2026-09",
     date: "2026-09-30",
     title: "More hunt methods",

@@ -10,7 +10,35 @@
 // chosen level reads in the method label; default "<label> <level>").
 const CHARM = { id: "charm", label: "Shiny Charm", type: "toggle" };
 const pctToOdds = pct => Math.round(1000 / pct) / 10;
+// DexNav (Omega Ruby & Alpha Sapphire), after RotomLabs' DexNav calculator: the search level gives a
+// chance p per extra roll; the next Pokémon gets 1 (3 with the charm) extra rolls, +4 on every 5th in the
+// chain (a guaranteed boost; otherwise a 4% chance of one), +5 on the 50th and +10 on the 100th.
+// `chain` is the chain before the encounter (49 → the 50th). A search level of 0 gives the normal odds.
+function dexNavOdds(level, chain, charm) {
+  const q = 4095 / 4096, base = 1 - Math.pow(q, charm ? 3 : 1);
+  if (!level) return Math.round(1 / base);
+  const s = Math.min(level, 999);
+  const p = Math.ceil(0.01 * (s > 200 ? s + 600 : s > 100 ? 2 * s + 400 : 6 * s)) / 10000;
+  let rolls = charm ? 3 : 1, boost = 0;
+  if ((chain + 1) % 5 === 0) rolls += 4; else boost = 0.04;
+  if (chain === 49) rolls += 5; else if (chain === 99) rolls += 10;
+  const hit = n => 1 - Math.pow(1 - p, n);
+  const h = (1 - boost) * hit(rolls) + boost * hit(rolls + 4);
+  return Math.round(1 / ((1 - h) * base + h));
+}
 export const HUNT_SETUP = {
+  // Omega Ruby & Alpha Sapphire (RotomLabs): the Shiny Charm adds 2 rolls, 1 for regular eggs. Chain
+  // fishing adds 2 rolls per hook in a row, up to 20 (1/100, 1/96 with the charm). A horde is 5 Pokémon
+  // with their own rolls: 1/820 per horde, 1/274 with the charm. DexNav: see dexNavOdds.
+  oras: { methods: [["wild", "Wild", 1, ["charm"]], ["dexnav", "DexNav", lv => dexNavOdds(lv("search"), lv("dchain"), lv("charm")), ["search", "dchain", "charm"]],
+    ["horde", "Horde", 5, ["charm:10"]], ["fish", "Chain fishing", 1, ["fish", "charm"]],
+    ["breed", "Breeding", 1, ["charm:1"]], ["masuda", "Masuda", 6, ["charm"]]],
+    bonus: [{ ...CHARM, rolls: 2 },
+      { id: "search", label: "Search level", type: "level", tag: lv => `search level ${lv}`,
+        levels: [["0", 0], ["10+", 10], ["25+", 25], ["50+", 50], ["100+", 100], ["200+", 200], ["400+", 400], ["600+", 600], ["800+", 800], ["999", 999]] },
+      { id: "dchain", label: "Chain", type: "level", tag: lv => lv === "–" ? "" : `${lv} in chain`,
+        levels: [["–", 0], ["Every 5th", 4], ["50th", 49], ["100th", 99]] },
+      { id: "fish", label: "Chain", type: "level", levels: [["–", 0], ["5+", 10], ["10+", 20], ["15+", 30], ["20+", 40]] }] },
   // Allowed bonuses may override their rolls per method ("charm:1"). Checked against
   // RotomLabs: in SwSh the charm adds 2 rolls in the wild and in Masuda, 1 for regular
   // eggs; in BD & SP it does nothing in the wild, Grand Underground or Poké Radar.
@@ -75,9 +103,14 @@ export function evalSetup(gid, setup) {
   const active = conf.bonus.filter(b => allowed.includes(b.id)).map(b => b.id in override ? { ...b, rolls: override[b.id] } : b);
   const parts = [mLabel];
   if (typeof base === "function") {
-    // Table/formula methods: every chosen level is part of the label, the function gives the odds.
-    const lv = id => { const b = active.find(x => x.id === id); return (b.levels[levelOf(b, setup)] || b.levels[0])[1]; };
-    for (const b of active) { const l = (b.levels[levelOf(b, setup)] || b.levels[0])[0]; parts.push(b.tag ? b.tag(l) : `${b.label} ${l}`); }
+    // Table/formula methods: every chosen level (and switched-on toggle) is part of the label, the
+    // function gives the odds. A tag may return "" to leave its level out of the label.
+    const lv = id => { const b = active.find(x => x.id === id); return b.type === "toggle" ? !!setup[id] : (b.levels[levelOf(b, setup)] || b.levels[0])[1]; };
+    for (const b of active) {
+      if (b.type === "toggle") { if (setup[b.id]) parts.push(b.label); continue; }
+      const l = (b.levels[levelOf(b, setup)] || b.levels[0])[0], tag = b.tag ? b.tag(l) : `${b.label} ${l}`;
+      if (tag) parts.push(tag);
+    }
     return { odds: base(lv), label: parts.join(" · ") };
   }
   if (typeof base === "object") {

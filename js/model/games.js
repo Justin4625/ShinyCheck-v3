@@ -1,6 +1,8 @@
 // The tracked games: names, colours, logos, regional dex sections and dex-number helpers.
 // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
 export const GAME_INFO = {
+  oras: { name: "Omega Ruby & Alpha Sapphire", abbr: "ORAS", released: "2014-11-21", short: "OR & AS", accent: "#e0322c", accent2: "#1f6fd8",
+          logo: "logos/orasLogo.png", sections: [["", "Hoenn"]] },
   sm:   { nativeForms: ["Alolan"], name: "Sun & Moon", abbr: "SM", released: "2016-11-18", accent: "#f5a300", accent2: "#6f4fd8",
           logo: "logos/smLogo.png", sections: [["", "Alola"], ["O", "Outside the dex"]] },
   usum: { nativeForms: ["Alolan"], name: "Ultra Sun & Ultra Moon", abbr: "USUM", released: "2017-11-17", accent: "#f08a1c", accent2: "#3b78d8",
