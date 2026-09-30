@@ -32,9 +32,6 @@
   .rec-shuffle { width: 36px; height: 36px; border-radius: 11px; }
   .rec-shuffle svg { width: 16px; height: 16px; }
   .dr-phase-btn { padding: 10px 0; font-size: 13px; }
-  .link-btn { padding: 10px; font-size: 14px; }
   .side-item { padding: 12px; }
-  .ghost-btn { height: 44px; }
-  .ghost-btn.square { flex-basis: 44px; }
   .en-row { min-height: 52px; }
 }

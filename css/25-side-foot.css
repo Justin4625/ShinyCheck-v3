@@ -1,0 +1,39 @@
+/* Sidebar foot (js/features/side-menu.js): one compact bar with the account, theme and ⚙,
+   and the ⚙ menu (Notifications, Backups, Sign out, Reset collection) that opens above it. */
+.side-foot {
+  position: relative; flex: none; display: flex; align-items: center; gap: 6px;
+  padding: 6px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border);
+}
+#account { flex: 1; min-width: 0; }
+.side-foot .acc { padding: 2px 4px; gap: 9px; background: none; border: 0; border-radius: 0; }
+.side-foot .acc-avatar { width: 30px; height: 30px; font-size: 13px; }
+.side-foot .acc-local { padding: 4px 6px; }
+
+.side-ico {
+  flex: none; width: 38px; height: 38px; display: grid; place-items: center; padding: 0; border-radius: 11px; cursor: pointer;
+  border: 1px solid transparent; background: none; color: var(--muted); font-size: 16px; transition: color .2s, background .2s, transform .1s;
+}
+.side-ico[hidden] { display: none; }
+.side-ico svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.side-ico:active { transform: scale(.94); }
+.side-ico[aria-expanded="true"] { color: var(--text); background: var(--surface-2); border-color: var(--border); }
+@media (hover: hover) { .side-ico:hover { color: var(--text); background: var(--surface-2); } }
+.side-menu {
+  position: absolute; left: 0; right: 0; bottom: calc(100% + 8px); z-index: 5; display: flex; flex-direction: column; padding: 6px;
+  border-radius: 16px; background: var(--surface); border: 1px solid var(--border-2); box-shadow: 0 -12px 40px rgba(0, 0, 0, .35);
+  animation: side-menu-in .16s ease-out;
+}
+.side-menu[hidden] { display: none; }
+@keyframes side-menu-in { from { opacity: 0; transform: translateY(6px); } }
+.side-menu-item {
+  display: block; width: 100%; min-height: 40px; padding: 0 12px; border: 0; border-radius: 11px; background: none; cursor: pointer;
+  text-align: left; font-size: 14px; font-weight: 650; color: var(--text);
+}
+.side-menu-item[hidden] { display: none; }
+.side-menu-item.danger { color: #ff5f7a; }
+.side-menu-item:focus-visible, .side-menu-item:hover { background: var(--surface-2); }
+
+@media (max-width: 560px), (hover: none) {
+  .side-ico { width: 44px; height: 44px; }
+  .side-menu-item { min-height: 46px; font-size: 15px; }
+}

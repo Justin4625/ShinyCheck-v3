@@ -227,6 +227,8 @@ async function start() {
 
   // ---------- Account UI ----------
   function renderAccount(user) {
+    // Sign out lives in the sidebar's ⚙ menu (features/side-menu.js).
+    $("#signOut").hidden = !user;
     if (!user) { account.innerHTML = ""; return; }
     const name = user.displayName || user.email || "Trainer";
     account.innerHTML = `
@@ -234,7 +236,6 @@ async function start() {
         ${user.photoURL ? `<img class="acc-avatar" src="${user.photoURL}" alt="" referrerpolicy="no-referrer">`
           : `<span class="acc-avatar">${name[0].toUpperCase()}</span>`}
         <span class="acc-text"><b>${escapeHtml(name)}</b><small id="syncStatus">Synced</small></span>
-        <button class="acc-out" id="signOut" title="Sign out">Sign out</button>
       </div>`;
     $("#signOut").onclick = async () => {
       await flush();

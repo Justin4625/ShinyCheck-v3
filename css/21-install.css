@@ -1,14 +1,18 @@
 /* Installed app / install prompts.
    Files in css/ load in name order (index.html); later files win on equal selectors. */
 /* ---------- Install as an app ---------- */
-.install-btn {
-  display: flex; align-items: center; justify-content: center; gap: 8px; height: 42px; border: 0; border-radius: 13px; cursor: pointer;
-  font-weight: 800; font-size: 14px; color: #14121f; background: var(--holo); transition: filter .2s, transform .1s;
+/* Sidebar: a small pill next to the logo. */
+.side-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex: none; margin-right: -6px; }
+.side-top .logo { padding-right: 0; min-width: 0; }
+.install-pill {
+  flex: none; display: flex; align-items: center; gap: 5px; height: 30px; padding: 0 10px 0 8px; border: 0; border-radius: 99px; cursor: pointer;
+  font-weight: 800; font-size: 12px; color: #14121f; background: var(--holo); transition: filter .2s, transform .1s;
 }
-.install-btn[hidden] { display: none; }
-.install-btn:hover { filter: brightness(1.05); }
-.install-btn:active { transform: scale(.97); }
-.install-btn svg { width: 17px; height: 17px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.install-pill[hidden] { display: none; }
+.install-pill svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 2.6; stroke-linecap: round; stroke-linejoin: round; }
+.install-pill:active { transform: scale(.96); }
+@media (hover: hover) { .install-pill:hover { filter: brightness(1.06); } }
+@media (max-width: 560px), (hover: none) { .install-pill { height: 40px; padding: 0 14px 0 12px; font-size: 13.5px; } }
 .install-banner > img { width: 36px; height: 36px; border-radius: 10px; flex: none; }
 .install-steps { list-style: none; margin: 4px 0 14px; padding: 0; display: flex; flex-direction: column; gap: 10px; text-align: left; }
 .install-steps li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); font-size: 14px; color: var(--muted); }
@@ -17,7 +21,7 @@
 .install-ico svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
 .install-ico img { width: 26px; height: 26px; border-radius: 7px; }
 /* Opened from the Home Screen: no browser chrome, so the install prompts never show. */
-@media (display-mode: standalone) { .install-btn, .install-banner { display: none !important; } }
+@media (display-mode: standalone) { .install-pill, .install-banner { display: none !important; } }
 @media (max-width: 560px) {
   .install-banner { gap: 10px; padding: 12px; }
   .install-banner p { font-size: 13px; }

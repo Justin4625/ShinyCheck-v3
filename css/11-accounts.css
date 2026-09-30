@@ -70,8 +70,6 @@ body.gated { overflow: hidden; }
 .acc-text small { font: 700 10px/1.4 var(--mono); color: #2bd67b; }
 .acc-text small[data-state="saving"] { color: var(--muted); }
 .acc-text small[data-state="error"] { color: #ff9f43; }
-.acc-out { flex: none; border: 1px solid var(--border); background: none; border-radius: 9px; padding: 6px 8px; cursor: pointer; font-size: 11px; font-weight: 700; color: var(--muted); }
-.acc-out:hover { color: var(--text); border-color: var(--border-2); }
 .acc-local { display: block; padding: 8px 10px; font: 700 10px/1.3 var(--mono); color: var(--faint); letter-spacing: .04em; }
 .gate-google-slot { display: flex; justify-content: center; min-height: 44px; max-width: 100%; overflow: hidden; color-scheme: light; }
 .gate-google-slot[hidden] { display: none; }
