@@ -131,8 +131,8 @@ Chrome (dark theme; desktop at 1280×800 @2x, phones at 390×844 @3x) and saved 
 ## Data sources
 
 - Pokémon, forms, sprites and regional dex numbers: a Pokémon HOME Living Dex spreadsheet.
-- X & Y: Central, Coastal and Mountain Kalos dexes from PokeAPI (`kalos-central`, `kalos-coastal`,
-  `kalos-mountain`), Outside the dex and locations from Serebii's per-species pages.
+- X & Y: Kalos dex from PokeAPI's `kalos-central`, `kalos-coastal` and `kalos-mountain`, numbered on as one
+  dex (Central 1–150, Coastal 151–303, Mountain 304–454), Outside the dex and locations from Serebii's per-species pages.
 - Omega Ruby & Alpha Sapphire: Hoenn dex from PokeAPI (`updated-hoenn`), Outside the dex and locations from
   Serebii's per-species pages (a trade with X & Y, transfer or event doesn't count).
 - Evolution chains: [PokeAPI](https://pokeapi.co) (`data/evolutions.js`).

@@ -13,7 +13,7 @@ window.UPDATES = [
     id: "xy-2026-09",
     date: "2026-09-30",
     title: "X & Y",
-    text: "Kalos is in: the Central, Coastal and Mountain Kalos dexes, the Pokémon you can get beyond them (Friend Safari, fossils) and hunts with the Poké Radar, the Friend Safari, chain fishing and hordes.",
+    text: "Kalos is in: the whole Kalos dex (Central, Coastal and Mountain as one), the Pokémon you can get beyond it (Friend Safari, fossils) and hunts with the Poké Radar, the Friend Safari, chain fishing and hordes.",
     steps: [
       "Open **X & Y** in the menu.",
       "Start a hunt and pick **Poké Radar**, **Friend Safari** or **Chain fishing**, then set your chain.",
