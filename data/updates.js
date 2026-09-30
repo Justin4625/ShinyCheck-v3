@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "rs-2026-09",
+    date: "2026-09-30",
+    title: "Ruby & Sapphire",
+    text: "The original Hoenn is in: the Hoenn dex of Ruby & Sapphire, with Latios and Latias roaming after the Elite Four and Kyogre, Groudon and Rayquaza. Hunts use Gen 3's odds of 1 in 8,192.",
+    steps: [
+      "Open **Ruby & Sapphire** in the menu.",
+      "Start a hunt: **Wild** or **Breeding**.",
+      "Everything you can get in Ruby & Sapphire is in the Hoenn dex, so there's no Outside the dex here.",
+    ],
+    shot: "shots/updates/rs.webp",
+    action: { label: "Open Ruby & Sapphire", go: "rs" },
+  },
+  {
     id: "frlg-2026-09",
     date: "2026-09-30",
     title: "FireRed & LeafGreen",

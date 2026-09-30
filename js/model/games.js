@@ -1,6 +1,8 @@
 // The tracked games: names, colours, logos, regional dex sections and dex-number helpers.
 // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
 export const GAME_INFO = {
+  rs:   { name: "Ruby & Sapphire", abbr: "RS", released: "2002-11-21", short: "R & S", accent: "#d42a3c", accent2: "#2a5fd4", logo: "logos/rsLogo.png",
+          sections: [["", "Hoenn"]] },
   frlg: { name: "FireRed & LeafGreen", abbr: "FRLG", released: "2004-01-29", short: "FR & LG", accent: "#e8412c", accent2: "#3fae49", logo: "logos/frlgLogo.png",
           sections: [["", "Kanto"]] },
   emerald: { name: "Emerald", abbr: "E", released: "2004-09-16", accent: "#1f9e5a", accent2: "#7fd4a0", logo: "logos/emeraldLogo.png",

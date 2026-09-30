@@ -198,7 +198,7 @@ step("home: search + region + filters", async () => {
   await click("#recShuffle");
 });
 step("home: share across games", async () => { await click("#fShare"); await click("#fShare"); });
-for (const g of ["frlg", "emerald", "dp", "pt", "hgss", "bw", "bw2", "xy", "oras", "sm", "usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"]) {
+for (const g of ["rs", "frlg", "emerald", "dp", "pt", "hgss", "bw", "bw2", "xy", "oras", "sm", "usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"]) {
   step(`game ${g}`, async () => {
     await nav(g, 500);
     expect(await exists(".dex-tabs .seg, #dexTabs .seg"), `${g}: dex tabs`);
@@ -289,6 +289,9 @@ step("hunt deck: more hunt methods", async () => {
   await key("Escape");
   await open("frlg", "pidgey");
   expect((await odds()) === "1/8,192", `FireRed & LeafGreen wild is 1/8,192, got ${await odds()}`);
+  await key("Escape");
+  await open("rs", "treecko");
+  expect((await odds()) === "1/8,192", `Ruby & Sapphire wild is 1/8,192, got ${await odds()}`);
   await key("Escape");
   await open("emerald", "treecko");
   expect((await odds()) === "1/8,192", `Emerald wild is 1/8,192, got ${await odds()}`);
