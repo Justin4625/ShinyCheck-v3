@@ -27,6 +27,9 @@ export const EVENT_ONLY = {
 // Zone 20, the PLA starters in outbreaks). "dex:Form" locks only that form; evolutions of a
 // locked-only line are locked too.
 const GAME_LOCKS = {
+  // Gold & Silver: the Kanto starters, fossils, legendary birds and Mewtwo only come from Gen 1; Mew and
+  // Celebi only from events.
+  gs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 138, 139, 140, 141, 144, 145, 146, 150, 151, 251],
   // Crystal: its Johto dex has all 251, but the Kanto starters, fossils, birds and Mewtwo only come from
   // Gen 1, Vulpix, Mankey, Mareep, Girafarig and Remoraid (and evolutions) only from Gold & Silver, Mew
   // only from events. Celebi is in: the Virtual Console Crystal has the GS Ball.

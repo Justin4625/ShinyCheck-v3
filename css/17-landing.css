@@ -155,3 +155,10 @@
 .gate-legal { display: none; margin: 14px 0 0; text-align: center; font-size: 11px; color: var(--faint); }
 .gate-legal a { color: var(--muted); }
 body.recaptcha .gate-legal { display: block; }
+/* A game without a usable logo (Gold & Silver): its name as a wordmark in the game's colours. */
+.lp-games .lp-wordmark {
+  display: flex; align-items: center; justify-content: center; height: 70px; margin-bottom: 8px; text-align: center;
+  font: 800 24px/1 var(--font); letter-spacing: -.03em; text-transform: uppercase;
+  background: linear-gradient(100deg, var(--a), var(--b)); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+@media (max-width: 560px) { .lp-games .lp-wordmark { height: 52px; font-size: 18px; } }

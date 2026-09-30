@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "gs-2026-09",
+    date: "2026-09-30",
+    title: "Gold & Silver",
+    text: "Gold & Silver are in: the Johto dex with all 251, where shinies started. Hunts use 1 in 8,192, or 1 in 64 when you breed with a shiny parent.",
+    steps: [
+      "Open **Gold & Silver** in the menu.",
+      "Start a hunt and pick **Shiny parent** if you breed from a shiny.",
+      "Locked cards only come from Gen 1 or events, so they don't count.",
+    ],
+    shot: "shots/updates/gs.webp",
+    action: { label: "Open Gold & Silver", go: "gs" },
+  },
+  {
     id: "crystal-2026-09",
     date: "2026-09-30",
     title: "Crystal",

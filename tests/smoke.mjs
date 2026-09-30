@@ -198,7 +198,7 @@ step("home: search + region + filters", async () => {
   await click("#recShuffle");
 });
 step("home: share across games", async () => { await click("#fShare"); await click("#fShare"); });
-for (const g of ["crystal", "rs", "frlg", "emerald", "dp", "pt", "hgss", "bw", "bw2", "xy", "oras", "sm", "usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"]) {
+for (const g of ["gs", "crystal", "rs", "frlg", "emerald", "dp", "pt", "hgss", "bw", "bw2", "xy", "oras", "sm", "usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"]) {
   step(`game ${g}`, async () => {
     await nav(g, 500);
     expect(await exists(".dex-tabs .seg, #dexTabs .seg"), `${g}: dex tabs`);
@@ -298,6 +298,11 @@ step("hunt deck: more hunt methods", async () => {
   expect((await odds()) === "1/64", `Crystal shiny parent is 1/64, got ${await odds()}`);
   await click('#drSetup [data-hm="oddegg"]');
   expect((await odds()) === "1/10", `Crystal Odd Egg is 1/10, got ${await odds()}`);
+  await click('#drSetup [data-hm="wild"]');
+  await key("Escape");
+  await open("gs", "chikorita");
+  await click('#drSetup [data-hm="sparent"]');
+  expect((await odds()) === "1/64", `Gold & Silver shiny parent is 1/64, got ${await odds()}`);
   await click('#drSetup [data-hm="wild"]');
   await key("Escape");
   await open("emerald", "treecko");
