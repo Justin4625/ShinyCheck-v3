@@ -1,5 +1,5 @@
 /* Poké Radar chain in the Hunt Deck (js/features/hunt-deck/chain.js): the chain length, how often it
-   broke, and the "Chain broke" button. */
+   broke, and the "Chain broke" button; also the button in the pop-out window. */
 .dr-chain {
   display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 8px 8px 8px 14px; text-align: left;
   border-radius: 14px; border: 1px solid var(--border); background: var(--surface-2);
@@ -16,3 +16,13 @@
 .dr-chain-break:disabled { opacity: .45; cursor: default; }
 @media (hover: hover) { .dr-chain-break:not(:disabled):hover { color: #ff5f7a; border-color: #ff5f7a; } }
 @media (max-height: 640px), (max-width: 420px) { .dr-chain { flex-basis: 100%; } }
+
+/* Pop-out: a small Chain broke button left of −1; +1 gets a little narrower to make room. */
+.pip-break {
+  width: 52px; max-height: 60px; padding: 0; border-radius: 14px; cursor: pointer; font-weight: 750; font-size: 10.5px; line-height: 1.15;
+  border: 1px solid var(--border-2); background: color-mix(in srgb, var(--surface) 80%, transparent); color: var(--text);
+}
+.pip-break[hidden] { display: none; }
+.pip-break:disabled { opacity: .45; cursor: default; }
+.pip-break:not(:disabled):active { transform: scale(.96); border-color: #ff5f7a; color: #ff5f7a; }
+.pip-body.has-chain .pip-plus { width: 84px; }

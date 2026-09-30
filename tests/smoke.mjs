@@ -326,6 +326,9 @@ step("hunt deck: more hunt methods", async () => {
   expect((await text("#drChainNote")).includes("broke 1×") && (await text("#drChainNote")).includes("longest 35"), `chain note, got ${await text("#drChainNote")}`);
   await click(".toast-action");
   expect((await text("#drChainN")) === "35", `Undo brings the chain back, got ${await text("#drChainN")}`);
+  await key("b");
+  expect((await text("#drChainN")) === "0", `the B key breaks the chain too, got ${await text("#drChainN")}`);
+  await click(".toast-action");
   await click('#drSetup [data-hl="rchain:7"]');
   expect((await text("#drChainN")) === "40" && (await odds()) === "1/200", `picking 40 jumps the chain there (1/200), got ${await text("#drChainN")} at ${await odds()}`);
   await click("#drReset"); await click("#drReset");

@@ -13,7 +13,7 @@ import { el, state } from "../../core/state.js";
 import { elapsed, hk, hunts, isActive, prefs, saveHunts, savePrefs, saveShinies, shinies } from "../../core/store.js";
 import { $, esc } from "../../core/util.js";
 import { paintPace } from "./pace.js";
-import { chainStep, paintChain } from "./chain.js";
+import { breakChain, chainStep, paintChain } from "./chain.js";
 import { paintPhases } from "./phases.js";
 import { paintPip, pip } from "./pop-out.js";
 import { openShare } from "../share-card.js";
@@ -340,7 +340,7 @@ export function init() {
     if (e.key === "Escape") { e.stopImmediatePropagation(); return closeDrawer(); }
     if (typing) return;
     const act = { " ": () => addEncounter(1), "+": () => addEncounter(1), "=": () => addEncounter(1), "-": () => addEncounter(-1),
-      p: togglePlay, P: togglePlay, ArrowLeft: () => step(-1), ArrowRight: () => step(1) }[e.key];
+      p: togglePlay, P: togglePlay, b: breakChain, B: breakChain, ArrowLeft: () => step(-1), ArrowRight: () => step(1) }[e.key];
     if (act && !(e.key === " " && document.activeElement.tagName === "BUTTON" && document.activeElement !== dr.panel)) {
       e.preventDefault(); e.stopImmediatePropagation(); act();
     } else if (e.key === "/") e.stopImmediatePropagation();

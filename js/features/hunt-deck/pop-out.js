@@ -9,6 +9,7 @@ import { altSprite } from "../../model/forms.js";
 import { GAME_INFO } from "../../model/games.js";
 import { huntPace } from "../../model/hunt-pace.js";
 import { activeHunts } from "../../pages/hunts.js";
+import { breakChain, chainNow } from "./chain.js";
 import { paintPace } from "./pace.js";
 
 export let pip = null;
@@ -37,6 +38,7 @@ async function popOut() {
       <button class="pip-play" title="Start / pause (P)"></button>
       <div class="pip-row">
         <div class="pip-tally"><span class="pip-count"></span><span class="pip-odds"></span></div>
+        <button class="pip-break" title="Poké Radar chain broke — back to 0 (B)" hidden>Chain<br>broke</button>
         <button class="pip-minus" title="−1 (−)"></button>
         <button class="pip-plus" title="+1 (Space)"></button>
       </div>
@@ -46,8 +48,10 @@ async function popOut() {
   d.querySelector(".pip-stage").onclick = () => addEncounter(1);
   d.querySelector(".pip-minus").onclick = () => addEncounter(-1);
   d.querySelector(".pip-play").onclick = togglePlay;
+  d.querySelector(".pip-break").onclick = breakChain;
   pip.addEventListener("keydown", e => {
-    const act = { " ": () => addEncounter(1), "+": () => addEncounter(1), "=": () => addEncounter(1), "-": () => addEncounter(-1), p: togglePlay, P: togglePlay }[e.key];
+    const act = { " ": () => addEncounter(1), "+": () => addEncounter(1), "=": () => addEncounter(1), "-": () => addEncounter(-1), p: togglePlay, P: togglePlay,
+      b: breakChain, B: breakChain }[e.key];
     if (act) { e.preventDefault(); act(); }
   });
   pip.addEventListener("pagehide", () => {
@@ -77,7 +81,12 @@ export function paintPip() {
   // Same luck meter as the Hunt Deck: chance a hunter would have found it by now.
   const p = 1 - Math.pow(1 - 1 / h.odds, h.count);
   const pace = huntPace(h, s);
-  d.querySelector(".pip-odds").textContent = `1/${nf(h.odds)}${h.count ? ` · ${(h.count / h.odds).toFixed(2)}×` : ""}${pace ? ` · ${nf(Math.round(pace.perHour))}/h` : ""}`;
+  // On the Poké Radar: the chain leads the line, and the Chain broke button shows.
+  const chain = chainNow(h), brk = d.querySelector(".pip-break");
+  brk.hidden = chain == null;
+  brk.disabled = !chain;
+  d.body.classList.toggle("has-chain", chain != null);
+  d.querySelector(".pip-odds").textContent = `${chain != null ? `chain ${nf(chain)} · ` : ""}1/${nf(h.odds)}${h.count ? ` · ${(h.count / h.odds).toFixed(2)}×` : ""}${pace ? ` · ${nf(Math.round(pace.perHour))}/h` : ""}`;
   d.querySelector(".pip-meter i").style.width = Math.min(100, p * 100) + "%";
   d.querySelector(".pip-plus").textContent = h.since ? `+${h.inc}` : "▶";
   d.querySelector(".pip-minus").textContent = `−${h.inc}`;

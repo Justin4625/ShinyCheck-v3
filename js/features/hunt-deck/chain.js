@@ -20,6 +20,12 @@ export function chainStep(h, sign) {
   return b ? withChain(h, chainOf(b, setupOf(h)) + sign) : {};
 }
 
+// The current chain length, or null when the hunt isn't on the Poké Radar.
+export function chainNow(h) {
+  const b = liveChain(curGame, setupOf(h));
+  return b ? chainOf(b, setupOf(h)) : null;
+}
+
 export function paintChain(h) {
   const b = liveChain(curGame, setupOf(h)), box = $("#drChain");
   box.hidden = !b;
@@ -30,7 +36,8 @@ export function paintChain(h) {
   $("#drChainBreak").disabled = !n;
 }
 
-function breakChain() {
+// Also used by the pop-out's button and the B key.
+export function breakChain() {
   const h = hunt(), b = liveChain(curGame, setupOf(h));
   const n = b && chainOf(b, setupOf(h));
   if (!n) return;
