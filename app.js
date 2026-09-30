@@ -2139,7 +2139,7 @@
   }
 
   const shareDlg = $("#shareDlg");
-  let shareFile = null, shareText = "", shareToPhotos = false;
+  let shareFile = null, shareText = "";
   async function openShare(s) {
     shareFile = null;
     $("#shareTitle").textContent = `Shiny ${s.m.name} ✦`;
@@ -2161,22 +2161,18 @@
     const canShare = !!(navigator.canShare && navigator.canShare({ files: [shareFile] }));
     $("#shareGo").hidden = !canShare;
     $("#shareSave").className = canShare ? "rl-again" : "rl-go";
-    // iPhone and iPad: a download lands in Files. The share sheet with only the image
-    // has "Save Image", which puts it straight in Photos.
-    shareToPhotos = isIOS && canShare;
-    $("#shareSave").textContent = shareToPhotos ? "Save to Photos" : "Save image";
-    $("#shareHint").hidden = !shareToPhotos;
+    // iPhone and iPad: a download lands in Files, while the share sheet has "Save Image"
+    // for Photos, so Share is the only button there.
+    const iosShare = isIOS && canShare;
+    $("#shareSave").hidden = iosShare;
+    $("#shareHint").hidden = !iosShare;
     $("#shareGo").disabled = $("#shareSave").disabled = false;
   }
   const closeShare = () => {
     shareDlg.hidden = true;
     if (!document.querySelector(".drawer.open")) document.body.classList.remove("drawer-open");
   };
-  async function saveShare() {
-    if (shareToPhotos) {
-      try { return await navigator.share({ files: [shareFile] }); }
-      catch (err) { if (err.name === "AbortError") return; console.error(err); }
-    }
+  function saveShare() {
     const a = Object.assign(document.createElement("a"), { href: $("#shareImg").src, download: shareFile.name });
     document.body.append(a);
     a.click();
