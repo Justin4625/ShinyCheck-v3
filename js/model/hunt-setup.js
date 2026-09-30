@@ -3,8 +3,8 @@
 // and carry over to the next hunt in that game.
 // Hunt setup per game, built from parts instead of a list of combinations:
 // a method (Wild, Masuda, Outbreak…) plus the bonuses that apply to it. Odds come from
-// shiny rolls, P = 1 − (4095/4096)^rolls (roll counts checked against RotomLabs and
-// PokéTools); some methods have a fixed rate ({ odds, charm }) or a table/formula of their
+// shiny rolls, P = 1 − (4095/4096)^rolls, or (8191/8192)^rolls up to Gen 5 (`rate: 8192`); roll counts
+// checked against RotomLabs and PokéTools. Some methods have a fixed rate ({ odds, charm }) or a table/formula of their
 // own (a function of the chosen levels) instead. A new game only needs its parts.
 // A level bonus may set `def` (the level used when a setup hasn't picked one yet) and `tag` (how the
 // chosen level reads in the method label; default "<label> <level>").
@@ -29,6 +29,8 @@ function dexNavOdds(level, chain, charm) {
   return Math.round(1 / ((1 - h) * base + h));
 }
 export const HUNT_SETUP = {
+  // Black & White (RotomLabs): 1/8192, no Shiny Charm yet; the Masuda Method gives 6 rolls (1/1366).
+  bw: { rate: 8192, methods: [["wild", "Wild", 1, []], ["breed", "Breeding", 1, []], ["masuda", "Masuda", 6, []]], bonus: [] },
   // Omega Ruby & Alpha Sapphire (RotomLabs): the Shiny Charm adds 2 rolls, 1 for regular eggs. Chain
   // fishing adds 2 rolls per hook in a row, up to 20 (1/100, 1/96 with the charm). A horde is 5 Pokémon
   // with their own rolls: 1/820 per horde, 1/274 with the charm. DexNav: see dexNavOdds.
@@ -102,7 +104,7 @@ export const HUNT_SETUP = {
   lza: { methods: [["wild", "Wild", 1, ["charm", "sparkling"]]],
     bonus: [{ ...CHARM, rolls: 3 }, { id: "sparkling", label: "Sparkling Power", type: "level", levels: [["–", 0], ["1", 1], ["2", 2], ["3", 3]] }] },
 };
-const rollsToOdds = r => Math.round(1 / (1 - Math.pow(4095 / 4096, r)));
+const rollsToOdds = (r, rate = 4096) => Math.round(1 / (1 - Math.pow((rate - 1) / rate, r)));
 // The level index a setup picked for a level bonus (or the bonus's default).
 export const levelOf = (b, setup) => setup[b.id] ?? b.def ?? 0;
 // setup = { m: method id, charm: bool, <level id>: index }
@@ -135,7 +137,7 @@ export function evalSetup(gid, setup) {
     if (b.type === "toggle" && setup[b.id]) { rolls += b.rolls; parts.push(b.label); }
     if (b.type === "level" && setup[b.id]) { const [lv, r] = b.levels[setup[b.id]] || b.levels[0]; rolls += r; if (r) parts.push(`${b.label} ${lv}`); }
   }
-  return { odds: rollsToOdds(rolls), label: parts.join(" · ") };
+  return { odds: rollsToOdds(rolls, conf.rate), label: parts.join(" · ") };
 }
 export const defaultSetup = gid => ({ m: HUNT_SETUP[gid] ? HUNT_SETUP[gid].methods[0][0] : "wild" });
 export function patchSetup(gid, setup, patch) {

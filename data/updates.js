@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "bw-2026-09",
+    date: "2026-09-30",
+    title: "Black & White",
+    text: "Unova is in: the Unova dex and every Pokémon you can get beyond it after the story (White Forest, swarms, fossils). Hunts use Gen 5's odds of 1 in 8,192, with the Masuda Method at 1 in 1,366.",
+    steps: [
+      "Open **Black & White** in the menu.",
+      "Start a hunt: **Wild**, **Breeding** or **Masuda**.",
+      "Turn on **Count outside the dex** to count the Pokémon from other regions too.",
+    ],
+    shot: "shots/updates/bw.webp",
+    action: { label: "Open Black & White", go: "bw" },
+  },
+  {
     id: "xy-2026-09",
     date: "2026-09-30",
     title: "X & Y",

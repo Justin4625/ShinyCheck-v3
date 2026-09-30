@@ -52,7 +52,8 @@ function paintAlt() {
   if (alts.length) $("#drAltBox").innerHTML = formPicker(cur, huntAlt(), "Form you're hunting");
   dr.img.src = altSprite(cur, huntAlt()) || "";
 }
-const gamePrefs = () => ({ inc: 1, odds: 4096, setup: defaultSetup(curGame), ...prefs[curGame] });
+// A new hunt starts from the game's default method (1/8192 up to Gen 5), or the game's last setup.
+const gamePrefs = () => ({ inc: 1, setup: defaultSetup(curGame), odds: evalSetup(curGame, defaultSetup(curGame)).odds, ...prefs[curGame] });
 export const hunt = () => {
   const h = hunts[curKey()] || { count: 0, time: 0, since: null, ...gamePrefs() };
   // Hunts and prefs from before hunt setups existed get the default setup.

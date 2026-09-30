@@ -27,6 +27,9 @@ export const EVENT_ONLY = {
 // Zone 20, the PLA starters in outbreaks). "dex:Form" locks only that form; evolutions of a
 // locked-only line are locked too.
 const GAME_LOCKS = {
+  // Black & White: Reshiram, Zekrom, Keldeo and Meloetta can't be shiny in Gen 5 and Genesect only
+  // via later events (Bulbapedia); Rotom is only an in-game trade, which is never shiny, and can't breed.
+  bw: [479, 643, 644, 647, 648, 649],
   // Bulbapedia's shiny-lock table: in X & Y the legendary birds, Mewtwo and the Kalos trio can't be shiny.
   xy: [144, 145, 146, 150, 716, 717, 718],
   // Kyogre and Groudon are each only in one version, both locked there.
