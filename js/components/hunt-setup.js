@@ -1,6 +1,6 @@
 // Hunt method chips and bonus switches, shared by the Hunt Deck and "Add a shiny".
 import { esc } from "../core/util.js";
-import { HUNT_SETUP } from "../model/hunt-setup.js";
+import { HUNT_SETUP, levelOf } from "../model/hunt-setup.js";
 
 // Method chips + bonus rows for a game's setup; shared by the Hunt Deck and "Add a shiny".
 export function setupHtml(gid, setup) {
@@ -13,7 +13,7 @@ export function setupHtml(gid, setup) {
     const allowed = (conf.methods.find(([id]) => id === setup.m) || conf.methods[0])[3].map(x => x.split(":")[0]);
     rows = conf.bonus.filter(b => allowed.includes(b.id)).map(b => b.type === "toggle"
       ? `<div class="hs-row"><span>${esc(b.label)}</span><button class="hs-switch" role="switch" aria-checked="${!!setup[b.id]}" data-hb="${b.id}"><i></i></button></div>`
-      : `<div class="hs-row"><span>${esc(b.label)}</span><div class="hs-seg">${b.levels.map(([lv], i) => chip(`data-hl="${b.id}:${i}"`, (setup[b.id] || 0) === i, esc(lv))).join("")}</div></div>`).join("");
+      : `<div class="hs-row"><span>${esc(b.label)}</span><div class="hs-seg">${b.levels.map(([lv], i) => chip(`data-hl="${b.id}:${i}"`, levelOf(b, setup) === i, esc(lv))).join("")}</div></div>`).join("");
   }
   return `<div class="hs-methods">${methods}</div>${rows}`;
 }

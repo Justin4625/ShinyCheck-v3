@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "hunt-methods-2026-09",
+    date: "2026-09-30",
+    title: "More hunt methods",
+    text: "Ultra Wormholes in Ultra Sun & Ultra Moon, Brilliant Aura with the Number battled bonus and Max Raids in Sword & Shield, every Poké Radar chain step in BD & SP, and Breeding and Tera Raids in Scarlet & Violet.",
+    steps: [
+      "Open a hunt and pick the method under **Hunt method**.",
+      "Set the details, like the wormhole's rings and light-years or your radar chain.",
+      "The odds, luck meter and pace follow right away.",
+    ],
+    shot: "shots/updates/hunt-methods.webp",
+    action: { label: "Open Ultra Sun & Ultra Moon", go: "usum" },
+  },
+  {
     id: "hunt-pace-2026-09",
     date: "2026-09-30",
     title: "Hunt pace and ETA",

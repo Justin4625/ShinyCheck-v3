@@ -261,6 +261,31 @@ step("hunt deck: pace and ETA", async () => {
   await click("#drPlay");
   await key("Escape");
 });
+step("hunt deck: more hunt methods", async () => {
+  const odds = () => text("#drOddsShow");
+  const open = async (g, q) => { await nav(g, 400); await type("#gq", q); await click("#gameCards .pcard", 400); };
+  await open("usum", "rockruff");
+  await click('#drSetup [data-hm="uw"]');
+  expect((await odds()) === "1/100", `no-ring wormhole is 1%, got ${await odds()}`);
+  await click('#drSetup [data-hl="ring:3"]');
+  expect((await odds()) === "1/2.8", `aura wormhole at 5,000 ly is 36%, got ${await odds()}`);
+  await js(`document.getElementById("drSetup").scrollIntoView({ block: "center" })`, 200);
+  await capture("hunt deck ultra wormhole");
+  await click('#drSetup [data-hm="wild"]');
+  await key("Escape");
+  await open("bdsp", "bidoof");
+  await click('#drSetup [data-hm="radar"]');
+  expect((await odds()) === "1/99", `radar chain 40 is 1/99, got ${await odds()}`);
+  await click('#drSetup [data-hl="chain:6"]');
+  expect((await odds()) === "1/400", `radar chain 38 is 1/400, got ${await odds()}`);
+  await click('#drSetup [data-hm="wild"]');
+  await key("Escape");
+  await open("swsh", "skwovet");
+  await click('#drSetup [data-hm="brilliant"]'); await click('#drSetup [data-hb="charm"]'); await click('#drSetup [data-hl="ko:5"]');
+  expect((await odds()) === "1/456", `Brilliant Aura, 500+ battled, charm is 1/456, got ${await odds()}`);
+  await click('#drSetup [data-hm="wild"]'); await click('#drSetup [data-hb="charm"]');
+  await key("Escape");
+});
 step("hunt deck: forms, phases, prev/next, reset, cancel", async () => {
   await nav("sv", 400);
   await type("#gq", "vivillon");
@@ -383,6 +408,15 @@ step("phone layout", async () => {
     expect(cut === 0, `pace numbers fit at ${w}px (${cut} cut off)`);
     await capture(`phone hunt deck pace ${w}`);
   }
+  await size(360, 800, true);
+  await key("Escape");
+  await nav("usum", 400); await type("#gq", "rockruff"); await click("#gameCards .pcard", 500);
+  await click('#drSetup [data-hm="uw"]');
+  await js(`document.getElementById("drSetup").scrollIntoView({ block: "center" })`, 200);
+  const wideSetup = await js(`[...document.querySelectorAll("#drSetup *")].filter(e => { const r = e.getBoundingClientRect(); return r.width && r.right > innerWidth + 1; }).length`);
+  expect(wideSetup === 0, `wormhole chips fit a 360px phone (${wideSetup})`);
+  await capture("phone ultra wormhole 360");
+  await click('#drSetup [data-hm="wild"]');
   await size(390, 844, true);
   await key("Escape");
   await openEntry("furfrou");
