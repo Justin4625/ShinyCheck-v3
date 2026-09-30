@@ -5,7 +5,7 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 
 - **Shiny Dex** — all 1,081 Pokémon and forms. A card glows once a shiny of it is logged in any game.
 - **Games** — Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
-- **Hunt Deck** — encounter counter, timer that keeps running, luck meter, Gotcha! log, pop-out mini window.
+- **Hunt Deck** — encounter counter, timer that keeps running, luck meter, pace (encounters per hour, time to odds), Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
 - **Forms** — cosmetic forms, switchable forms and gender differences (Vivillon, Furfrou, Flabébé, Rotom, …) as a checklist in Dex Entry; pick the form when adding, editing or hunting. Any form counts the species; forms are extra.
 - **Landing page** — shown before signing in (the gate in `index.html`): what shiny hunting is, the features with screenshots from `shots/`, and the sign-in card.

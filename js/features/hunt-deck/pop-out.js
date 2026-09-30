@@ -7,7 +7,9 @@ import { $ } from "../../core/util.js";
 import { addEncounter, cur, curGame, dr, gameOf, hunt, huntAlt, releaseCur, syncWakeLock, togglePlay } from "./deck.js";
 import { altSprite } from "../../model/forms.js";
 import { GAME_INFO } from "../../model/games.js";
+import { huntPace } from "../../model/hunt-pace.js";
 import { activeHunts } from "../../pages/hunts.js";
+import { paintPace } from "./pace.js";
 
 export let pip = null;
 const pipBtn = $("#drPop");
@@ -74,7 +76,8 @@ export function paintPip() {
   d.querySelector(".pip-count").textContent = nf(h.count);
   // Same luck meter as the Hunt Deck: chance a hunter would have found it by now.
   const p = 1 - Math.pow(1 - 1 / h.odds, h.count);
-  d.querySelector(".pip-odds").textContent = `1/${nf(h.odds)}${h.count ? ` · ${(h.count / h.odds).toFixed(2)}×` : ""}`;
+  const pace = huntPace(h, s);
+  d.querySelector(".pip-odds").textContent = `1/${nf(h.odds)}${h.count ? ` · ${(h.count / h.odds).toFixed(2)}×` : ""}${pace ? ` · ${nf(Math.round(pace.perHour))}/h` : ""}`;
   d.querySelector(".pip-meter i").style.width = Math.min(100, p * 100) + "%";
   d.querySelector(".pip-plus").textContent = h.since ? `+${h.inc}` : "▶";
   d.querySelector(".pip-minus").textContent = `−${h.inc}`;
@@ -88,7 +91,7 @@ export function init() {
 
   // One clock for everything that runs: the open drawer and live hunt strips on cards.
   setInterval(() => {
-    if (cur && hunt().since) { dr.time.textContent = fmtTime(elapsed(hunt())); paintPip(); }
+    if (cur && hunt().since) { dr.time.textContent = fmtTime(elapsed(hunt())); paintPace(hunt()); paintPip(); }
     for (const n of document.querySelectorAll("#gameCards [data-live], #huntCards [data-live]")) {
       const gid = gameOf(n);
       const h = gid && hunts[hk(gid, n.dataset.live)];

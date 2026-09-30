@@ -12,6 +12,7 @@ import { fmtDate, fmtShort, fmtTime, nf } from "../../core/format.js";
 import { el, state } from "../../core/state.js";
 import { elapsed, hk, hunts, isActive, prefs, saveHunts, savePrefs, saveShinies, shinies } from "../../core/store.js";
 import { $, esc } from "../../core/util.js";
+import { paintPace } from "./pace.js";
 import { paintPhases } from "./phases.js";
 import { paintPip, pip } from "./pop-out.js";
 import { openShare } from "../share-card.js";
@@ -163,6 +164,7 @@ export function paintHunt() {
     : ratio >= 1
       ? `<b>${(ratio).toFixed(2)}× odds.</b> ${(p * 100).toFixed(1)}% of hunters would have it by now — it's out there ✦`
       : `<b>${(p * 100).toFixed(1)}%</b> of hunters would have found it by now · ${(ratio * 100).toFixed(0)}% of odds`;
+  paintPace(h);
   paintPip();
 }
 

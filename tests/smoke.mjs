@@ -148,6 +148,11 @@ async function capture(name) {
     return { url: location.pathname + location.search, html, store: JSON.stringify(store, Object.keys(store).sort()) };
   })()`);
   states[name] = s;
+  // With --shots, every named moment gets a screenshot too (not only the end of each step).
+  if (SHOTS) {
+    const { data } = await cdp("Page.captureScreenshot", { format: "png" });
+    await writeFile(join(SHOTS, name.replace(/[^a-z0-9]+/gi, "-") + ".png"), Buffer.from(data, "base64"));
+  }
   return s;
 }
 const click = (sel, wait = 250) => js(`(() => { const e = document.querySelector(${JSON.stringify(sel)}); if (!e) throw new Error("no element: " + ${JSON.stringify(sel)}); e.click(); })()`, wait);
@@ -242,6 +247,21 @@ step("hunt deck: start, count, pause, gotcha", async () => {
   await key("Escape", 300);
   await key("Escape");
 });
+step("hunt deck: pace and ETA", async () => {
+  await nav("sv", 400);
+  await type("#gq", "sneasel");
+  await click(`#gameCards .pcard`, 400);
+  // Demo hunt: 212 encounters in 30 minutes at 1/1365 → 424 an hour.
+  const stats = await js(`[...document.querySelectorAll("#drPaceStats b")].map(b => b.textContent).join(" | ")`);
+  expect(stats === "424 | ~2h 43m | ~3h 13m", `pace stats, got ${stats}`);
+  expect((await text("#drPaceNote")).startsWith("Based on 212"), "paused hunt explains the pace");
+  await click("#drPlay");
+  expect((await text("#drPaceNote")).includes("around"), "running hunt shows a clock time");
+  await js(`document.getElementById("drPace").scrollIntoView({ block: "center" })`, 200);
+  await capture("hunt deck pace");
+  await click("#drPlay");
+  await key("Escape");
+});
 step("hunt deck: forms, phases, prev/next, reset, cancel", async () => {
   await nav("sv", 400);
   await type("#gq", "vivillon");
@@ -280,8 +300,10 @@ step("what's new popup once", async () => {
   await go("/", 2600);
   expect(!(await js(`document.getElementById("wnDlg").hidden`)), "popup shows for someone with data");
   await capture("whats new popup");
-  await click("#wnDlg [data-wn-go]", 700);
-  expect(await js(`document.getElementById("entry").classList.contains("open")`), "Try it opens Dex Entry");
+  // The newest update's button (if it has one) closes the popup and goes where it points.
+  if (await js(`!!document.querySelector("#wnDlg [data-wn-go]")`)) await click("#wnDlg [data-wn-go]", 700);
+  else await key("Escape", 300);
+  expect(await js(`document.getElementById("wnDlg").hidden`), "the popup closes");
   await go("/", 2600);
   expect(await js(`document.getElementById("wnDlg").hidden`), "popup shows only once");
 });
@@ -353,6 +375,16 @@ step("phone layout", async () => {
   await click("#gameCards .pcard", 500);
   expect(await js(`!!document.querySelector(".dr-foot .dr-count-actions")`), "thumb dock on phones");
   await capture("phone hunt deck");
+  for (const w of [390, 360]) {
+    await size(w, 800, true);
+    await js(`document.getElementById("drPace").scrollIntoView({ block: "center" })`, 200);
+    const wide = await js(`[...document.querySelectorAll("#drawer .dr-scroll *")].filter(e => { const r = e.getBoundingClientRect(); return r.width && r.right > innerWidth + 1; }).length`);
+    expect(wide === 0, `nothing wider than a ${w}px phone in the Hunt Deck (${wide})`);
+    const cut = await js(`[...document.querySelectorAll("#drPaceStats b")].filter(b => b.scrollWidth > b.clientWidth).length`);
+    expect(cut === 0, `pace numbers fit at ${w}px (${cut} cut off)`);
+    await capture(`phone hunt deck pace ${w}`);
+  }
+  await size(390, 844, true);
   await key("Escape");
   await openEntry("furfrou");
   await capture("phone entry");

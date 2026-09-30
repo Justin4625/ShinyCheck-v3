@@ -115,3 +115,18 @@
   font: 700 9px/1.2 var(--mono); letter-spacing: .03em; color: var(--muted);
   border: 1px dashed var(--border-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+
+/* Pace: encounters per hour and time estimates, under the luck meter */
+.dr-pace[hidden] { display: none; }
+.dr-pace { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border); }
+.dr-pace .dr-luck-sub { margin-top: 0; }
+.dr-pace-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.dr-pace-stats div { min-width: 0; padding: 10px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.dr-pace-stats b { display: block; font: 800 17px/1.1 var(--font); letter-spacing: -.02em; font-variant-numeric: tabular-nums; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.dr-pace-stats span { display: block; margin-top: 4px; font-size: 11.5px; color: var(--muted); }
+.dr-pace-note { margin: 10px 0 0; font-size: 12.5px; color: var(--faint); }
+@media (max-width: 420px) {
+  .dr-pace-stats { gap: 6px; }
+  .dr-pace-stats div { padding: 8px; }
+  .dr-pace-stats b { font-size: 15px; }
+}
