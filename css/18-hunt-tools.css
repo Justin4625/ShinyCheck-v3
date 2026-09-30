@@ -1,0 +1,117 @@
+/* Hunt tools added later: cancel hunt, toast actions, hunt method setup, phases, backups,
+   moving a shiny and Outside the dex locations.
+   Files in css/ load in name order (index.html); later files win on equal selectors. */
+/* Cancel hunt */
+.dr-cancel {
+  flex: none; height: 56px; padding: 0 16px; border-radius: 18px; cursor: pointer; font-weight: 700; font-size: 13px;
+  border: 1px solid var(--border-2); background: var(--surface); color: var(--muted); transition: color .2s, border-color .2s, background .2s;
+}
+.dr-cancel[hidden] { display: none; }
+.dr-cancel:hover { color: #ff5f7a; border-color: #ff5f7a; }
+.dr-cancel.armed { background: #ff5f7a; border-color: transparent; color: #fff; }
+.dr-gotcha { flex: 1; }
+@media (max-height: 640px), (max-width: 420px) { .dr-cancel { height: 44px; border-radius: 14px; padding: 0 12px; } }
+/* Toast with an action */
+.toast.has-action { pointer-events: auto; display: flex; align-items: center; gap: 14px; }
+.toast-action {
+  border: 0; background: none; cursor: pointer; padding: 4px 2px; font: inherit; font-weight: 800;
+  color: var(--bg); text-decoration: underline; text-underline-offset: 3px;
+}
+.v2-connect {
+  width: 100%; height: 48px; margin: 14px 0 8px; border: 0; border-radius: 14px; cursor: pointer;
+  font-weight: 800; font-size: 15px; color: #14121f; background: var(--holo);
+}
+
+/* Hunt method */
+.dr-odds-show { font: 800 20px/1 var(--font); letter-spacing: -.03em; color: var(--accent); }
+
+.dr-luck-sub { margin-top: 4px; }
+
+/* Hunt setup: method chips + bonus rows */
+.hunt-setup { display: flex; flex-direction: column; gap: 10px; margin: 4px 0 14px; }
+.hs-methods { display: flex; flex-wrap: wrap; gap: 6px; }
+.hs-chip {
+  padding: 7px 11px; border-radius: 10px; cursor: pointer; font-weight: 650; font-size: 12.5px; white-space: nowrap;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--muted); transition: all .15s;
+}
+.hs-chip:hover { color: var(--text); border-color: var(--border-2); }
+.hs-chip.on { color: #fff; border-color: transparent; background: linear-gradient(100deg, var(--accent), var(--accent2)); }
+.hs-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.hs-row > span { font-size: 13px; font-weight: 650; color: var(--text); }
+.hs-seg { display: flex; flex-wrap: wrap; gap: 4px; }
+.hs-seg .hs-chip { padding: 5px 9px; }
+.hs-switch { position: relative; width: 42px; height: 24px; border-radius: 99px; border: 0; cursor: pointer; background: var(--border-2); transition: background .25s; flex: none; }
+.hs-switch i { position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.25); transition: transform .25s; }
+.hs-switch[aria-checked="true"] { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.hs-switch[aria-checked="true"] i { transform: translateX(18px); }
+.hs-methods:empty { display: none; }
+
+/* Phases */
+.dr-phase-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 10px; }
+.dr-phase-count { font: 800 12px/1 var(--mono); color: var(--accent); letter-spacing: .06em; text-transform: uppercase; }
+.dr-phase-btn { margin-left: auto; border: 0; background: none; cursor: pointer; font-size: 12.5px; color: var(--muted); padding: 4px 0; }
+.dr-phase-btn b { color: var(--text); text-decoration: underline; text-underline-offset: 3px; }
+.dr-phase-btn[hidden] { display: none; }
+.dr-phase-pick { margin-top: 10px; text-align: left; }
+.dr-phase-pick[hidden] { display: none; }
+.dr-phase-pick input {
+  width: 100%; padding: 10px 12px; border-radius: 12px; border: 1px solid var(--border); background: var(--surface-2);
+  font: 500 14px/1 var(--font); color: var(--text); outline: none;
+}
+.dr-phase-pick input:focus { border-color: var(--accent); }
+.dr-phase-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 6px; max-height: 220px; overflow-y: auto; margin-top: 8px; }
+.dr-phase-list button {
+  display: flex; align-items: center; gap: 6px; padding: 4px 8px 4px 4px; border-radius: 10px; cursor: pointer; text-align: left;
+  border: 1px solid var(--border); background: var(--surface-2); color: var(--text); font-size: 12.5px; font-weight: 650;
+}
+.dr-phase-list button:hover { border-color: var(--accent); }
+.dr-phase-list img { width: 30px; height: 30px; object-fit: contain; flex: none; }
+.dr-phase-list em { font-style: normal; font: 700 9px/1 var(--mono); color: var(--muted); text-transform: uppercase; }
+.dr-phase-none { margin: 6px 0; color: var(--muted); font-size: 13px; }
+.dr-phases { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 4px; text-align: left; }
+.dr-phases:empty { display: none; }
+.dr-phases li { display: flex; align-items: center; gap: 8px; padding: 4px 8px 4px 4px; border-radius: 10px; background: var(--surface-2); font-size: 12.5px; }
+.dr-phases img { width: 28px; height: 28px; object-fit: contain; }
+.dr-phases span { flex: 1; }
+.dr-phases small { font: 700 10px/1 var(--mono); color: var(--faint); }
+@media (max-height: 640px), (max-width: 420px) {
+  .dr-counter { flex-wrap: wrap; }
+  .dr-phase-row, .dr-phase-pick, .dr-phases { flex-basis: 100%; }
+}
+
+/* Backups */
+.bk-list { list-style: none; margin: 14px 0 4px; padding: 0; display: flex; flex-direction: column; gap: 6px; max-height: 320px; overflow-y: auto; }
+.bk-list li { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); }
+.bk-list li.bk-empty { display: block; color: var(--muted); font-size: 13px; border-style: dashed; background: none; }
+.bk-main { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.bk-main small { font: 700 10px/1.3 var(--mono); color: var(--faint); }
+.bk-restore { flex: none; border: 1px solid var(--border-2); background: var(--surface); border-radius: 10px; padding: 7px 12px; cursor: pointer; font-weight: 700; font-size: 12.5px; color: var(--text); }
+.bk-restore.armed { background: #ff9f43; border-color: transparent; color: #14121f; }
+#bkNow[hidden] { display: none; }
+.dr-phase-list span small { display: block; font: 700 9px/1.2 var(--mono); color: var(--faint); }
+
+/* Hunt method in "Add a shiny" */
+.en-setup { display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--border); }
+.en-setup[hidden] { display: none; }
+.en-setup-head { display: flex; justify-content: space-between; align-items: baseline; }
+.en-setup-head span { font: 700 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.en-setup-head b { font: 800 18px/1 var(--font); letter-spacing: -.03em; background: var(--holo); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.en-setup .hs-chip { --accent: #9d7bff; --accent2: #ff7ad9; }
+.en-setup .hs-switch { --accent: #9d7bff; --accent2: #ff7ad9; }
+
+/* Move a shiny to another game */
+.en-move { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding-top: 4px; }
+.en-move > span { width: 100%; font: 700 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin-bottom: 2px; }
+.en-move-btn {
+  padding: 6px 10px; border-radius: 10px; cursor: pointer; font-weight: 700; font-size: 12px; color: var(--text);
+  border: 1px solid var(--border); background: var(--surface-2); border-left: 3px solid var(--accent);
+}
+.en-move-btn:hover { border-color: var(--accent); }
+.en-from { font-style: normal; color: var(--muted); letter-spacing: 0; text-transform: none; }
+
+/* Outside-the-dex location on game cards */
+.where-tag {
+  max-width: 100%; margin-top: 6px; padding: 3px 7px; border-radius: 6px; min-height: 15px;
+  font: 700 9px/1.2 var(--mono); letter-spacing: .03em; color: var(--muted);
+  border: 1px dashed var(--border-2); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}

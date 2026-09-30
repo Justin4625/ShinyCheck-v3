@@ -1,0 +1,51 @@
+/* Dialogs (V2 import and the ones built on it) and the reCAPTCHA notice.
+   Files in css/ load in name order (index.html); later files win on equal selectors. */
+/* ---------- V2 import ---------- */
+.v2-banner {
+  display: flex; align-items: center; gap: 14px; margin-top: 16px; padding: 14px 16px; border-radius: 18px;
+  border: 1px solid transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--holo) border-box;
+}
+.v2-banner[hidden] { display: none; }
+.v2-banner > svg { width: 22px; height: 22px; flex: none; }
+.v2-banner p { flex: 1; margin: 0; color: var(--muted); }
+.v2-banner p b { color: var(--text); }
+.v2-banner-go { flex: none; height: 38px; padding: 0 16px; border: 0; border-radius: 12px; cursor: pointer; font-weight: 750; color: #14121f; background: var(--holo); }
+.v2-import .rl-card { --accent: #9d7bff; --accent2: #ff7ad9; text-align: left; width: min(560px, 100%); }
+.v2-import .eyebrow { justify-content: flex-start; }
+.v2-title { margin: 0 0 14px; font-size: 26px; font-weight: 800; letter-spacing: -.035em; }
+.v2-table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 12px; }
+.v2-table th { text-align: left; font: 700 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); padding: 0 8px 8px; }
+.v2-table td { padding: 9px 8px; border-top: 1px solid var(--border); font-variant-numeric: tabular-nums; }
+.v2-table td:first-child { font-weight: 700; }
+.v2-table th:not(:first-child), .v2-table td:not(:first-child) { text-align: right; }
+.v2-dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 8px; background: var(--accent); }
+.v2-note { margin: 0 0 10px; padding: 10px 12px; border-radius: 12px; font-size: 13px; }
+.v2-note.ok { background: color-mix(in srgb, #2bd67b 12%, transparent); color: var(--text); }
+.v2-note.warn { background: color-mix(in srgb, #ff9f43 14%, transparent); color: var(--text); }
+.v2-note ul { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
+.v2-fine, .v2-empty { margin: 4px 0 0; font-size: 12.5px; color: var(--muted); }
+.v2-empty { font-size: 14px; padding: 10px 0; }
+.v2-go[hidden] { display: none; }
+.v2-import .rl-go { opacity: 1; pointer-events: auto; }
+.push-state { margin: 14px 0 2px; }
+.share-dlg .rl-card { width: min(440px, 100%); max-height: calc(100dvh - 24px); display: flex; flex-direction: column; }
+.share-dlg .v2-title { padding-right: 44px; }
+.share-preview {
+  flex: 0 1 auto; min-height: 0; aspect-ratio: 4 / 5; max-height: 62dvh; margin: 0 auto; width: 100%; border-radius: 18px; overflow: hidden;
+  background: #07070d linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, .06) 50%, transparent 70%) 0 0 / 200% 100%;
+  animation: shareShimmer 1.2s linear infinite;
+}
+.share-preview:has(img[src]) { animation: none; }
+.share-preview img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.share-preview img:not([src]) { visibility: hidden; }
+@keyframes shareShimmer { to { background-position: -200% 0; } }
+.share-dlg .rl-go:disabled, .share-dlg .rl-again:disabled { opacity: .45; }
+.share-dlg [hidden] { display: none; }
+.share-hint { margin-top: 10px; text-align: center; }
+.share-hint b { color: var(--text); }
+.push-state .v2-note { margin: 0; }
+.push-state .v2-note:not(.ok):not(.warn) { background: var(--surface-2); color: var(--muted); }
+.push-state .v2-note b { color: var(--text); }
+
+/* reCAPTCHA (App Check): the floating badge is hidden; the required notice sits on the login card. */
+.grecaptcha-badge { visibility: hidden !important; }

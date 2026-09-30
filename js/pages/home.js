@@ -1,0 +1,105 @@
+// Shiny Dex page (/): all entries by generation, totals and recommendations.
+import { setRing, updateSection } from "../components/progress.js";
+import { empty, sectionHtml } from "../components/section.js";
+import { renderSidebar } from "../components/sidebar.js";
+import { toast } from "../components/toast.js";
+import { done, has, matchText, pct, sharing } from "../core/collection.js";
+import { GAMES } from "../core/config.js";
+import { fmtPct } from "../core/format.js";
+import { el, state } from "../core/state.js";
+import { prefs, savePrefs } from "../core/store.js";
+import { $, esc } from "../core/util.js";
+import { openEntry } from "../features/dex-entry.js";
+import { huntable } from "../model/availability.js";
+import { genNames, mons, region } from "../model/dex.js";
+import { GAME_INFO } from "../model/games.js";
+import { render } from "./router.js";
+
+// Recommended: missing shinies you can actually hunt — not shiny locked or event only,
+// and in at least one tracked game. A random order is drawn once per page load (and on
+// shuffle) so the picks stay put while you click around.
+let recOrder = [];
+const shuffleRecs = () => {
+  recOrder = mons.map(m => m.id);
+  for (let i = recOrder.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [recOrder[i], recOrder[j]] = [recOrder[j], recOrder[i]];
+  }
+};
+function recommended(scope) {
+  const ok = new Set(scope.filter(m => !has(m) && huntable(m)).map(m => m.id));
+  return recOrder.filter(id => ok.has(id)).slice(0, 6).map(id => mons.find(m => m.id === id));
+}
+
+const homeScope = m => !state.gen || m.gen === state.gen;
+// The Forms toggle decides whether alternate forms count towards totals and percentages:
+// Shiny Dex uses its own toggle, game pages share theirs.
+export const homePool = () => mons.filter(m => state.forms || !m.variant);
+const homeMatch = m => homeScope(m) && matchText(m, el.q) && !(state.missing && has(m)) && (state.forms || !m.variant);
+
+export function renderHome() {
+  const list = mons.filter(homeMatch);
+  $("#count").textContent = `${list.length} shown`;
+  let html = "";
+  for (const g of Object.keys(genNames).map(Number)) {
+    const items = list.filter(m => m.gen === g);
+    if (items.length) html += sectionHtml(String(g).padStart(2, "0"), region(g), g, homePool().filter(m => m.gen === g), items);
+  }
+  el.cards.innerHTML = html || empty(el.q);
+  renderHomeStats();
+}
+
+export function renderHomeStats() {
+  const pool = homePool();
+  const got = done(pool), p = pct(pool);
+  const regionsDone = Object.keys(genNames).filter(g => {
+    const l = pool.filter(m => m.gen === +g);
+    return done(l) === l.length;
+  }).length;
+  $("#statCaught").textContent = got;
+  $("#statLeft").textContent = pool.length - got;
+  $("#statRegions").textContent = `${regionsDone}/${Object.keys(genNames).length}`;
+  $("#heroPct").textContent = fmtPct(p);
+  setRing($("#heroRing"), p);
+  const left = pool.length - got;
+  $("#heroSub").innerHTML = left
+    ? `<b>${left}</b> Pokémon and forms still missing from your shiny collection. ${got ? "Keep going!" : "Open a Pokémon to log your first shiny."}`
+    : `<b>Shiny Dex complete!</b> Every form, shiny and in one place. ✦`;
+
+  el.regions.innerHTML = [[0, "All regions", pool], ...Object.keys(genNames).map(g => [+g, region(g), pool.filter(m => m.gen === +g)])]
+    .map(([g, n, l]) => `<button class="region ${state.gen === g ? "active" : ""} ${done(l) === l.length ? "done" : ""}" data-gen="${g}">
+        <span class="r-name">${esc(n)}</span><span class="r-num">${done(l)} / ${l.length}</span>
+        <span class="r-bar" style="width:${pct(l)}%"></span>
+      </button>`).join("");
+
+  const next = recommended(pool.filter(homeScope));
+  el.upNext.innerHTML = next.length
+    ? next.map(m => `<button data-jump="${m.id}" title="#${m.dex} ${esc(m.name)}${m.form ? " (" + esc(m.form) + ")" : ""} — hunt in ${esc(GAMES.filter(g => m.games[g]).map(g => GAME_INFO[g].abbr).reverse().join(", "))}"><img src="${m.sprite}" alt="${esc(m.name)}"></button>`).join("")
+    : `<p class="up-next-empty">Nothing left to hunt here ✦</p>`;
+
+  for (const g of Object.keys(genNames)) updateSection(el.cards, g, pool.filter(m => m.gen === +g));
+  renderSidebar();
+}
+
+// Wiring: runs once at startup, from main.js.
+export function init() {
+  shuffleRecs();
+
+  el.regions.addEventListener("click", e => {
+    const r = e.target.closest(".region");
+    if (r) { state.gen = +r.dataset.gen; render(); }
+  });
+  // A recommendation opens its Dex Entry, where "Hunt it in" starts the hunt.
+  el.upNext.addEventListener("click", e => {
+    const b = e.target.closest("[data-jump]");
+    if (b) openEntry(+b.dataset.jump);
+  });
+  $("#recShuffle").addEventListener("click", () => { shuffleRecs(); renderHomeStats(); });
+
+  $("#fShare").addEventListener("click", () => {
+    prefs.shareAcrossGames = !sharing();
+    savePrefs();
+    render();
+    toast(sharing() ? "Shinies now count in every game they appear in ✦" : "Each game counts only its own shinies again");
+  });
+}

@@ -1,0 +1,54 @@
+/* What's new page and popup.
+   Files in css/ load in name order (index.html); later files win on equal selectors. */
+/* ---------- What's new: update log (/updates) and one-time popup ---------- */
+.updates-icon { width: 14px; height: 14px; border-radius: 0; background: none; box-shadow: none; }
+.updates-icon svg { display: block; width: 14px; height: 14px; fill: url(#holo); }
+.side-new {
+  justify-self: end; padding: 3px 7px; border-radius: 99px; font: 800 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase;
+  color: #fff; background: linear-gradient(100deg, #ff7ad9, #9d7bff);
+}
+.side-new[hidden] { display: none; }
+.wn-hero { margin-bottom: 18px; }
+.wn-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 14px; max-width: 980px; }
+.wn-item {
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; padding: 24px; border-radius: 24px;
+  background: var(--surface); border: 1px solid var(--border); box-shadow: var(--card-shadow);
+}
+.wn-item.has-shot { grid-template-columns: minmax(0, 1fr) 200px; align-items: center; }
+.wn-item:first-child { border-color: transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--holo) border-box; }
+.wn-date { display: flex; align-items: center; gap: 8px; margin: 0; font: 700 10px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--faint); }
+.wn-new { padding: 4px 8px; border-radius: 99px; color: #fff; background: linear-gradient(100deg, #ff7ad9, #9d7bff); letter-spacing: .1em; }
+.wn-item h3 { margin: 10px 0 6px; font-size: 24px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; }
+.wn-desc { margin: 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
+.wn-desc b, .wn-steps b { color: var(--text); font-weight: 750; }
+.wn-steps { counter-reset: wn; list-style: none; margin: 14px 0 0; padding: 0; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.wn-steps li { counter-increment: wn; position: relative; padding-left: 34px; font-size: 14.5px; line-height: 1.45; color: var(--muted); }
+.wn-steps li::before {
+  content: counter(wn); position: absolute; left: 0; top: -1px; width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center;
+  font: 800 12px/1 var(--mono); color: var(--text); background: linear-gradient(var(--surface-2), var(--surface-2)) padding-box, var(--holo) border-box; border: 1.5px solid transparent;
+}
+.wn-go {
+  margin-top: 16px; height: 42px; padding: 0 16px; border-radius: 12px; cursor: pointer; font-weight: 750; font-size: 14px; color: var(--text);
+  border: 1px solid transparent; background: linear-gradient(var(--surface), var(--surface)) padding-box, var(--holo) border-box;
+}
+.wn-shot { margin: 0; justify-self: center; width: 100%; max-width: 200px; aspect-ratio: 390 / 600; border-radius: 22px; overflow: hidden; border: 1px solid var(--border-2); background: var(--surface-2); box-shadow: 0 20px 40px -20px rgba(0, 0, 0, .5); }
+.wn-shot img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+/* Popup */
+.wn-dlg .rl-card { --accent: #ff7ad9; --accent2: #9d7bff; width: min(440px, 100%); max-height: calc(100dvh - 32px); overflow-y: auto; overscroll-behavior: contain; padding-top: 22px; }
+.wn-card .wn-shot { max-width: 230px; aspect-ratio: 390 / 470; margin: 4px auto 18px; }
+.wn-title { margin: 0 0 8px; font-size: 26px; font-weight: 800; letter-spacing: -.035em; line-height: 1.1; }
+.wn-card .wn-steps { margin: 16px 0 6px; }
+.wn-dlg-go { opacity: 1; pointer-events: auto; }
+.wn-all { display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 650; color: var(--muted); text-decoration: none; }
+.wn-all:hover { color: var(--text); }
+@media (max-width: 700px) {
+  .wn-item, .wn-item.has-shot { grid-template-columns: minmax(0, 1fr); padding: 20px; }
+  .wn-item h3 { font-size: 21px; }
+  .wn-shot { max-width: 220px; }
+}
+@media (max-width: 560px) {
+  .wn-dlg { padding: 16px; }
+  .wn-dlg .rl-card { padding: 20px 18px 16px; }
+  .wn-card .wn-shot { max-width: 180px; aspect-ratio: 390 / 420; margin-bottom: 14px; }
+  .wn-title { font-size: 23px; }
+}

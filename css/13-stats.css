@@ -1,0 +1,71 @@
+/* Stats page (Shiny Wrapped).
+   Files in css/ load in name order (index.html); later files win on equal selectors. */
+/* ---------- Stats (Shiny Wrapped) ---------- */
+.stats-icon { width: 12px; height: 12px; border-radius: 0; background: none; box-shadow: none; }
+.stats-icon svg { display: block; width: 12px; height: 12px; fill: var(--st-bar); }
+.stats-hero { margin-bottom: 18px; }
+.st-hero-side { position: relative; display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; gap: 14px; min-width: 0; }
+.st-years { margin: 0; }
+.st-years[hidden], .st-share[hidden] { display: none; }
+.st-share {
+  display: inline-flex; align-items: center; gap: 9px; height: 46px; padding: 0 20px; border-radius: 14px; cursor: pointer;
+  font-weight: 750; font-size: 14px; color: #14121f; border: 0; background: var(--holo);
+  box-shadow: 0 10px 24px -14px rgba(157, 123, 255, .8);
+}
+.st-share .share-ico { width: 17px; height: 17px; }
+
+.st-highlights { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.st-hl {
+  position: relative; display: flex; flex-direction: column; align-items: flex-start; gap: 2px; min-width: 0; padding: 14px 16px 16px;
+  border-radius: 20px; cursor: pointer; text-align: left; color: var(--text); font: inherit;
+  background: var(--surface); border: 1px solid var(--border); box-shadow: var(--card-shadow); transition: transform .15s, border-color .2s;
+}
+.st-hl::before { content: ""; position: absolute; left: 16px; right: 16px; top: 0; height: 3px; border-radius: 0 0 3px 3px; background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.st-hl:hover { border-color: var(--border-2); transform: translateY(-2px); }
+.st-hl-label { font: 700 10px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.st-hl-img { align-self: center; width: 96px; height: 96px; margin: 6px 0 4px; }
+.st-hl-img img { width: 100%; height: 100%; object-fit: contain; }
+.st-hl-value { font-size: 22px; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.st-hl-name { font-weight: 700; font-size: 14px; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-hl-name em { font-style: normal; font-weight: 600; color: var(--muted); }
+.st-hl small { font: 700 10px/1.35 var(--mono); color: var(--faint); }
+
+.st-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding-bottom: 40px; }
+.st-card { min-width: 0; padding: 20px 22px 18px; border-radius: 22px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--card-shadow); }
+.st-card.wide { grid-column: 1 / -1; }
+.st-card-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+.st-card-head h3 { margin: 0; font-size: 19px; font-weight: 800; letter-spacing: -.03em; }
+.st-card-head span { font: 700 10px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.st-note { margin: 12px 0 0; font-size: 12.5px; color: var(--muted); }
+
+/* Column chart: one hue; bars end in a rounded top on a hairline baseline. */
+.st-cols { display: flex; align-items: stretch; gap: 6px; height: 170px; border-bottom: 1px solid var(--border-2); padding-top: 20px; }
+.st-col { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; position: relative; cursor: default; outline: none; border-radius: 8px; }
+.st-col:hover, .st-col:focus-visible { background: color-mix(in srgb, var(--st-bar) 8%, transparent); }
+.st-col-bar { position: relative; display: block; width: min(100%, 34px); margin: 0 auto; min-height: 0; border-radius: 4px 4px 0 0; background: var(--st-bar); }
+.st-col-bar[style*="height:0%"] { height: 2px !important; background: var(--border-2); }
+.st-col-bar i { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); padding-bottom: 4px; font: 700 11px/1 var(--mono); font-style: normal; color: var(--text); }
+.st-col-label { position: absolute; top: 100%; left: 0; right: 0; padding-top: 7px; text-align: center; font: 700 10px/1 var(--mono); color: var(--muted); white-space: nowrap; }
+.st-cols + .st-note, .st-cols { margin-bottom: 22px; }
+.st-cols + .st-note { margin-top: -2px; }
+/* Luck: a line where the odds are. */
+.st-col.past-odds::before { content: "odds"; position: absolute; top: -18px; bottom: 0; left: -4px; border-left: 1.5px dashed var(--faint); padding-left: 4px; font: 700 9px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--faint); }
+
+/* Row chart: name, bar, count. */
+.st-rows { display: flex; flex-direction: column; gap: 4px; }
+.st-row { display: grid; grid-template-columns: minmax(70px, 34%) minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 36px; padding: 0 6px; border-radius: 10px; outline: none; }
+.st-row:hover, .st-row:focus-visible { background: var(--surface-2); }
+.st-row-name { font-weight: 650; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.st-row-track { display: block; height: 10px; }
+.st-row-track i { display: block; height: 100%; min-width: 4px; border-radius: 0 4px 4px 0; background: var(--st-bar); }
+.st-row-track i.game { background: linear-gradient(90deg, var(--accent), var(--accent2)); }
+.st-row b { font: 700 13px/1 var(--mono); font-variant-numeric: tabular-nums; min-width: 2ch; text-align: right; }
+
+.st-tip {
+  position: fixed; z-index: 120; left: 0; top: 0; max-width: 240px; padding: 8px 11px; border-radius: 10px; pointer-events: none;
+  background: var(--text); color: var(--bg); font-size: 12.5px; line-height: 1.35; opacity: 0; transition: opacity .12s;
+}
+.st-tip.show { opacity: 1; }
+.st-tip b { font-weight: 800; }
+.section-dot { width: 14px; height: 14px; border-radius: 50%; align-self: center; background: var(--g); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 20%, transparent); }
+#huntCards .section-head { align-items: center; }

@@ -1,0 +1,9 @@
+/* Toast messages.
+   Files in css/ load in name order (index.html); later files win on equal selectors. */
+/* ---------- Toast ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: 28px; z-index: 100; transform: translate(-50%, 20px); opacity: 0; pointer-events: none;
+  padding: 12px 18px; border-radius: 14px; background: var(--text); color: var(--bg); font-weight: 650;
+  box-shadow: 0 20px 40px -10px rgba(0, 0, 0, .4); transition: opacity .25s, transform .25s;
+}
+.toast.show { opacity: 1; transform: translate(-50%, 0); }

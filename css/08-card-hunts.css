@@ -1,0 +1,24 @@
+/* Hunt counter strip on game cards.
+   Files in css/ load in name order (index.html); later files win on equal selectors. */
+/* ---------- Hunt extras on game cards ---------- */
+.shiny-count svg, .log-n svg { width: 9px; height: 9px; margin-right: 3px; vertical-align: -1px; }
+.log-n svg { width: 12px; height: 12px; }
+.shiny-count {
+  font: 700 10px/1 var(--mono); padding: 3px 6px; border-radius: 6px; color: #fff;
+  background: linear-gradient(90deg, var(--accent, #ff7ad9), var(--accent2, #9d7bff));
+}
+.hunt-strip {
+  white-space: nowrap;
+  width: 100%; margin-top: 10px; display: flex; justify-content: space-between; gap: 6px;
+  padding: 7px 9px; border-radius: 10px; background: var(--surface-2); border: 1px solid var(--border);
+  font: 700 11px/1 var(--mono); color: var(--muted);
+}
+.hunt-strip span:first-child { color: var(--text); }
+.hunt-strip.live { border-color: color-mix(in srgb, var(--accent) 55%, transparent); }
+.hunt-strip.live span:last-child { color: var(--accent); }
+.hunt-strip.live span:last-child::before { content: "● "; animation: blink 1.2s steps(2) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.seg-hunts { gap: 8px; }
+.live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--border-2); }
+.live-dot.on { background: #ff4d6d; box-shadow: 0 0 0 3px rgba(255, 77, 109, .25); animation: blink 1.2s steps(2) infinite; }
+.empty-state small { display: block; font-size: 13px; font-weight: 500; color: var(--faint); }

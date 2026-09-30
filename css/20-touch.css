@@ -1,0 +1,40 @@
+/* Touch screens.
+   Files in css/ load in name order (index.html); later files win on equal selectors. */
+/* ---------- Touch screens ---------- */
+/* Taps shouldn't leave hover effects stuck on; give a short press instead. */
+@media (hover: none) {
+  .pcard:not(.on):hover .sprite img { filter: var(--silhouette); transform: none; }
+  .pcard:hover .types { opacity: .55; }
+  .pcard.on:hover { animation: none; }
+  .pcard.on:hover::after { display: none; }
+  .region:hover, .up-next-row button:hover, .en-game-chip:hover { transform: none; }
+  .up-next-row button:hover img { filter: var(--silhouette); }
+  .rec-shuffle:hover { transform: none; }
+  .pcard:active, .region:active, .up-next-row button:active, .en-game-chip:active, .seg:active,
+  .chip-toggle:active, .random-btn:active, .hs-chip:active, .side-item:active { transform: scale(.96); transition: transform .08s; }
+  button, .pcard, .region, .side-item { -webkit-user-select: none; user-select: none; }
+}
+/* Scrolling inside a panel doesn't drag (or pull-to-refresh) the page behind it. */
+.dr-scroll, .sidebar, .gate, .roulette, .dr-phase-list { overscroll-behavior: contain; }
+
+@media (max-width: 560px) {
+  /* Panels stay clear of the notch / status bar (also when opened from the Home Screen). */
+  .drawer-panel { top: calc(6px + env(safe-area-inset-top)); bottom: calc(6px + env(safe-area-inset-bottom)); }
+  .dr-foot { padding-bottom: 10px; }
+
+  /* Tap targets of at least ~40px. */
+  .chip-toggle, .random-btn { height: 40px; }
+  .hs-chip { min-height: 40px; padding: 8px 14px; font-size: 13.5px; border-radius: 12px; }
+  .hs-seg .hs-chip { min-width: 40px; padding: 8px 10px; }
+  .hs-switch { width: 50px; height: 30px; }
+  .hs-switch i { width: 24px; height: 24px; }
+  .hs-switch[aria-checked="true"] i { transform: translateX(20px); }
+  .rec-shuffle { width: 36px; height: 36px; border-radius: 11px; }
+  .rec-shuffle svg { width: 16px; height: 16px; }
+  .dr-phase-btn { padding: 10px 0; font-size: 13px; }
+  .link-btn { padding: 10px; font-size: 14px; }
+  .side-item { padding: 12px; }
+  .ghost-btn { height: 44px; }
+  .ghost-btn.square { flex-basis: 44px; }
+  .en-row { min-height: 52px; }
+}

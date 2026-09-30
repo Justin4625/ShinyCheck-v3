@@ -1,0 +1,55 @@
+/* Shiny availability labels, game picker and the Active hunts page.
+   Files in css/ load in name order (index.html); later files win on equal selectors. */
+/* ---------- Shiny availability labels ---------- */
+.status-chip {
+  display: inline-grid; place-items: center; width: 18px; height: 18px; margin-left: 5px; border-radius: 6px;
+  color: var(--muted); background: var(--surface-2); border: 1px solid var(--border); vertical-align: middle;
+}
+.status-chip svg, .status-note svg { width: 11px; height: 11px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+.status-chip.event { color: #d9a441; }
+.status-note {
+  display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 14px; text-align: left;
+  background: var(--surface); border: 1px solid var(--border); color: var(--muted); font-size: 12.5px; line-height: 1.4;
+}
+.status-note svg { flex: none; width: 16px; height: 16px; margin-top: 1px; }
+.status-note b { color: var(--text); font-weight: 750; margin-right: 2px; }
+.status-note.event svg { color: #d9a441; }
+.dr-sub .status-note { margin-top: 10px; }
+.dr-sub:has(.status-note) { display: block; }
+#enStatus:empty { display: none; }
+
+/* Game picker (manual add) */
+.game-pick { display: flex; flex-direction: column; gap: 10px; }
+.gp-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.gp-head > span { font: 700 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.gp-filter {
+  width: 55% !important; padding: 7px 10px !important; border-radius: 10px; border: 1px solid var(--border); background: var(--surface-2);
+  font: 500 13px/1 var(--font) !important; color: var(--text); outline: none; text-align: left !important;
+}
+.gp-title { margin: 0 0 6px; font: 700 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.gp-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 6px; }
+.gp-tile {
+  position: relative; display: flex !important; flex-direction: column; gap: 3px !important; padding: 9px 10px 9px 14px; border-radius: 12px; cursor: pointer;
+  background: var(--surface-2); border: 1px solid var(--border); overflow: hidden;
+  font: 650 12.5px/1.2 var(--font) !important; letter-spacing: 0 !important; text-transform: none !important; color: var(--text) !important;
+  transition: border-color .15s, background .15s;
+}
+.gp-tile[hidden] { display: none !important; }
+.gp-tile input { position: absolute; opacity: 0; pointer-events: none; }
+.gp-tile .gp-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: linear-gradient(var(--accent), var(--accent2)); }
+.gp-tile b { font-weight: 700; }
+.gp-tile small { font: 700 10px/1 var(--mono); color: var(--faint); }
+.gp-tile:hover { border-color: var(--border-2); }
+.gp-tile:has(input:checked) {
+  border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface-2));
+  box-shadow: 0 0 0 1px var(--accent);
+}
+.gp-tile:has(input:focus-visible) { outline: 2px solid var(--brand); outline-offset: 2px; }
+.gp-group[hidden], .gp-empty[hidden] { display: none; }
+.gp-empty { margin: 0; font-size: 13px; color: var(--muted); }
+
+/* ---------- Active hunts ---------- */
+.side-hunts { grid-template-rows: auto; }
+.hunt-dot { background: var(--border-2); box-shadow: none; }
+.hunt-dot.on { background: #ff4d6d; box-shadow: 0 0 0 3px rgba(255, 77, 109, .25); animation: blink 1.2s steps(2) infinite; }
+.hunts-hero { margin-bottom: 26px; }
