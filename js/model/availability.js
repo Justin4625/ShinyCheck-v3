@@ -29,6 +29,9 @@ export const EVENT_ONLY = {
 const GAME_LOCKS = {
   // Diamond & Pearl: Manaphy is in the Sinnoh dex but only hatches from the Pokémon Ranger egg.
   dp: [490],
+  // Platinum: Manaphy too, and Murkrow, Misdreavus, Glameow and Stunky (and their evolutions) are in its
+  // Sinnoh dex but only come by trading from Diamond & Pearl.
+  pt: [490, 198, 200, 429, 430, 431, 432, 434, 435],
   // HeartGold & SoulSilver: Mew and Celebi are in the Johto dex but only came through events there.
   hgss: [151, 251],
   // Black & White and Black 2 & White 2: Reshiram, Zekrom, Keldeo and Meloetta can't be shiny in Gen 5 and Genesect only

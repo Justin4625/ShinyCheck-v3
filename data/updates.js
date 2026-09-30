@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "pt-2026-09",
+    date: "2026-09-30",
+    title: "Platinum",
+    text: "Platinum is in with its bigger Sinnoh dex of 210, every Pokémon you can get beyond it (the Distortion World, the Kanto birds, the Regis) and Poké Radar hunts that count your chain.",
+    steps: [
+      "Open **Platinum** in the menu.",
+      "Start a hunt and pick **Poké Radar**; every **+1** grows your chain.",
+      "Turn on **Count outside the dex** to count the Pokémon from other regions too.",
+    ],
+    shot: "shots/updates/pt.webp",
+    action: { label: "Open Platinum", go: "pt" },
+  },
+  {
     id: "dp-2026-09",
     date: "2026-09-30",
     title: "Diamond & Pearl",

@@ -36,6 +36,8 @@ export const HUNT_SETUP = {
     ["breed", "Breeding", 1, []], ["masuda", "Masuda", 5, []]],
     bonus: [{ id: "rchain", label: "Chain", type: "level", live: true, tag: lv => `chain ${lv}`,
       levels: [["0–9", 8192], ["10+", 5958], ["20+", 4096], ["30+", 2185], ["35", 1192], ["36", 993], ["37", 799], ["38", 596], ["39", 400], ["40", 200]] }] },
+  // Platinum has the same odds and Poké Radar as Diamond & Pearl.
+  get pt() { return this.dp; },
   // HeartGold & SoulSilver (RotomLabs): 1/8192; the Masuda Method gives 5 rolls (1/1639). No Shiny Charm.
   hgss: { rate: 8192, methods: [["wild", "Wild", 1, []], ["breed", "Breeding", 1, []], ["masuda", "Masuda", 5, []]], bonus: [] },
   // Black & White (RotomLabs): 1/8192, no Shiny Charm yet; the Masuda Method gives 6 rolls (1/1366).

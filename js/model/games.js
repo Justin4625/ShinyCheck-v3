@@ -1,6 +1,8 @@
 // The tracked games: names, colours, logos, regional dex sections and dex-number helpers.
 // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
 export const GAME_INFO = {
+  pt:   { name: "Platinum", abbr: "Pt", released: "2008-09-13", accent: "#8a94a6", accent2: "#c9a043", logo: "logos/ptLogo.png",
+          sections: [["", "Sinnoh"]] },
   dp:   { name: "Diamond & Pearl", abbr: "DP", released: "2006-09-28", short: "D & P", accent: "#3f74d9", accent2: "#e48db3", logo: "logos/dpLogo.png",
           sections: [["", "Sinnoh"]] },
   hgss: { name: "HeartGold & SoulSilver", abbr: "HGSS", released: "2009-09-12", short: "HG & SS", accent: "#d9a520", accent2: "#9fb0c8", logo: "logos/hgssLogo.png",
