@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "crystal-2026-09",
+    date: "2026-09-30",
+    title: "Crystal",
+    text: "Crystal is in: the Johto dex with all 251, Celebi via the GS Ball on Virtual Console, and Gen 2's shiny tricks: breed with a shiny parent for 1 in 64, or hatch the Odd Egg at 1 in 10.",
+    steps: [
+      "Open **Crystal** in the menu.",
+      "Start a hunt and pick **Shiny parent** or **Odd Egg** for the better odds.",
+      "Locked cards need a trade from Gold & Silver or Gen 1, so they don't count.",
+    ],
+    shot: "shots/updates/crystal.webp",
+    action: { label: "Open Crystal", go: "crystal" },
+  },
+  {
     id: "rs-2026-09",
     date: "2026-09-30",
     title: "Ruby & Sapphire",

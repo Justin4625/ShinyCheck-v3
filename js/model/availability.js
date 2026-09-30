@@ -27,6 +27,10 @@ export const EVENT_ONLY = {
 // Zone 20, the PLA starters in outbreaks). "dex:Form" locks only that form; evolutions of a
 // locked-only line are locked too.
 const GAME_LOCKS = {
+  // Crystal: its Johto dex has all 251, but the Kanto starters, fossils, birds and Mewtwo only come from
+  // Gen 1, Vulpix, Mankey, Mareep, Girafarig and Remoraid (and evolutions) only from Gold & Silver, Mew
+  // only from events. Celebi is in: the Virtual Console Crystal has the GS Ball.
+  crystal: [1, 2, 3, 4, 5, 6, 7, 8, 9, 37, 38, 56, 57, 138, 139, 140, 141, 144, 145, 146, 150, 151, 179, 180, 181, 203, 223, 224],
   // Ruby & Sapphire: Jirachi and Deoxys are in the Hoenn dex but only came through events and other games.
   rs: [385, 386],
   // FireRed & LeafGreen: Mew is in the Kanto dex but only came through events.

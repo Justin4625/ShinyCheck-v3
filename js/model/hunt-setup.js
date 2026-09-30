@@ -30,6 +30,10 @@ function dexNavOdds(level, chain, charm) {
   return Math.round(1 / ((1 - h) * base + h));
 }
 export const HUNT_SETUP = {
+  // Crystal (RotomLabs): 1/8192 in the wild and for eggs. A shiny parent passes on its DVs: 1/64 for its
+  // opposite-gender children (Gold & Silver too). The Odd Egg is shiny 1 in 10.
+  crystal: { rate: 8192, methods: [["wild", "Wild", 1, []], ["breed", "Breeding", 1, []], ["sparent", "Shiny parent", { odds: 64 }, []],
+    ["oddegg", "Odd Egg", { odds: 10 }, []]], bonus: [] },
   // Ruby & Sapphire (RotomLabs): 1/8192 in the wild and for eggs; no Masuda Method or Shiny Charm yet.
   rs: { rate: 8192, methods: [["wild", "Wild", 1, []], ["breed", "Breeding", 1, []]], bonus: [] },
   // FireRed & LeafGreen (RotomLabs): 1/8192 in the wild and for eggs; no Masuda Method or Shiny Charm yet.
