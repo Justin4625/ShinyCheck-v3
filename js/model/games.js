@@ -1,8 +1,8 @@
 // The tracked games: names, colours, logos, regional dex sections and dex-number helpers.
 // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
 export const GAME_INFO = {
-  // No usable English logo was found: the game page and landing page show the name as a wordmark.
-  gs:   { name: "Gold & Silver", abbr: "GS", released: "1999-11-21", accent: "#c9a227", accent2: "#9fb0c8",
+  // Gen 1 and 2 have no separate English logo: these are the logos from the games' title screens.
+  gs:   { name: "Gold & Silver", abbr: "GS", released: "1999-11-21", accent: "#c9a227", accent2: "#9fb0c8", logo: "logos/gsLogo.png",
           sections: [["", "Johto"]] },
   crystal: { name: "Crystal", abbr: "C", released: "2000-12-14", accent: "#3aa3cf", accent2: "#a9dff2", logo: "logos/crystalLogo.png",
           sections: [["", "Johto"]] },
