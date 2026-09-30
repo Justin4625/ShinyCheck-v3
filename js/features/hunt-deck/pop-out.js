@@ -38,7 +38,7 @@ async function popOut() {
       <button class="pip-play" title="Start / pause (P)"></button>
       <div class="pip-row">
         <div class="pip-tally"><span class="pip-count"></span><span class="pip-odds"></span></div>
-        <button class="pip-break" title="Poké Radar chain broke — back to 0 (B)" hidden>Chain<br>broke</button>
+        <button class="pip-break" title="Chain broke — back to 0 (B)" hidden>Chain<br>broke</button>
         <button class="pip-minus" title="−1 (−)"></button>
         <button class="pip-plus" title="+1 (Space)"></button>
       </div>
@@ -81,7 +81,7 @@ export function paintPip() {
   // Same luck meter as the Hunt Deck: chance a hunter would have found it by now.
   const p = 1 - Math.pow(1 - 1 / h.odds, h.count);
   const pace = huntPace(h, s);
-  // On the Poké Radar: the chain leads the line, and the Chain broke button shows.
+  // On a chain method (Poké Radar, chain fishing, DexNav): the chain leads the line, and the Chain broke button shows.
   const chain = chainNow(h), brk = d.querySelector(".pip-break");
   brk.hidden = chain == null;
   brk.disabled = !chain;

@@ -1,4 +1,5 @@
-// Poké Radar chain (X & Y, BD & SP, DP, Pt): every encounter adds one to the chain, "Chain broke" drops it
+// Live chains — Poké Radar (X & Y, BD & SP, DP, Pt), chain fishing (X & Y, OR & AS) and the DexNav
+// (OR & AS): every encounter adds one to the chain, "Chain broke" drops it
 // back to 0 (with Undo), "Reset" starts over (chain, breaks and longest to 0), and the odds follow the chain. The chain lives in the hunt's setup, so it
 // carries over to the next hunt in that game, like it does in the game after a shiny.
 import { toast } from "../../components/toast.js";
@@ -20,7 +21,7 @@ export function chainStep(h, sign) {
   return b ? withChain(h, chainOf(b, setupOf(h)) + sign) : {};
 }
 
-// The current chain length, or null when the hunt isn't on the Poké Radar.
+// The current chain length, or null when the hunt's method has no chain.
 export function chainNow(h) {
   const b = liveChain(curGame, setupOf(h));
   return b ? chainOf(b, setupOf(h)) : null;
@@ -31,6 +32,7 @@ export function paintChain(h) {
   box.hidden = !b;
   if (!b) return;
   const n = chainOf(b, setupOf(h)), breaks = h.breaks || 0;
+  $("#drChainName").textContent = b.name;
   $("#drChainN").textContent = nf(n);
   $("#drChainNote").textContent = [breaks ? `broke ${breaks}×` : "", h.best ? `longest ${nf(h.best)}` : ""].filter(Boolean).join(" · ");
   $("#drChainBreak").disabled = !n;
@@ -51,11 +53,12 @@ export function breakChain() {
 
 // Start the chain over without counting a break: chain, breaks and longest back to 0.
 function resetChain() {
-  const h = hunt(), n = chainNow(h);
-  if (n == null) return;
+  const h = hunt(), b = liveChain(curGame, setupOf(h));
+  if (!b) return;
+  const n = chainOf(b, setupOf(h));
   const prev = { n, breaks: h.breaks || 0, best: h.best || 0 };
   setHunt({ ...withChain(h, 0), breaks: 0, best: 0 });
-  toast("Radar chain reset", { label: "Undo", run: () => setHunt({ ...withChain(hunt(), prev.n), breaks: prev.breaks, best: prev.best }) });
+  toast(`${b.name} reset`, { label: "Undo", run: () => setHunt({ ...withChain(hunt(), prev.n), breaks: prev.breaks, best: prev.best }) });
 }
 
 // Wiring: runs once at startup, from main.js.

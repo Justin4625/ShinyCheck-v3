@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "fish-dexnav-chains-2026-09",
+    date: "2026-09-30",
+    title: "Chain fishing & DexNav chains",
+    text: "The Hunt Deck now counts your chain for chain fishing in X & Y and Omega Ruby & Alpha Sapphire, and for DexNav chains in Omega Ruby & Alpha Sapphire, just like the Poké Radar. Every encounter adds one and the odds follow your chain.",
+    steps: [
+      "Open a hunt in **X & Y** or **Omega Ruby & Alpha Sapphire** and pick **Chain fishing** or **DexNav**.",
+      "Every **+1** adds one to your chain; fishing tops out at a chain of 20 (1 in 100).",
+      "Chain broke? Tap **Chain broke**. After a shiny, a fishing chain starts over at 0.",
+    ],
+    shot: "shots/updates/chains.webp",
+    action: { label: "Open X & Y", go: "xy" },
+  },
+  {
     id: "rby-2026-09",
     date: "2026-09-30",
     title: "Red, Blue & Yellow",

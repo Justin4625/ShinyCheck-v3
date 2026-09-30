@@ -21,7 +21,7 @@ import { mons } from "../../model/dex.js";
 import { altOf, altSprite, altsOf } from "../../model/forms.js";
 import { codeLabel, whereIn } from "../../model/game-dex.js";
 import { GAME_INFO } from "../../model/games.js";
-import { defaultSetup, evalSetup, patchSetup } from "../../model/hunt-setup.js";
+import { afterShiny, defaultSetup, evalSetup, patchSetup } from "../../model/hunt-setup.js";
 import { renderGameStats } from "../../pages/game.js";
 import { renderHunts } from "../../pages/hunts.js";
 import { render } from "../../pages/router.js";
@@ -197,7 +197,7 @@ function refreshCard() {
 export function addEncounter(sign = 1) {
   const h = hunt();
   if (sign > 0 && !h.since) return togglePlay();
-  // On the Poké Radar the chain moves with every encounter (chain.js).
+  // On a chain method the chain moves with every encounter (chain.js).
   setHunt({ count: Math.max(0, h.count + sign * h.inc), ...(h.count || sign > 0 ? chainStep(h, sign) : {}) });
   if (sign > 0) {
     // A short buzz confirms the tap on phones that support it (Android; iOS ignores it).
@@ -232,6 +232,9 @@ function gotcha() {
   delete hunts[k];
   delete altPick[k];
   saveHunts();
+  // A shiny ends a fishing chain: the next hunt in this game starts at 0.
+  const next = afterShiny(curGame, h.setup);
+  if (next !== h.setup) { prefs[curGame] = { ...prefs[curGame], setup: next, odds: evalSetup(curGame, next).odds }; savePrefs(); }
   paintHunt();
   paintLog();
   refreshCard();

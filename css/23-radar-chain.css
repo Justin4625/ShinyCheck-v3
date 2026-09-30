@@ -1,4 +1,4 @@
-/* Poké Radar chain in the Hunt Deck (js/features/hunt-deck/chain.js): the chain length, how often it
+/* Live chain (Poké Radar, chain fishing, DexNav) in the Hunt Deck (js/features/hunt-deck/chain.js): the chain length, how often it
    broke, and the "Chain broke" button; also the button in the pop-out window. */
 .dr-chain {
   display: flex; align-items: center; gap: 12px; margin-top: 12px; padding: 8px 8px 8px 14px; text-align: left;
