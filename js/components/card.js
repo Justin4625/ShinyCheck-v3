@@ -39,7 +39,8 @@ export function init() {
 
   // ---------- Events ----------
   for (const root of [el.cards, el.gameCards, el.huntCards]) {
-    const activate = c => root === el.cards ? openEntry(+c.dataset.id) : openDrawer(+c.dataset.id, gameOf(c));
+    // The Shiny Dex and games without shinies (Red, Blue & Yellow) open Dex Entry; game pages open the Hunt Deck.
+    const activate = c => root === el.cards || GAME_INFO[gameOf(c)].noShiny ? openEntry(+c.dataset.id) : openDrawer(+c.dataset.id, gameOf(c));
     root.addEventListener("click", e => {
       if (e.target.closest(".wiki")) return;
       const c = e.target.closest(".pcard");

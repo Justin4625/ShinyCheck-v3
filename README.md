@@ -4,7 +4,7 @@ Shiny Dex and shiny-hunt tracker for Pokémon. Plain HTML, CSS and JavaScript (E
 no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 
 - **Shiny Dex** — all 1,081 Pokémon and forms. A card glows once a shiny of it is logged in any game.
-- **Games** — Gold & Silver, Crystal, Ruby & Sapphire, FireRed & LeafGreen, Emerald, Diamond & Pearl, Platinum, HeartGold & SoulSilver, Black & White, Black 2 & White 2, X & Y, Omega Ruby & Alpha Sapphire, Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
+- **Games** — Red, Blue & Yellow (the Kanto dex to browse; Gen 1 has no shinies), Gold & Silver, Crystal, Ruby & Sapphire, FireRed & LeafGreen, Emerald, Diamond & Pearl, Platinum, HeartGold & SoulSilver, Black & White, Black 2 & White 2, X & Y, Omega Ruby & Alpha Sapphire, Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, pace (encounters per hour, time to odds), Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
 - **Forms** — cosmetic forms, switchable forms and gender differences (Vivillon, Furfrou, Flabébé, Rotom, …) as a checklist in Dex Entry; pick the form when adding, editing or hunting. Any form counts the species; forms are extra.
@@ -131,6 +131,8 @@ Chrome (dark theme; desktop at 1280×800 @2x, phones at 390×844 @3x) and saved 
 ## Data sources
 
 - Pokémon, forms, sprites and regional dex numbers: a Pokémon HOME Living Dex spreadsheet.
+- Red, Blue & Yellow: Kanto dex from PokeAPI (`kanto`), browse only: Gen 1 has no shinies (`DEX_ONLY` in
+  `js/core/config.js`, `noShiny` in `GAME_INFO`). Its logo and Gold & Silver's come from the English title screens.
 - Gold & Silver: Johto dex from PokeAPI (`original-johto`), locks from Serebii's per-species pages as for Crystal.
 - Crystal: Johto dex from PokeAPI (`original-johto`, all 251); locations from Serebii's per-species pages decide
   which ones are locked (trades from Gold & Silver or Gen 1 don't count).

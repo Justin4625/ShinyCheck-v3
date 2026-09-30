@@ -1,5 +1,5 @@
 // Per game: which entries count for its regional dex and which are "Outside the dex".
-import { GAMES } from "../core/config.js";
+import { DEX_ONLY, GAMES } from "../core/config.js";
 import { state } from "../core/state.js";
 import { lockedIn } from "./availability.js";
 import { mons } from "./dex.js";
@@ -10,7 +10,7 @@ import { GAME_INFO, codeIn, codes, gamePrefix } from "./games.js";
 // regional form (nativeForms), else the regular form — and the rest are extra. An entry is
 // extra for a game if it's extra in every dex of that game it appears in.
 const EXTRA = {};
-for (const gid of GAMES) {
+for (const gid of [...GAMES, ...DEX_ONLY]) {
   const seen = new Map(), extraIn = new Map(), native = GAME_INFO[gid].nativeForms || [];
   const rank = m => native.includes(m.form) ? 0 : !m.variant && ["", "Original", "Basic"].includes(m.form) ? 1 : 2;
   for (const [p] of GAME_INFO[gid].sections) {
@@ -37,7 +37,7 @@ export const whereIn = (m, gid) => (m.where && m.where[gid]) || "";
 export const codeLabel = (m, gid) => isExtraForm(m, gid) ? "outside the dex" : codes(m, gid).join(" / ");
 // Every game with such entries gets an "Outside the dex" tab: Pokémon you can have in the
 // game beyond its regional dex (other forms of a dex number, Dynamax Adventure legends…).
-for (const gid of GAMES) {
+for (const gid of [...GAMES, ...DEX_ONLY]) {
   const s = GAME_INFO[gid].sections;
   if (!s.some(([p]) => p === "O") && mons.some(m => m.games[gid] && isExtraForm(m, gid))) s.push(["O", "Outside the dex"]);
 }

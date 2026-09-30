@@ -7,3 +7,5 @@ export const GAMES = ["gs", "crystal", "rs", "frlg", "emerald", "dp", "pt", "hgs
 // Places a shiny can be logged. GO and HOME have no regional dex or hunt page, only
 // logs, and no odds (HOME shinies are gifts; GO odds aren't tracked).
 export const LOG_GAMES = [...GAMES, "pogo", "home"];
+// Games with a dex to browse but no shinies (Gen 1): a page and a menu entry, never hunts, logs or totals.
+export const DEX_ONLY = ["rby"];

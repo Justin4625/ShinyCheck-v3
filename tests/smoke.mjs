@@ -261,6 +261,17 @@ step("hunt deck: pace and ETA", async () => {
   await click("#drPlay");
   await key("Escape");
 });
+step("red, blue & yellow: dex only, no shinies", async () => {
+  await nav("rby", 500);
+  expect((await text("#gameSub")).includes("don't exist yet"), `the page says there are no shinies, got ${await text("#gameSub")}`);
+  expect(!(await exists(".seg-hunts")) && await js(`getComputedStyle(document.getElementById("gameRing")).display === "none"`), "no Hunts tab or progress ring");
+  expect(await js(`document.querySelectorAll("#gameCards .pcard").length`) === 151, "the Kanto dex has 151 cards");
+  await click("#gameCards .pcard", 500);
+  expect(await js(`document.getElementById("entry").classList.contains("open") && !document.getElementById("drawer").classList.contains("open")`), "a card opens Dex Entry, not the Hunt Deck");
+  expect(!(await js(`[...document.querySelectorAll("#enGames .en-game-chip")].some(b => b.dataset.hunt === "rby")`)), "Hunt it in doesn't offer Red, Blue & Yellow");
+  await capture("red blue yellow");
+  await key("Escape");
+});
 step("hunt deck: more hunt methods", async () => {
   const odds = () => text("#drOddsShow");
   const open = async (g, q) => { await nav(g, 400); await type("#gq", q); await click("#gameCards .pcard", 400); };

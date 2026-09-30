@@ -1,0 +1,10 @@
+/* Games without shinies (Red, Blue & Yellow, see DEX_ONLY in js/core/config.js): the game page shows only
+   the dex, so the progress ring, section progress and hunt tools are hidden. */
+#gameView.no-shiny #gameRing,
+#gameView.no-shiny .section-meta,
+#gameView.no-shiny #gMissing,
+#gameView.no-shiny #gForms,
+#gameView.no-shiny #randomHunt { display: none; }
+#gameView.no-shiny #gameSub { max-width: 560px; }
+/* In the menu: "no shinies" instead of a percentage, and no progress bar. */
+.side-noshiny .side-pct { font-size: 10px; letter-spacing: .02em; opacity: .75; }

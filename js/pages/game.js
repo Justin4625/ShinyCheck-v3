@@ -18,6 +18,9 @@ const inTab = (gid, p) => m => p === "O" ? !!m.games[gid] && isExtraForm(m, gid)
 
 export function renderGame() {
   const gid = state.page, g = GAME_INFO[gid];
+  // Red, Blue & Yellow: no shinies yet, so no hunts, totals or hunt buttons, only the dex.
+  el.game.classList.toggle("no-shiny", !!g.noShiny);
+  if (g.noShiny && state.tab === "hunts") state.tab = "";
   $("#gForms").hidden = !g.sections.some(([p]) => p === "O");
   if (state.tab !== "hunts" && !g.sections.some(([p]) => p === state.tab)) state.tab = g.sections[0][0];
   // Tabs always show everything; only the totals follow "Count outside the dex".
@@ -31,8 +34,8 @@ export function renderGame() {
   el.dexTabs.innerHTML = g.sections.map(([p, t]) => {
     const l = all.filter(inTab(gid, p));
     return `<button class="seg ${state.tab === p ? "active" : ""}" data-tab="${p}">${esc(t)}<small data-tabcount="${p}">${done(l, gHas(gid))}/${l.length}</small></button>`;
-  }).join("") + `<button class="seg seg-hunts ${state.tab === "hunts" ? "active" : ""}" data-tab="hunts">
-      <span class="live-dot ${huntList.some(m => hunts[hk(gid, m.id)].since) ? "on" : ""}"></span>Hunts<small>${huntList.length}</small></button>`;
+  }).join("") + (g.noShiny ? "" : `<button class="seg seg-hunts ${state.tab === "hunts" ? "active" : ""}" data-tab="hunts">
+      <span class="live-dot ${huntList.some(m => hunts[hk(gid, m.id)].since) ? "on" : ""}"></span>Hunts<small>${huntList.length}</small></button>`);
 
   if (state.tab === "hunts") {
     const items = huntList.filter(m => matchText(m, el.gq));
@@ -63,6 +66,14 @@ export function renderGameStats() {
   const gid = state.page, g = GAME_INFO[gid];
   const full = mons.filter(m => m.games[gid]), all = full.filter(m => inGamePool(m, gid)), f = gHas(gid);
   const p = pct(all, f), left = all.length - done(all, f);
+  if (g.noShiny) {
+    $("#gameSub").innerHTML = `Shiny Pokémon don't exist yet in ${esc(g.name)}: they arrived in Gold &amp; Silver. The Kanto dex is here to browse, but there's nothing to hunt or log.`;
+    for (const [p2] of g.sections) {
+      const n = el.dexTabs.querySelector(`[data-tabcount="${p2}"]`);
+      if (n) n.textContent = full.filter(inTab(gid, p2)).length;
+    }
+    return renderSidebar();
+  }
   $("#gamePct").textContent = fmtPct(p);
   $("#gameCount").textContent = `${done(all, f)} / ${all.length}`;
   setRing($("#gameRing"), p);

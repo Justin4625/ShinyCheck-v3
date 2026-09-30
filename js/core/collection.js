@@ -17,7 +17,8 @@ export const has = m => loggedIn(m).length > 0;
 // counts in every other game the form appears in, like moving it there through HOME.
 export const sharing = () => !!prefs.shareAcrossGames;
 const ownIn = (gid, m) => (shinies[hk(gid, m.id)] || []).length > 0;
-export const gHas = gid => m => ownIn(gid, m) || (sharing() && has(m));
+// A game without shinies (Red, Blue & Yellow) never has one.
+export const gHas = gid => GAME_INFO[gid] && GAME_INFO[gid].noShiny ? () => false : m => ownIn(gid, m) || (sharing() && has(m));
 export const viaLabel = m => loggedIn(m).map(g => GAME_INFO[g].name).join(", ");
 export const done = (list, f = has) => list.filter(f).length;
 export const pct = (list, f = has) => list.length ? (done(list, f) / list.length) * 100 : 0;

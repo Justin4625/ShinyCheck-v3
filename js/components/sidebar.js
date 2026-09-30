@@ -1,6 +1,6 @@
 // Sidebar navigation (collection, games, What's new) and the phone menu.
 import { gHas, pct } from "../core/collection.js";
-import { BASE, GAMES } from "../core/config.js";
+import { BASE, DEX_ONLY, GAMES } from "../core/config.js";
 import { fmtPct, nf } from "../core/format.js";
 import { el, state } from "../core/state.js";
 import { shinies } from "../core/store.js";
@@ -24,6 +24,14 @@ export function renderSidebar() {
         <span class="side-name">${esc(g.name)}</span>
         <span class="side-pct">${fmtPct(pct(l, gHas(id)))}</span>
         <span class="side-bar"><i style="width:${pct(l, gHas(id))}%"></i></span>
+      </a>`;
+  }).join("") + DEX_ONLY.map(id => {
+    // Dex-only games (Gen 1, no shinies) come last, without a percentage.
+    const g = GAME_INFO[id];
+    return `<a class="side-item side-noshiny ${state.page === id ? "active" : ""}" href="${BASE}${id}" style="--c:${g.accent};--g:${gameGrad(g)}">
+        <span class="side-icon"></span>
+        <span class="side-name">${esc(g.name)}</span>
+        <span class="side-pct">no shinies</span>
       </a>`;
   }).join("");
   document.querySelector('.side-item[data-page=""]').classList.toggle("active", !state.page && !state.huntsView && !state.statsView && !state.updatesView);

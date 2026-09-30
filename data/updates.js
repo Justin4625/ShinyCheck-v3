@@ -10,6 +10,18 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "rby-2026-09",
+    date: "2026-09-30",
+    title: "Red, Blue & Yellow",
+    text: "Where it all began: Red, Blue & Yellow now have their own page with the Kanto dex. Shiny Pokémon didn't exist yet in those games (they arrived in Gold & Silver), so there's nothing to hunt or log there. It doesn't count toward your totals.",
+    steps: [
+      "Open **Red, Blue & Yellow** at the bottom of the games in the menu.",
+      "Browse the Kanto dex; tap a Pokémon to open its Dex Entry.",
+    ],
+    shot: "shots/updates/rby.webp",
+    action: { label: "Open Red, Blue & Yellow", go: "rby" },
+  },
+  {
     id: "gs-2026-09",
     date: "2026-09-30",
     title: "Gold & Silver",
