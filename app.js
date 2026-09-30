@@ -2717,6 +2717,7 @@
         ${wnShot(u)}
       </li>`).join("");
     markSeen();
+    renderSidebar();
   }
 
   const wnDlg = $("#wnDlg");
