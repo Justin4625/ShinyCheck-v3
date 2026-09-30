@@ -42,7 +42,7 @@ button, a, label, .pcard, .region { touch-action: manipulation; -webkit-tap-high
 
   /* Game banner: logo and ring on top, text below. */
   .banner-content { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 14px 12px; }
-  .banner-logo { width: 100%; max-width: 180px; height: 64px; justify-self: start; }
+  .banner-logo { width: 100%; max-width: 180px; height: 80px; justify-self: start; }
   .banner-logo img { object-position: left center; }
   .banner-text { grid-column: 1 / -1; grid-row: 2; }
   .banner .ring { width: 92px; height: 92px; grid-column: 2; grid-row: 1; }
