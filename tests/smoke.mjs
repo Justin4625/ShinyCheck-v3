@@ -254,9 +254,8 @@ step("hunt deck: pace and ETA", async () => {
   // Demo hunt: 212 encounters in 30 minutes at 1/1365 → 424 an hour.
   const stats = await js(`[...document.querySelectorAll("#drPaceStats b")].map(b => b.textContent).join(" | ")`);
   expect(stats === "424 | ~2h 43m | ~3h 13m", `pace stats, got ${stats}`);
-  expect((await text("#drPaceNote")).startsWith("Based on 212"), "paused hunt explains the pace");
+  expect((await text("#drPaceNote")).includes("timer shows about 3h 13m"), `pace note gives the timer target, got ${await text("#drPaceNote")}`);
   await click("#drPlay");
-  expect((await text("#drPaceNote")).includes("around"), "running hunt shows a clock time");
   await js(`document.getElementById("drPace").scrollIntoView({ block: "center" })`, 200);
   await capture("hunt deck pace");
   await click("#drPlay");

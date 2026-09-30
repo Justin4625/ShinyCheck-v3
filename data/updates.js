@@ -13,11 +13,11 @@ window.UPDATES = [
     id: "hunt-pace-2026-09",
     date: "2026-09-30",
     title: "Hunt pace and ETA",
-    text: "The Hunt Deck now shows your encounters per hour, how long until you hit odds at that pace, and the average wait for a shiny.",
+    text: "The Hunt Deck now shows your encounters per hour, how many more hours of hunting until you hit odds at that pace, and the average hunting time per shiny.",
     steps: [
       "Open a hunt and scroll to **Pace**, under the luck meter.",
       "It appears after a minute and a few encounters, and follows your timer.",
-      "While the timer runs you also see the time you'd hit odds hunting non-stop.",
+      "It counts hunt time, like your timer: pauses don't count.",
     ],
     shot: "shots/updates/hunt-pace.webp",
     action: { label: "Open Active hunts", go: "hunts" },
