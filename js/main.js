@@ -29,6 +29,12 @@ import { init as initStats } from "./pages/stats.js";
 import { init as initShareCard } from "./features/share-card.js";
 import { init as initNotifications } from "./features/notifications.js";
 import { init as initWhatsNew } from "./features/whats-new.js";
+import { init as initSocialSync } from "./features/social-sync.js";
+import { init as initFeed } from "./pages/feed.js";
+import { init as initProfile } from "./pages/profile.js";
+import { init as initFollowList } from "./features/follow-list.js";
+import { init as initProfileEdit } from "./features/profile-edit.js";
+import { init as initSocialBell } from "./features/social-bell.js";
 
 // Event wiring, in the order the features depend on (e.g. which Escape handler runs first).
 initFormPicker();
@@ -53,6 +59,12 @@ initStats();
 initShareCard();
 initNotifications();
 initWhatsNew();
+initSocialSync();
+initFeed();
+initProfile();
+initFollowList();
+initProfileEdit();
+initSocialBell();
 
 // Bridge for services/cloud.js (a separate module that loads Firebase).
 window.ShinyApp = { snapshot, applyData, hasLocalData, toast, render, whatsNew: () => whatsNew() };

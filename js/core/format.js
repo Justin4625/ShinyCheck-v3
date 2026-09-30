@@ -7,3 +7,9 @@ export const fmtPct = p => (p === 100 || p === 0 ? p.toFixed(0) : p.toFixed(1)) 
 // Rough hunting time for estimates, in hours (nobody hunts days on end): "~53h", "~9h 20m", "~12m", "<1m".
 export const fmtEta = s => s < 60 ? "<1m" : "~" + (s >= 36000 ? `${Math.round(s / 3600)}h`
   : s >= 3600 ? `${Math.floor(s / 3600)}h ${Math.floor(s / 60) % 60}m` : `${Math.floor(s / 60)}m`);
+// How long ago, short: "now", "5m", "3h", "2d", then the date.
+export const fmtAgo = ts => {
+  const s = Math.max(0, (Date.now() - ts) / 1000);
+  return s < 60 ? "now" : s < 3600 ? `${Math.floor(s / 60)}m` : s < 86400 ? `${Math.floor(s / 3600)}h`
+    : s < 7 * 86400 ? `${Math.floor(s / 86400)}d` : new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short" });
+};

@@ -15,6 +15,7 @@ import { hk, hunts, isActive, prefs, saveShinies, shinies } from "../core/store.
 import { $, esc } from "../core/util.js";
 import { SHARE_ICO } from "./hunt-deck/deck.js";
 import { openShare } from "./share-card.js";
+import { markPost } from "./social-sync.js";
 import { EVENT_ONLY } from "../model/availability.js";
 import { mons, region, speciesOf } from "../model/dex.js";
 import { evolutionsOf } from "../model/evolutions.js";
@@ -249,7 +250,7 @@ export function init() {
       const f = addBtn.closest(".en-add-form"), val = n => f.querySelector(`[name="${n}"]:not([type="radio"]), [name="${n}"]:checked`).value;
       const g = val("game"), ts = new Date(val("ts")).getTime(), num = n => Math.max(0, +val(n) || 0);
       const k = hk(g, entryMon.id), alt = f.querySelector('[name="alt"]') ? f.querySelector('[name="alt"]').value : "";
-      (shinies[k] = shinies[k] || []).push({ count: num("count"), time: num("h") * 3600 + num("m") * 60 + num("s"), ...(GAME_INFO[g].noOdds || !HUNT_SETUP[g] ? { odds: null } : { odds: evalSetup(g, addSetup).odds, method: evalSetup(g, addSetup).label }), ...(alt ? { alt } : {}), ts: isNaN(ts) ? Date.now() : ts, manual: true });
+      (shinies[k] = shinies[k] || []).push(markPost({ count: num("count"), time: num("h") * 3600 + num("m") * 60 + num("s"), ...(GAME_INFO[g].noOdds || !HUNT_SETUP[g] ? { odds: null } : { odds: evalSetup(g, addSetup).odds, method: evalSetup(g, addSetup).label }), ...(alt ? { alt } : {}), ts: isNaN(ts) ? Date.now() : ts, manual: true }, { manual: true }));
       shinies[k].sort((x, y) => x.ts - y.ts);
       saveShinies();
       adding = false;

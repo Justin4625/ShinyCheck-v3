@@ -96,6 +96,18 @@ export async function cardCanvas(glowA, glowB) {
   return { W, H, x, F, M, HOLO, holo, glow, spark, text, fit, spaced, panel, blob };
 }
 
+// What a card says about a catch (also used by the feed's cards, components/post-card.js):
+// three stats (encounters, hunt time, odds — or the date for GO / HOME) and a footer line.
+export function cardFacts(s) {
+  const odds = s.odds && !GAME_INFO[s.g].noOdds;
+  const stats = [["ENCOUNTERS", s.count ? nf(s.count) : "—"], ["HUNT TIME", s.time ? fmtShort(s.time) : "—"],
+    odds ? ["ODDS", `1/${nf(s.odds)}`] : ["CAUGHT", fmtDate(s.ts)]];
+  const ratio = odds && s.count ? s.count / s.odds : 0;
+  const luck = ratio ? `${ratio < .01 ? "<0.01" : ratio.toFixed(2)}× odds` : "";
+  const foot = [s.method, s.phases ? `after ${s.phases} ${s.phases === 1 ? "phase" : "phases"}` : "", luck, odds ? fmtDate(s.ts) : ""].filter(Boolean);
+  return { stats, foot };
+}
+
 async function drawShareCard(s) {
   const g = GAME_INFO[s.g], m = s.m;
   const { W, H, x, F, M, HOLO, holo, glow, spark, text, fit, spaced, panel, blob } = await cardCanvas(g.accent + "8c", g.accent2 + "80");
@@ -162,9 +174,7 @@ async function drawShareCard(s) {
   spaced("0px");
 
   // Stats: encounters, hunt time, odds (or the date for GO / HOME).
-  const odds = s.odds && !g.noOdds;
-  const stats = [["ENCOUNTERS", s.count ? nf(s.count) : "—"], ["HUNT TIME", s.time ? fmtShort(s.time) : "—"],
-    odds ? ["ODDS", `1/${nf(s.odds)}`] : ["CAUGHT", fmtDate(s.ts)]];
+  const { stats, foot } = cardFacts(s);
   panel(80, 1100, W - 160, 136, 30);
   const colW = (W - 160) / 3;
   stats.forEach(([label, v], i) => {
@@ -178,9 +188,7 @@ async function drawShareCard(s) {
   // Footer: how it was found and when; the site on the right.
   spaced("1px");
   text("shinycheck.nl", W - 84, 1290, `700 24px ${M}`, holo(W - 300, 0, W - 84, 0), "right");
-  const ratio = odds && s.count ? s.count / s.odds : 0;
-  const luck = ratio ? `${ratio < .01 ? "<0.01" : ratio.toFixed(2)}× odds` : "";
-  const parts = [s.method, s.phases ? `after ${s.phases} ${s.phases === 1 ? "phase" : "phases"}` : "", luck, odds ? fmtDate(s.ts) : ""].filter(Boolean);
+  const parts = [...foot];
   x.font = `700 22px ${M}`;
   // Drop the least important parts until the line fits next to the site name.
   while (parts.length > 1 && x.measureText(parts.join(" · ")).width > W - 520) parts.shift();

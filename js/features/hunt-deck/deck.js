@@ -17,6 +17,7 @@ import { breakChain, chainStep, paintChain } from "./chain.js";
 import { paintPhases } from "./phases.js";
 import { paintPip, pip } from "./pop-out.js";
 import { openShare } from "../share-card.js";
+import { markPost } from "../social-sync.js";
 import { mons } from "../../model/dex.js";
 import { altOf, altSprite, altsOf } from "../../model/forms.js";
 import { codeLabel, whereIn } from "../../model/game-dex.js";
@@ -228,7 +229,7 @@ function gotcha() {
   const k = curKey();
   const method = h.setup ? evalSetup(curGame, h.setup).label : "";
   const phases = (h.phases || []).length, alt = huntAlt();
-  (shinies[k] = shinies[k] || []).push({ count: h.count, time: elapsed(h), odds: h.odds, ...(method ? { method } : {}), ...(phases ? { phases } : {}), ...(alt ? { alt } : {}), ts: Date.now() });
+  (shinies[k] = shinies[k] || []).push(markPost({ count: h.count, time: elapsed(h), odds: h.odds, ...(method ? { method } : {}), ...(phases ? { phases } : {}), ...(alt ? { alt } : {}), ts: Date.now() }));
   saveShinies();
   delete hunts[k];
   delete altPick[k];

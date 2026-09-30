@@ -428,6 +428,19 @@ step("what's new page", async () => {
   expect(await js(`document.querySelectorAll(".wn-item").length`) === (await js(`UPDATES.length`)), "every update listed");
   expect(await js(`document.querySelector('.side-item[data-page="updates"]').classList.contains("active")`), "sidebar marks What's new");
 });
+// Local mode has no accounts: the community pages say so, and nothing breaks.
+step("community pages in local mode", async () => {
+  await nav("feed", 400);
+  expect(await js(`!document.getElementById("feedView").classList.contains("hidden")`), "feed page shows");
+  expect(await js(`/needs an account/.test(document.getElementById("feedList").textContent)`), "feed explains it needs an account");
+  expect(await js(`document.querySelector('.side-item[data-page="feed"]').classList.contains("active")`), "sidebar marks Feed");
+  await nav("trainer", 400);
+  expect(await js(`!document.getElementById("profileView").classList.contains("hidden")`), "profile page shows");
+  await nav("@some_trainer", 400);
+  expect(await js(`!document.getElementById("profileView").classList.contains("hidden")`), "/@username routes to a profile");
+  expect(await js(`[...document.querySelectorAll("[data-bell]")].every(b => b.hidden)`), "no bell without an account");
+  await nav("", 300);
+});
 step("what's new popup once", async () => {
   await js(`localStorage.removeItem("shinycheck-v3-seen-update"); const p = JSON.parse(localStorage.getItem("shinycheck-v3-prefs")); delete p.seenUpdate; localStorage.setItem("shinycheck-v3-prefs", JSON.stringify(p))`);
   await go("/", 2600);

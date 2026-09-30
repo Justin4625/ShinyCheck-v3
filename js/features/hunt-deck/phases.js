@@ -4,6 +4,7 @@ import { nf } from "../../core/format.js";
 import { elapsed, hk, hunts, isActive, saveShinies, shinies } from "../../core/store.js";
 import { $, esc, norm } from "../../core/util.js";
 import { cur, curGame, curKey, hunt, setHunt } from "./deck.js";
+import { markPost } from "../social-sync.js";
 import { mons } from "../../model/dex.js";
 import { isExtraForm } from "../../model/game-dex.js";
 import { GAME_INFO, codeIn, gameNum } from "../../model/games.js";
@@ -45,7 +46,7 @@ function logPhase(id) {
   const count = Math.max(0, h.count - last.at), time = Math.max(0, elapsed(h) - last.time);
   const method = h.setup ? evalSetup(curGame, h.setup).label : "";
   const k = hk(curGame, m.id);
-  (shinies[k] = shinies[k] || []).push({ count, time, odds: h.odds, method: `${method ? method + " · " : ""}Phase ${phases.length + 1}`, ts: Date.now() });
+  (shinies[k] = shinies[k] || []).push(markPost({ count, time, odds: h.odds, method: `${method ? method + " · " : ""}Phase ${phases.length + 1}`, ts: Date.now() }));
   saveShinies();
   setHunt({ phases: [...phases, { id: m.id, at: h.count, time: elapsed(h), count }] });
   $("#drPhasePick").hidden = true;

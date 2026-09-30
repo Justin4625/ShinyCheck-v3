@@ -38,6 +38,122 @@ service cloud.firestore {
         && request.resource.data.data is map;
     }
 
+    // ---------- Social: profiles, the public collection, posts, likes and follows ----------
+    // Everything here is readable by any signed-in trainer and written by its owner only.
+    // Like and follower counts can't be faked: a post's `likes` only moves by one, in the
+    // same batch that adds or removes that trainer's like; followers are counted from follows.
+    function signedIn() { return request.auth != null; }
+    function me() { return request.auth.uid; }
+    function str(v, max) { return v is string && v.size() <= max; }
+    function num(v) { return v is int && v >= 0 && v <= 100000000; }
+
+    // profiles/{uid}: name and picture on the profile, feed and followers lists.
+    match /profiles/{uid} {
+      function validProfile(d) {
+        return d.keys().hasOnly(['name', 'username', 'photo', 'avatar', 'public', 'shinies', 'createdAt', 'updatedAt'])
+          && d.keys().hasAll(['name', 'username', 'photo', 'avatar', 'public', 'shinies', 'createdAt', 'updatedAt'])
+          // The username must be claimed by this trainer in usernames/ (in the same batch).
+          && d.username is string
+          && getAfter(/databases/$(database)/documents/usernames/$(d.username)).data.uid == uid
+          && d.name is string && d.name.size() >= 1 && d.name.size() <= 30
+          && str(d.photo, 500) && (d.photo == '' || d.photo.matches('https://[a-z0-9.-]+\\.googleusercontent\\.com/.*'))
+          && str(d.avatar, 60)
+          && d.public is bool
+          && num(d.shinies)
+          && d.createdAt is timestamp
+          && d.updatedAt == request.time;
+      }
+      allow read: if signedIn();
+      allow create: if signedIn() && me() == uid && validProfile(request.resource.data)
+        && request.resource.data.createdAt == request.time;
+      allow update: if signedIn() && me() == uid && validProfile(request.resource.data)
+        && request.resource.data.createdAt == resource.data.createdAt;
+      allow delete: if signedIn() && me() == uid;
+    }
+
+    // usernames/{name}: claims a unique @username (lowercase letters, digits, _ and .) for a trainer.
+    // Claimed and released in the same batch that changes the profile's username.
+    match /usernames/{name} {
+      function profileAfter() { return getAfter(/databases/$(database)/documents/profiles/$(me())); }
+      allow read: if signedIn();
+      allow create: if signedIn() && name.matches('[a-z0-9_.]{3,20}')
+        && request.resource.data.keys().hasOnly(['uid']) && request.resource.data.uid == me()
+        && profileAfter().data.username == name;
+      allow delete: if signedIn() && resource.data.uid == me()
+        && (!existsAfter(/databases/$(database)/documents/profiles/$(me())) || profileAfter().data.username != name);
+    }
+
+    // collections/{uid}: every logged shiny, shown on a public profile.
+    match /collections/{uid} {
+      allow read: if signedIn() && (me() == uid || get(/databases/$(database)/documents/profiles/$(uid)).data.public == true);
+      allow create, update: if signedIn() && me() == uid
+        && request.resource.data.keys().hasOnly(['list', 'updatedAt'])
+        && request.resource.data.list is list && request.resource.data.list.size() <= 5000
+        && request.resource.data.updatedAt == request.time;
+      allow delete: if signedIn() && me() == uid;
+    }
+
+    // posts/{uid_id}: a catch in the feed. The owner writes everything but `likes`.
+    match /posts/{postId} {
+      function validPost(d) {
+        return d.keys().hasOnly(['uid', 'key', 'g', 'alt', 'count', 'time', 'odds', 'method', 'phases', 'ts', 'createdAt', 'likes'])
+          && d.keys().hasAll(['uid', 'key', 'g', 'count', 'time', 'ts', 'createdAt', 'likes'])
+          && str(d.key, 60) && str(d.g, 20)
+          && (!('alt' in d) || str(d.alt, 60))
+          && num(d.count) && num(d.time)
+          && (!('odds' in d) || d.odds == null || num(d.odds))
+          && (!('method' in d) || str(d.method, 100))
+          && (!('phases' in d) || num(d.phases))
+          && d.ts is int && d.createdAt is timestamp && d.createdAt <= request.time
+          && num(d.likes);
+      }
+      function likeRef() { return /databases/$(database)/documents/likes/$(me() + '_' + postId); }
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.uid == me()
+        && postId.matches(me() + '_[A-Za-z0-9]{6,24}')
+        && validPost(request.resource.data) && request.resource.data.likes == 0;
+      allow update: if signedIn() && (
+        // The owner edits the catch (not its likes, owner or date).
+        (resource.data.uid == me() && validPost(request.resource.data)
+          && request.resource.data.diff(resource.data).affectedKeys().hasAny(['uid', 'likes', 'createdAt']) == false)
+        // Anyone likes or unlikes it: likes ±1 together with their own like document.
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['likes']) && (
+          (request.resource.data.likes == resource.data.likes + 1 && existsAfter(likeRef()) && !exists(likeRef()))
+          || (request.resource.data.likes == resource.data.likes - 1 && !existsAfter(likeRef()) && exists(likeRef())))));
+      allow delete: if signedIn() && resource.data.uid == me();
+    }
+
+    // likes/{liker_postId}: who liked what. Created and removed together with the post's count.
+    match /likes/{likeId} {
+      function post(id) { return /databases/$(database)/documents/posts/$(id); }
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['uid', 'post', 'owner', 'createdAt'])
+        && request.resource.data.uid == me()
+        && request.resource.data.post is string
+        && likeId == me() + '_' + request.resource.data.post
+        && request.resource.data.createdAt == request.time
+        && exists(post(request.resource.data.post))
+        && request.resource.data.owner == get(post(request.resource.data.post)).data.uid
+        && getAfter(post(request.resource.data.post)).data.likes == get(post(request.resource.data.post)).data.likes + 1;
+      // A like on a deleted post can simply be removed.
+      allow delete: if signedIn() && resource.data.uid == me()
+        && (!exists(post(resource.data.post))
+          || getAfter(post(resource.data.post)).data.likes == get(post(resource.data.post)).data.likes - 1);
+    }
+
+    // follows/{from_to}: one trainer following another. Followers and following are counted
+    // from these; the followed trainer sees new ones in their notifications.
+    match /follows/{followId} {
+      allow read: if signedIn();
+      allow create: if signedIn() && request.resource.data.keys().hasOnly(['from', 'to', 'createdAt'])
+        && request.resource.data.from == me()
+        && request.resource.data.to is string && request.resource.data.to != me()
+        && followId == me() + '_' + request.resource.data.to
+        && request.resource.data.createdAt == request.time
+        && exists(/databases/$(database)/documents/profiles/$(request.resource.data.to));
+      allow delete: if signedIn() && resource.data.from == me();
+    }
+
     // Notifications: one document per device that turned them on, keyed by its FCM token.
     // Written by the signed-in app, never read by it (the send script uses the Admin SDK).
     match /pushTokens/{token} {

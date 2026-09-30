@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "community-2026-09",
+    date: "2026-09-30",
+    title: "Community: feed, profiles & follows",
+    text: "ShinyCheck is social now. Every new shiny you log shows up in the feed and on your profile by itself, so you can see what other trainers are catching, like their shinies and follow them.",
+    steps: [
+      "Open **Feed** in the menu: **For you** shows everyone's newest catches, **Following** only the trainers you follow.",
+      "Tap the heart (or double-tap the Pokémon) to like a shiny. Tap a trainer to see their profile and whole collection.",
+      "On **My profile**, tap **Edit profile** to pick your @username and picture, or make your profile private. The bell tells you when someone follows you.",
+    ],
+    shot: "shots/updates/community.webp",
+    action: { label: "Open the feed", go: "feed" },
+  },
+  {
     id: "fish-dexnav-chains-2026-09",
     date: "2026-09-30",
     title: "Chain fishing & DexNav chains",

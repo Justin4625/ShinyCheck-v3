@@ -9,6 +9,11 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
 - **Forms** — cosmetic forms, switchable forms and gender differences (Vivillon, Furfrou, Flabébé, Rotom, …) as a checklist in Dex Entry; pick the form when adding, editing or hunting. Any form counts the species; forms are extra.
 - **Landing page** — shown before signing in (the gate in `index.html`): what shiny hunting is, the features with screenshots from `shots/`, and the sign-in card.
+- **Community** — a feed (`/feed`) of everyone's new catches ("For you") or of the trainers you follow ("Following"),
+  with likes (tap the heart or double-tap the Pokémon). Every trainer has a profile (`/@username`, or `/trainer` for your
+  own) with their catches, whole collection, likes, followers and following. A new catch (Gotcha, a phase, or a manual log
+  dated in the last 3 days) is posted by itself; editing or deleting it updates the post. Profiles are public by default
+  and can be made private in Edit profile (name, unique @username, picture). The bell shows new followers. Emails are never shown.
 - **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore.
 - **What's new** — update log at `/updates`, filled from `data/updates.js` (newest first). The newest entry shows once as a popup with a short tutorial and screenshot (`shots/updates/`) to people who already use ShinyCheck; "seen" is kept in the account and on the device. To announce an update, add an entry at the top.
 - **Notifications** — opt-in update news (Menu → Notifications), sent with Firebase Cloud Messaging.
@@ -23,6 +28,7 @@ sw.js                   service worker: offline app, update prompt, push notific
 manifest.webmanifest    installable app
 firebase-config.js      Firebase web config (public); null = local-only mode
 firestore.rules         Firestore security rules
+firestore.indexes.json  the one composite index (posts by trainer, newest first) the Following feed needs
 
 css/                    stylesheets, loaded in name order (later files win on equal selectors)
 data/                   content as plain scripts that set a global:
@@ -35,9 +41,10 @@ js/                     the app, as ES modules
   core/                   config, storage (store.js), UI state, formatting, helpers
   model/                  game data and rules: games, dex, shiny locks, per-game dex, hunt odds, forms
   components/             reusable UI: card, form picker, game picker, hunt setup, toast, sidebar, …
-  pages/                  one per route: home (/), game (/sv …), hunts, stats, updates, plus the router
+  pages/                  one per route: home (/), game (/sv …), hunts, stats, updates, feed, profile, plus the router
   features/               drawers and dialogs: hunt-deck/, dex-entry, share card, backups, …
   services/cloud.js       Firebase: sign-in, Firestore sync, backups, push tokens (separate module)
+  services/social.js      community data: profiles, usernames, posts, likes, follows (through cloud.js's connection)
 scripts/                bump-version (asset versions), gen-forms.py, send-push.mjs (notifications)
 tests/smoke.mjs         end-to-end smoke test in headless Chrome
 sprites/ types/ logos/ icons/ shots/   images
@@ -55,6 +62,11 @@ sprites/ types/ logos/ icons/ shots/   images
 - **Versions.** `scripts/bump-version.mjs` stamps `?v=<version>` on every file and generates the CSS links,
   the import map (so each module gets the new version) and the service worker's offline file list.
   It runs from the pre-commit hook, so adding a CSS or JS file needs no other edit.
+- **Community.** `features/social-sync.js` mirrors the collection to the public side after every cloud save:
+  `collections/{uid}` (the profile's Collection tab), the shiny count on `profiles/{uid}`, and one `posts/{uid_pid}`
+  per catch that has a post id (`pid`, given by `markPost()` when it's logged). `pages/feed.js` and `pages/profile.js`
+  show them with `components/post-card.js` (the share card's facts) and `features/post-actions.js` (likes, share).
+  cloud.js announces `cloud:user`, `cloud:ready` and `cloud:saved` events; the social modules listen to those.
 
 ### Adding things
 
@@ -103,6 +115,17 @@ printf '#!/bin/sh\nif git diff --cached --name-only | grep -qE "\\.(js|css|html)
 
 - `firebase-config.js` — the project's web config (public by design). Set it to `null` for local-only mode.
 - `firestore.rules` — security rules; paste them into Firestore → Rules. Each account can only read and write its own `users/{uid}` document, with ShinyCheck's fields and size limits.
+  The community collections are readable by every signed-in trainer and written by their owner only; a post's like
+  count can only move by one together with that trainer's like document, follows can only be made in your own name,
+  and a username belongs to whoever claimed it first (`usernames/{name}`).
+- `firestore.indexes.json` — the composite index for the Following feed (`posts`: `uid` ascending, `createdAt`
+  descending). Create it once under Firestore → Indexes → Composite → Create index.
+
+### Testing against the emulators
+
+To try accounts and the community without touching the real project, run the Firebase emulators (auth on 9099,
+Firestore on 8181, with `firestore.rules`) and, on `http://localhost:…`, set `localStorage["shinycheck-emulator"] = "1"`
+before the app loads: cloud.js then connects to the emulators instead.
 
 ## Notifications
 

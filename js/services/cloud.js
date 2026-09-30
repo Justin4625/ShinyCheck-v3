@@ -9,7 +9,8 @@ const gate = $("#gate");
 const account = $("#account");
 
 if (!firebaseConfig) {
-  // Local-only mode: no login, everything stays in this browser.
+  // Local-only mode: no login, everything stays in this browser (and no community pages).
+  window.CloudLocal = true;
   account.innerHTML = `<span class="acc-local" title="Add your Firebase config in firebase-config.js to enable accounts">Local mode · not synced</span>`;
   setTimeout(() => window.ShinyApp.whatsNew(), 1500);
 } else {
@@ -49,6 +50,14 @@ async function start() {
   const auth = getAuth(app);
   // Firestore's own offline cache queues writes while offline and sends them later.
   const db = initializeFirestore(app, { localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }) });
+  // Testing on localhost: localStorage "shinycheck-emulator" = "1" switches to the local Firebase
+  // emulators (auth 9099, Firestore 8181), so nothing reaches the real project.
+  if (location.hostname === "localhost" && localStorage.getItem("shinycheck-emulator") === "1") {
+    authMod.connectAuthEmulator(auth, "http://127.0.0.1:9099", { disableWarnings: true });
+    fs.connectFirestoreEmulator(db, "127.0.0.1", 8181);
+  }
+  // The social layer (services/social.js) reads and writes through the same connection.
+  const emit = (name, detail) => dispatchEvent(new CustomEvent(name, { detail }));
 
   const OWNER = "shinycheck-v3-owner";
   let ref = null, unsub = null, first = true;
@@ -67,6 +76,7 @@ async function start() {
       timer = setTimeout(flush, wait);
     },
     flush: () => flush(),
+    fb: { db, fs, auth },
   };
 
   async function flush() {
@@ -79,6 +89,7 @@ async function start() {
     try {
       await setDoc(ref, { ...window.ShinyApp.snapshot(), rev: lastRev, updatedAt: serverTimestamp() });
       setStatus("saved");
+      emit("cloud:saved");
     } catch (err) {
       console.error(err);
       dirty = true;
@@ -93,6 +104,7 @@ async function start() {
     unsub && unsub();
     unsub = null;
     ref = null;
+    emit("cloud:user", user);
     if (!user) {
       showGate();
       renderAccount(null);
@@ -123,6 +135,7 @@ async function start() {
       if (first) setTimeout(autoBackup, 5000);
       if (first) setTimeout(refreshPush, 8000);
       if (first) setTimeout(() => window.ShinyApp.whatsNew(), 1500);
+      if (first) emit("cloud:ready", user);
       first = false;
       setStatus("saved");
     }, err => {
@@ -230,7 +243,8 @@ async function start() {
     // Sign out lives in the sidebar's ⚙ menu (features/side-menu.js).
     $("#signOut").hidden = !user;
     if (!user) { account.innerHTML = ""; return; }
-    const name = user.displayName || user.email || "Trainer";
+    // Never the email: the account's name, then the profile name once it's loaded.
+    const name = user.displayName || "Trainer";
     account.innerHTML = `
       <div class="acc">
         ${user.photoURL ? `<img class="acc-avatar" src="${user.photoURL}" alt="" referrerpolicy="no-referrer">`
@@ -245,6 +259,14 @@ async function start() {
       localStorage.removeItem(OWNER);
     };
   }
+
+  // Show the profile name once it's loaded (social:me) and after it changes.
+  const showName = e => {
+    const b = account.querySelector(".acc-text b");
+    if (b && e.detail && e.detail.uid === (auth.currentUser && auth.currentUser.uid)) b.textContent = e.detail.name;
+  };
+  addEventListener("social:me", showName);
+  addEventListener("social:profile", showName);
 
   function setStatus(s) {
     const el = $("#syncStatus");

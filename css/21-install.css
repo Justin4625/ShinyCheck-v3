@@ -1,7 +1,7 @@
 /* Installed app / install prompts.
    Files in css/ load in name order (index.html); later files win on equal selectors. */
 /* ---------- Install as an app ---------- */
-/* Sidebar: a small pill next to the logo. */
+/* Sidebar: the logo with the notification bell; Install is a wide pill above the bottom bar (.side-install). */
 .side-top { display: flex; align-items: center; justify-content: space-between; gap: 6px; flex: none; margin-right: -6px; }
 .side-top .logo { padding-right: 0; min-width: 0; }
 .install-pill {
