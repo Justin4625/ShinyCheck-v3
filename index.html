@@ -17,7 +17,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260930111342">
+  <link rel="stylesheet" href="style.css?v=20260930112358">
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -60,6 +60,11 @@
           <span class="side-icon hunt-dot" id="sideHuntDot"></span>
           <span class="side-name">Active hunts</span>
           <span class="side-pct" id="sideHuntCount">0</span>
+        </a>
+        <a class="side-item side-stats" href="stats" data-page="stats">
+          <span class="side-icon stats-icon"><svg viewBox="0 0 12 12" aria-hidden="true"><rect x="0" y="6" width="3" height="6" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="4" width="3" height="8" rx="1"/></svg></span>
+          <span class="side-name">Stats</span>
+          <span class="side-pct" id="sideShinyCount">0</span>
         </a>
 
         <p class="side-label">Games</p>
@@ -197,6 +202,24 @@
           </div>
         </div>
         <div id="huntCards"></div>
+      </section>
+
+      <!-- Stats / Shiny Wrapped (/stats) -->
+      <section id="statsView" class="hidden">
+        <div class="hero stats-hero">
+          <div class="hero-glow" aria-hidden="true"></div>
+          <div class="hero-text">
+            <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> Shiny Wrapped</p>
+            <h1 id="stTitle">Your shiny story</h1>
+            <p class="hero-sub" id="stSub"></p>
+            <div class="stats" id="stStats"></div>
+          </div>
+          <div class="st-hero-side">
+            <div class="segmented st-years" id="stYears" role="tablist" aria-label="Period"></div>
+            <button class="st-share" id="stShare"><svg class="share-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 00-1 1v8a1 1 0 001 1h14a1 1 0 001-1v-8a1 1 0 00-1-1h-1"/></svg>Share your Wrapped</button>
+          </div>
+        </div>
+        <div id="stBody"></div>
       </section>
     </main>
   </div>
@@ -464,9 +487,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=20260930111342"></script>
-  <script src="evo.js?v=20260930111342"></script>
-  <script src="app.js?v=20260930111342"></script>
-  <script type="module" src="cloud.js?v=20260930111342"></script>
+  <script src="data.js?v=20260930112358"></script>
+  <script src="evo.js?v=20260930112358"></script>
+  <script src="app.js?v=20260930112358"></script>
+  <script type="module" src="cloud.js?v=20260930112358"></script>
 </body>
 </html>
