@@ -74,7 +74,7 @@ export function renderHomeStats() {
 
   const next = recommended(pool.filter(homeScope));
   el.upNext.innerHTML = next.length
-    ? next.map(m => `<button data-jump="${m.id}" title="#${m.dex} ${esc(m.name)}${m.form ? " (" + esc(m.form) + ")" : ""} — hunt in ${esc(GAMES.filter(g => m.games[g]).map(g => GAME_INFO[g].abbr).reverse().join(", "))}"><img src="${m.sprite}" alt="${esc(m.name)}"></button>`).join("")
+    ? next.map(m => `<button data-jump="${m.id}" title="#${m.dex} ${esc(m.name)}${m.form ? " (" + esc(m.form) + ")" : ""} — hunt in ${esc(GAMES.filter(g => m.games[g]).map(g => GAME_INFO[g].name).reverse().join(", "))}"><img src="${m.sprite}" alt="${esc(m.name)}"></button>`).join("")
     : `<p class="up-next-empty">Nothing left to hunt here ✦</p>`;
 
   for (const g of Object.keys(genNames)) updateSection(el.cards, g, pool.filter(m => m.gen === +g));

@@ -185,7 +185,7 @@ export function paintEntry() {
     ? games.map(gid => {
       const g = GAME_INFO[gid], h = hunts[hk(gid, m.id)];
       return `<button class="en-game-chip" data-hunt="${gid}" style="--accent:${g.accent};--accent2:${g.accent2}">
-          <span>${esc(g.short || g.name)}</span><small>${isActive(h) ? `⚡ ${nf(h.count)}` : codeLabel(m, gid)}</small></button>`;
+          <span>${esc(g.name)}</span><small>${isActive(h) ? `⚡ ${nf(h.count)}` : codeLabel(m, gid)}</small></button>`;
     }).join("")
     : `<p class="en-none">Not obtainable in the tracked games.</p>`;
 }
