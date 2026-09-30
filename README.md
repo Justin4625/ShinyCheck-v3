@@ -137,7 +137,8 @@ Chrome (dark theme; desktop at 1280×800 @2x, phones at 390×844 @3x) and saved 
 - Ruby & Sapphire: Hoenn dex from PokeAPI (`hoenn`); every other Pokémon there needs a trade, so there's no
   Outside the dex.
 - FireRed & LeafGreen: Kanto dex from PokeAPI (`kanto`), Outside the dex and locations from Serebii's per-species
-  pages (the Sevii Islands; the ticket islands, trades and events don't count).
+  pages (the Sevii Islands, and Navel Rock and Birth Island: the Switch version gives their tickets after the
+  Hall of Fame; trades and events don't count).
 - Emerald: Hoenn dex from PokeAPI (`hoenn`), Outside the dex and locations from Serebii's per-species pages
   (the ticket islands, Altering Cave's event Pokémon, the Colosseum bonus disc and trades don't count).
 - Diamond & Pearl: Sinnoh dex from PokeAPI (`original-sinnoh`), Outside the dex and locations from Serebii's

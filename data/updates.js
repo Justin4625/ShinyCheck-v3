@@ -52,7 +52,7 @@ window.UPDATES = [
     id: "frlg-2026-09",
     date: "2026-09-30",
     title: "FireRed & LeafGreen",
-    text: "Kanto is back: the Kanto dex and every Pokémon you can get beyond it on the Sevii Islands (Johto Pokémon, the legendary beasts, Togepi's egg). Hunts use Gen 3's odds of 1 in 8,192.",
+    text: "Kanto is back: the Kanto dex and every Pokémon you can get beyond it on the Sevii Islands (Johto Pokémon, the legendary beasts, Togepi's egg), plus Lugia, Ho-Oh and Deoxys: the Switch version gives their tickets after the Hall of Fame. Hunts use Gen 3's odds of 1 in 8,192.",
     steps: [
       "Open **FireRed & LeafGreen** in the menu.",
       "Start a hunt: **Wild** or **Breeding**.",
