@@ -2,34 +2,40 @@
 import { toast } from "../components/toast.js";
 import { BASE } from "../core/config.js";
 import { $, safe } from "../core/util.js";
+import { openInstallHelp } from "./install-help.js";
 
 // The service worker (sw.js) makes ShinyCheck open offline. Not on localhost unless ?sw,
 // so development always gets fresh files.
 export const swOk = "serviceWorker" in navigator && (location.hostname !== "localhost" || new URLSearchParams(location.search).has("sw"));
 
 // Install: Chrome / Edge / Android fire beforeinstallprompt; iPhone and iPad (Safari) don't,
-// so there the button explains Share → Add to Home Screen.
+// so there the button explains Share → Add to Home Screen, and Safari on a Mac gets File → Add to Dock.
+// Chrome / Edge (computer) and Android first get the same kind of explainer before their own prompt.
 const INSTALL_DISMISSED = "shinycheck-v3-install-dismissed";
 export const standalone = () => matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
 export const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+// Safari 17+ on a Mac (Add to Dock needs macOS Sonoma; the user agent can't tell the macOS version).
+const isMacSafari = !isIOS && /Macintosh/.test(navigator.userAgent) && !/Chrome|Chromium|Edg\/|Firefox|OPR\//.test(navigator.userAgent)
+  && +((navigator.userAgent.match(/Version\/(\d+)/) || [])[1] || 0) >= 17;
+const isDesktop = () => matchMedia("(hover: hover) and (pointer: fine)").matches;
 let installEvent = null;
 function paintInstall() {
-  const can = !standalone() && (!!installEvent || isIOS);
+  const can = !standalone() && (!!installEvent || isIOS || isMacSafari);
   $("#installSide").hidden = !can;
   $("#installBanner").hidden = !can || !!safe(() => localStorage.getItem(INSTALL_DISMISSED)) || !matchMedia("(max-width: 900px)").matches;
 }
-export async function install() {
-  if (installEvent) {
-    installEvent.prompt();
-    const { outcome } = await installEvent.userChoice;
-    installEvent = null;
-    if (outcome === "accepted") safe(() => localStorage.setItem(INSTALL_DISMISSED, "1"));
-    paintInstall();
-  } else if (isIOS) {
-    document.body.classList.remove("menu-open");
-    $("#installHelp").hidden = false;
-    document.body.classList.add("drawer-open");
-  }
+async function prompt() {
+  if (!installEvent) return;
+  installEvent.prompt();
+  const { outcome } = await installEvent.userChoice;
+  installEvent = null;
+  if (outcome === "accepted") safe(() => localStorage.setItem(INSTALL_DISMISSED, "1"));
+  paintInstall();
+}
+export function install() {
+  if (installEvent) return openInstallHelp(isDesktop() ? "prompt" : "android", prompt);
+  if (isIOS) openInstallHelp("ios");
+  else if (isMacSafari) openInstallHelp("mac");
 }
 
 // Wiring: runs once at startup, from main.js.
@@ -66,15 +72,9 @@ export function init() {
   addEventListener("offline", () => toast("You're offline — everything keeps working and syncs when you're back", null, 4000));
   addEventListener("online", () => toast("Back online ✦"));
   addEventListener("beforeinstallprompt", e => { e.preventDefault(); installEvent = e; paintInstall(); });
-  addEventListener("appinstalled", () => { installEvent = null; paintInstall(); toast("ShinyCheck is installed ✦ Open it from your home screen"); });
+  addEventListener("appinstalled", () => { installEvent = null; paintInstall(); toast(`ShinyCheck is installed ✦ Open it from your ${isDesktop() ? "Dock, Start menu or desktop" : "home screen"}`); });
   $("#installSide").addEventListener("click", install);
   $("#installBannerGo").addEventListener("click", install);
   $("#installBannerClose").addEventListener("click", () => { safe(() => localStorage.setItem(INSTALL_DISMISSED, "1")); paintInstall(); });
-  $("#installHelp").addEventListener("click", e => {
-    if (e.target.closest("[data-installclose]") || e.target === e.currentTarget) {
-      $("#installHelp").hidden = true;
-      document.body.classList.remove("drawer-open");
-    }
-  });
   paintInstall();
 }

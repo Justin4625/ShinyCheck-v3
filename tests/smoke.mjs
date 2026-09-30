@@ -493,6 +493,18 @@ step("dialogs", async () => {
   }
   await click("#themeBtn", 200); await capture("light theme"); await click("#themeBtn", 200);
 });
+step("install explainer on a computer", async () => {
+  // A stand-in for Chrome's beforeinstallprompt: the explainer comes first, then the browser's prompt.
+  await js(`window.__prompted = 0; const e = new Event("beforeinstallprompt"); e.prompt = () => { window.__prompted++; };
+    e.userChoice = Promise.resolve({ outcome: "dismissed" }); dispatchEvent(e)`, 200);
+  expect(!(await js(`document.getElementById("installSide").hidden`)), "Install shows next to the logo");
+  await click("#installSide", 300);
+  expect((await text("#installTitle")) === "Install ShinyCheck" && !(await js(`document.getElementById("installHelp").hidden`)), "Install opens the explainer first");
+  expect((await js(`window.__prompted`)) === 0, "no browser prompt before the explainer's Install");
+  await capture("install explainer");
+  await click("#installGo", 300);
+  expect((await js(`window.__prompted`)) === 1 && (await js(`document.getElementById("installHelp").hidden`)), "Install ✦ closes it and opens the browser's prompt");
+});
 step("snapshot / restore round trip", async () => {
   const before = await js(`JSON.stringify(window.ShinyApp.snapshot())`);
   await js(`window.ShinyApp.applyData(JSON.parse(${JSON.stringify(before)}))`, 400);
