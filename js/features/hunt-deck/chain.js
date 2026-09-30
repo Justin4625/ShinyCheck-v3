@@ -1,5 +1,5 @@
-// Poké Radar chain (X & Y, BD & SP): every encounter adds one to the chain, "Chain broke" drops it
-// back to 0 (with Undo), and the odds follow the chain. The chain lives in the hunt's setup, so it
+// Poké Radar chain (X & Y, BD & SP, DP, Pt): every encounter adds one to the chain, "Chain broke" drops it
+// back to 0 (with Undo), "Reset" starts over (chain, breaks and longest to 0), and the odds follow the chain. The chain lives in the hunt's setup, so it
 // carries over to the next hunt in that game, like it does in the game after a shiny.
 import { toast } from "../../components/toast.js";
 import { nf } from "../../core/format.js";
@@ -34,6 +34,7 @@ export function paintChain(h) {
   $("#drChainN").textContent = nf(n);
   $("#drChainNote").textContent = [breaks ? `broke ${breaks}×` : "", h.best ? `longest ${nf(h.best)}` : ""].filter(Boolean).join(" · ");
   $("#drChainBreak").disabled = !n;
+  $("#drChainReset").disabled = !n && !breaks && !h.best;
 }
 
 // Also used by the pop-out's button and the B key.
@@ -48,7 +49,17 @@ export function breakChain() {
   } });
 }
 
+// Start the chain over without counting a break: chain, breaks and longest back to 0.
+function resetChain() {
+  const h = hunt(), n = chainNow(h);
+  if (n == null) return;
+  const prev = { n, breaks: h.breaks || 0, best: h.best || 0 };
+  setHunt({ ...withChain(h, 0), breaks: 0, best: 0 });
+  toast("Radar chain reset", { label: "Undo", run: () => setHunt({ ...withChain(hunt(), prev.n), breaks: prev.breaks, best: prev.best }) });
+}
+
 // Wiring: runs once at startup, from main.js.
 export function init() {
   $("#drChainBreak").addEventListener("click", breakChain);
+  $("#drChainReset").addEventListener("click", resetChain);
 }

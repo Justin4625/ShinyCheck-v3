@@ -14,6 +14,12 @@
   border: 1px solid var(--border-2); background: var(--surface); color: var(--text); transition: color .2s, border-color .2s;
 }
 .dr-chain-break:disabled { opacity: .45; cursor: default; }
+.dr-chain-reset {
+  flex: none; min-height: 42px; padding: 0 6px; border: 0; background: none; cursor: pointer; font-size: 12.5px; font-weight: 650;
+  color: var(--muted); text-decoration: underline; text-underline-offset: 3px;
+}
+.dr-chain-reset:disabled { visibility: hidden; }
+@media (hover: hover) { .dr-chain-reset:not(:disabled):hover { color: var(--text); } }
 @media (hover: hover) { .dr-chain-break:not(:disabled):hover { color: #ff5f7a; border-color: #ff5f7a; } }
 @media (max-height: 640px), (max-width: 420px) { .dr-chain { flex-basis: 100%; } }
 
