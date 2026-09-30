@@ -6,8 +6,10 @@ Shiny Dex and shiny-hunt tracker for Pokémon. Plain HTML, CSS and JavaScript �
 - **Games** — Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
+- **Forms** — cosmetic forms, switchable forms and gender differences (Vivillon, Furfrou, Flabébé, Rotom, …) as a checklist in Dex Entry; pick the form when adding, editing or hunting. Any form counts the species; forms are extra.
 - **Landing page** — shown before signing in (the gate in `index.html`): what shiny hunting is, the features with screenshots from `shots/`, and the sign-in card.
 - **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore.
+- **What's new** — update log at `/updates`, filled from `updates.js` (newest first). The newest entry shows once as a popup with a short tutorial and screenshot (`shots/updates/`) to people who already use ShinyCheck; "seen" is kept in the account and on the device. To announce an update, add an entry at the top.
 - **Notifications** — opt-in update news (Menu → Notifications), sent with Firebase Cloud Messaging.
 - **App** — installable (Add to Home Screen / Install app) and works offline via a service worker (`sw.js`); new versions show an Update prompt.
 
@@ -60,3 +62,4 @@ Chrome (dark theme; desktop at 1280×800 @2x, phones at 390×844 @3x) and saved 
 
 - Pokémon, forms, sprites and regional dex numbers: a Pokémon HOME Living Dex spreadsheet.
 - Evolution chains: [PokeAPI](https://pokeapi.co) (`evo.js`).
+- Forms and their shiny HOME sprites: [PokeAPI](https://pokeapi.co) via `scripts/gen-forms.py` (`forms.js`, `sprites/forms/`).

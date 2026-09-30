@@ -11,6 +11,7 @@ const account = $("#account");
 if (!firebaseConfig) {
   // Local-only mode: no login, everything stays in this browser.
   account.innerHTML = `<span class="acc-local" title="Add your Firebase config in firebase-config.js to enable accounts">Local mode · not synced</span>`;
+  setTimeout(() => window.ShinyApp.whatsNew(), 1500);
 } else {
   start().catch(err => {
     console.error(err);
@@ -121,6 +122,7 @@ async function start() {
       localStorage.setItem(OWNER, user.uid);
       if (first) setTimeout(autoBackup, 5000);
       if (first) setTimeout(refreshPush, 8000);
+      if (first) setTimeout(() => window.ShinyApp.whatsNew(), 1500);
       first = false;
       setStatus("saved");
     }, err => {

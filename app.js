@@ -139,13 +139,14 @@
   const $ = s => document.querySelector(s);
   const el = {
     home: $("#homeView"), game: $("#gameView"), cards: $("#cards"), gameCards: $("#gameCards"),
-    huntsView: $("#huntsView"), huntCards: $("#huntCards"), statsView: $("#statsView"),
+    huntsView: $("#huntsView"), huntCards: $("#huntCards"), statsView: $("#statsView"), updatesView: $("#updatesView"),
     regions: $("#regions"), dexTabs: $("#dexTabs"), sideGames: $("#sideGames"), upNext: $("#upNext"),
     q: $("#q"), gq: $("#gq"), toast: $("#toast"),
   };
   // page: "" = Living Dex, otherwise a game id. tab = regional dex on a game page.
-  // huntsView: the Active hunts page (/hunts), statsView: Stats (/stats); page stays "" there.
-  const state = { huntsView: false, statsView: false, page: "", gen: 0, tab: "", missing: false, forms: true, gMissing: false, gOutside: false };
+  // huntsView: the Active hunts page (/hunts), statsView: Stats (/stats), updatesView: What's new
+  // (/updates); page stays "" there.
+  const state = { huntsView: false, statsView: false, updatesView: false, page: "", gen: 0, tab: "", missing: false, forms: true, gMissing: false, gOutside: false };
 
   const norm = s => s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
   const matchText = (m, input) => {
@@ -171,6 +172,39 @@
   const cap = s => s[0].toUpperCase() + s.slice(1);
   const typeImgs = m => m.types.map(t => `<img src="types/${t}.png" alt="${cap(t)}" title="${cap(t)}">`).join("");
   const sparkSvg = (cls = "", fill = "url(#holo)") => `<svg class="${cls}" viewBox="0 0 100 100"><use href="#spark" fill="${fill}"/></svg>`;
+
+  // Alternate forms (forms.js): cosmetic forms, switchable forms and gender differences of an
+  // entry. A shiny's `alt` is the form id; any shiny still counts the entry, forms are extra.
+  const FORMS = window.FORMS || {};
+  const altsOf = m => FORMS[m.key] || [];
+  const altOf = (m, id) => id && altsOf(m).find(f => f.id === id) || null;
+  const altSprite = (m, id) => (altOf(m, id) || {}).s || m.sprite;
+  // Form picker: one dropdown for every place a form is chosen (add, edit, Hunt Deck). It is built
+  // from forms.js only, so new forms show up by themselves. A hidden input carries the value and
+  // fires "change" like a <select>; long lists get a filter. Wiring: see "Form picker" below.
+  const FP_FILTER = 8;
+  const fpFace = (m, id) => {
+    const f = altOf(m, id);
+    return `${f ? `<img src="${altSprite(m, id)}" alt="">` : `<span class="fp-none">?</span>`}<span class="fp-label">${esc(f ? f.n : "Form not set")}</span>`;
+  };
+  const formPicker = (m, id, label = "Form") => {
+    const alts = altsOf(m);
+    return `<div class="fp" data-mon="${m.id}">
+      <input type="hidden" name="alt" value="${id && altOf(m, id) ? id : ""}">
+      <button type="button" class="fp-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(label)}">${fpFace(m, id)}<svg class="fp-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <div class="fp-pop" hidden>
+        ${alts.length > FP_FILTER ? `<input type="search" class="fp-q" placeholder="Filter ${alts.length} forms…" aria-label="Filter forms" autocomplete="off">` : ""}
+        <div class="fp-list" role="listbox" aria-label="${esc(label)}">
+          <button type="button" role="option" class="fp-opt" data-v="" aria-selected="${!altOf(m, id)}"><span class="fp-none">?</span><span class="fp-label">Form not set</span></button>
+          ${alts.map(f => `<button type="button" role="option" class="fp-opt" data-v="${f.id}" data-q="${esc(norm(f.n))}" aria-selected="${f.id === id}">
+            <img src="${altSprite(m, f.id)}" alt="" loading="lazy"><span class="fp-label">${esc(f.n)}</span></button>`).join("")}
+        </div>
+        <p class="fp-empty" hidden>No form matches.</p>
+      </div>
+    </div>`;
+  };
+  // Name plus regional form and alternate form, e.g. "Vivillon · Marine Pattern".
+  const formText = (m, alt) => [m.form && m.form !== "Original" ? m.form : "", (altOf(m, alt) || {}).n].filter(Boolean).join(" · ");
 
   // All logged shinies of one entry (form) across every game.
   const shiniesOf = m => LOG_GAMES.flatMap(g => (shinies[hk(g, m.id)] || []).map((s, i) => ({ ...s, g, i, m })));
@@ -418,8 +452,10 @@
         <span class="side-bar"><i style="width:${pct(l, gHas(id))}%"></i></span>
       </a>`;
     }).join("");
-    document.querySelector('.side-item[data-page=""]').classList.toggle("active", !state.page && !state.huntsView && !state.statsView);
+    document.querySelector('.side-item[data-page=""]').classList.toggle("active", !state.page && !state.huntsView && !state.statsView && !state.updatesView);
     document.querySelector('.side-item[data-page="stats"]').classList.toggle("active", state.statsView);
+    document.querySelector('.side-item[data-page="updates"]').classList.toggle("active", state.updatesView);
+    $("#sideNew").hidden = !UPDATES.length || seenUpdate();
     $("#sideShinyCount").textContent = nf(Object.values(shinies).reduce((t, l) => t + l.length, 0));
     const live = activeHunts();
     $("#sideHuntCount").textContent = live.length;
@@ -430,11 +466,12 @@
   function render() {
     typeof renderV2Banner === "function" && renderV2Banner();
     $("#fShare").setAttribute("aria-pressed", sharing());
-    el.home.classList.toggle("hidden", !!state.page || state.huntsView || state.statsView);
+    el.home.classList.toggle("hidden", !!state.page || state.huntsView || state.statsView || state.updatesView);
     el.game.classList.toggle("hidden", !state.page);
     el.huntsView.classList.toggle("hidden", !state.huntsView);
     el.statsView.classList.toggle("hidden", !state.statsView);
-    state.huntsView ? renderHunts() : state.statsView ? renderStats() : state.page ? renderGame() : renderHome();
+    el.updatesView.classList.toggle("hidden", !state.updatesView);
+    state.huntsView ? renderHunts() : state.statsView ? renderStats() : state.updatesView ? renderUpdates() : state.page ? renderGame() : renderHome();
   }
 
   // ---------- Active hunts (all games) ----------
@@ -613,6 +650,15 @@
     setHunt({ setup, odds });
   }
 
+  // Form picked in the Hunt Deck before the hunt has started (a hunt only exists once it runs).
+  const altPick = {};
+  const huntAlt = () => (hunts[curKey()] || {}).alt || altPick[curKey()] || "";
+  function paintAlt() {
+    const box = $("#drAlt"), alts = altsOf(cur);
+    box.hidden = !alts.length;
+    if (alts.length) $("#drAltBox").innerHTML = formPicker(cur, huntAlt(), "Form you're hunting");
+    dr.img.src = altSprite(cur, huntAlt()) || "";
+  }
   const gamePrefs = () => ({ inc: 1, odds: 4096, setup: defaultSetup(curGame), ...prefs[curGame] });
   const hunt = () => {
     const h = hunts[curKey()] || { count: 0, time: 0, since: null, ...gamePrefs() };
@@ -621,6 +667,7 @@
   };
   function setHunt(patch) {
     const h = { ...hunt(), ...patch, updated: Date.now() };
+    if (!h.alt && altPick[curKey()]) h.alt = altPick[curKey()];
     if ("odds" in patch || "inc" in patch || "setup" in patch) {
       prefs[curGame] = { inc: h.inc, odds: h.odds, setup: h.setup || null };
       savePrefs();
@@ -643,7 +690,7 @@
     $("#drName").textContent = cur.name;
     $("#drSub").innerHTML = (cur.form ? `<span class="form-tag">${esc(cur.form)}</span>` : "") + statusNote(cur, curGame);
     dr.celebrate.classList.remove("show");
-    dr.img.src = cur.sprite || "";
+    paintAlt();
     paintHunt();
     paintLog();
     disarm();
@@ -732,7 +779,7 @@
     dr.log.innerHTML = list.length
       ? list.map((s, i) => `<li>
           <span class="log-n">${sparkSvg()}${i + 1}</span>
-          <span class="log-main"><b>${nf(s.count)}</b> encounters · ${fmtShort(s.time)}<small>${fmtDate(s.ts)}${s.method ? ` · ${esc(s.method)}` : ""}${s.odds ? ` · 1/${s.odds}` : ""}${s.phases ? ` · after ${s.phases} ${s.phases === 1 ? "phase" : "phases"}` : ""}</small></span>
+          <span class="log-main"><b>${nf(s.count)}</b> encounters · ${fmtShort(s.time)}<small>${altOf(cur, s.alt) ? `${esc(altOf(cur, s.alt).n)} · ` : ""}${fmtDate(s.ts)}${s.method ? ` · ${esc(s.method)}` : ""}${s.odds ? ` · 1/${s.odds}` : ""}${s.phases ? ` · after ${s.phases} ${s.phases === 1 ? "phase" : "phases"}` : ""}</small></span>
           <button class="log-share" data-share="${i}" title="Share card" aria-label="Share card">${SHARE_ICO}</button>
           <button class="log-del" data-del="${i}" title="Delete entry">✕</button>
         </li>`).join("")
@@ -798,10 +845,11 @@
     const h = hunt();
     const k = curKey();
     const method = h.setup ? evalSetup(curGame, h.setup).label : "";
-    const phases = (h.phases || []).length;
-    (shinies[k] = shinies[k] || []).push({ count: h.count, time: elapsed(h), odds: h.odds, ...(method ? { method } : {}), ...(phases ? { phases } : {}), ts: Date.now() });
+    const phases = (h.phases || []).length, alt = huntAlt();
+    (shinies[k] = shinies[k] || []).push({ count: h.count, time: elapsed(h), odds: h.odds, ...(method ? { method } : {}), ...(phases ? { phases } : {}), ...(alt ? { alt } : {}), ts: Date.now() });
     saveShinies();
     delete hunts[k];
+    delete altPick[k];
     saveHunts();
     paintHunt();
     paintLog();
@@ -891,6 +939,12 @@
     const patch = t && setupPatch(t, hunt().setup || defaultSetup(curGame));
     if (patch) changeSetup(patch);
   });
+  $("#drAlt").addEventListener("change", e => {
+    const v = e.target.value, k = curKey();
+    if (v) altPick[k] = v; else delete altPick[k];
+    if (hunts[k]) { hunts[k].alt = v || undefined; if (!v) delete hunts[k].alt; saveHunts(); }
+    dr.img.src = altSprite(cur, v) || "";
+  });
   $("#drInc").addEventListener("change", e => setHunt({ inc: Math.max(1, +e.target.value || 1) }));
   $("#drSetCount").addEventListener("change", e => setHunt({ count: Math.max(0, +e.target.value || 0) }));
   for (const id of ["drH", "drM", "drS"]) $("#" + id).addEventListener("change", () => {
@@ -962,9 +1016,72 @@
 
 
 
+  // ---------- Form picker (see formPicker) ----------
+  const fpOpen = () => document.querySelector(".fp.open");
+  function fpClose(fp = fpOpen(), focus = false) {
+    if (!fp) return;
+    fp.classList.remove("open");
+    fp.querySelector(".fp-pop").hidden = true;
+    fp.querySelector(".fp-btn").setAttribute("aria-expanded", "false");
+    if (focus) fp.querySelector(".fp-btn").focus();
+  }
+  function fpToggle(fp) {
+    const was = fp.classList.contains("open");
+    fpClose();
+    if (was) return;
+    fp.classList.add("open");
+    const pop = fp.querySelector(".fp-pop"), q = fp.querySelector(".fp-q");
+    pop.hidden = false;
+    fp.querySelector(".fp-btn").setAttribute("aria-expanded", "true");
+    // Open upwards when there's no room below (e.g. the Hunt Deck near the thumb dock).
+    const r = fp.getBoundingClientRect(), dock = $(".dr-foot"), bottom = dock && dock.offsetParent && fp.closest("#drawer") ? dock.getBoundingClientRect().top : innerHeight;
+    fp.classList.toggle("up", bottom - r.bottom < 300 && r.top > bottom - r.bottom);
+    const sel = pop.querySelector('[aria-selected="true"]');
+    if (sel) sel.scrollIntoView({ block: "nearest" });
+    // No auto-focus on the filter on touch screens: the keyboard would cover the list.
+    (q && matchMedia("(hover: hover)").matches ? q : sel || pop.querySelector(".fp-opt")).focus({ preventScroll: true });
+  }
+  function fpPick(opt) {
+    const fp = opt.closest(".fp"), m = mons.find(x => x.id === +fp.dataset.mon), input = fp.querySelector('input[name="alt"]');
+    input.value = opt.dataset.v;
+    fp.querySelectorAll(".fp-opt").forEach(o => o.setAttribute("aria-selected", o === opt));
+    fp.querySelector(".fp-btn").innerHTML = fpFace(m, opt.dataset.v) + fp.querySelector(".fp-chev").outerHTML;
+    fpClose(fp, true);
+    input.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+  document.addEventListener("click", e => {
+    const btn = e.target.closest(".fp-btn"), opt = e.target.closest(".fp-opt");
+    if (btn) return fpToggle(btn.closest(".fp"));
+    if (opt) return fpPick(opt);
+    if (!e.target.closest(".fp-pop")) fpClose();
+  });
+  document.addEventListener("input", e => {
+    if (!e.target.classList.contains("fp-q")) return;
+    const fp = e.target.closest(".fp"), q = norm(e.target.value.trim());
+    let any = false;
+    fp.querySelectorAll(".fp-opt").forEach(o => { o.hidden = !!q && !(o.dataset.q || "").includes(q); any = any || !o.hidden; });
+    fp.querySelector(".fp-empty").hidden = any;
+  });
+  // Runs before the drawers' own keys (window capture), so Esc closes only the list.
+  addEventListener("keydown", e => {
+    const fp = fpOpen();
+    if (!fp) return;
+    const opts = [...fp.querySelectorAll(".fp-opt:not([hidden])")], i = opts.indexOf(document.activeElement);
+    if (e.key === "Escape") { e.preventDefault(); e.stopImmediatePropagation(); return fpClose(fp, true); }
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      e.preventDefault(); e.stopImmediatePropagation();
+      const next = opts[e.key === "ArrowDown" ? Math.min(opts.length - 1, i + 1) : Math.max(0, i - 1)];
+      if (next) next.focus();
+    } else if (e.key === "Enter" && i < 0 && opts.length === 1) { e.preventDefault(); fpPick(opts[0]); }
+    else if (e.key === " " || e.key === "Enter") e.stopImmediatePropagation();
+  }, true);
+
   // ---------- Dex Entry (Living Dex): all shinies of a species across games ----------
   const en = { root: $("#entry"), panel: $("#entry .drawer-panel"), log: $("#enLog") };
   let entryMon = null, entryFocus = null, editing = null, pendingHunt = null, adding = false;
+  // Forms checklist: the form tapped (shown in the hero, marked in the log, preset for "Add a shiny")
+  // and whether a long list is expanded.
+  let viewAlt = "", altsAll = false;
   // Setup for "Add a shiny": starts from the game's remembered hunt setup.
   let addSetup = null;
   const addSetupFor = g => ({ ...defaultSetup(g), ...((prefs[g] || {}).setup || {}) });
@@ -1020,6 +1137,8 @@
     entryMon = mons.find(m => m.id === id);
     editing = null;
     adding = false;
+    viewAlt = "";
+    altsAll = false;
     paintEntry();
     if (!en.root.classList.contains("open")) {
       entryFocus = document.activeElement;
@@ -1044,7 +1163,7 @@
     const m = entryMon, forms = speciesOf(m);
     const logs = forms.flatMap(shiniesOf).sort((a, b) => b.ts - a.ts);
     $("#enChip").textContent = `National Dex #${m.dex}`;
-    $("#enImg").src = m.sprite || "";
+    $("#enImg").src = altSprite(m, viewAlt) || "";
     $("#enMeta").textContent = `${region(m.gen)} · Gen ${m.gen}`;
     $("#enStatus").innerHTML = statusNote(m);
     $("#enName").innerHTML = `${esc(m.name)}${logs.length ? ` <span class="en-x">✦${logs.length}</span>` : ""}`;
@@ -1058,15 +1177,40 @@
       [logs.length, "Shinies"], [nf(enc), "Encounters"], [logs.length ? fmtShort(time) : "—", "Hunt time"],
     ].map(([v, l]) => `<div class="en-stat"><b>${v}</b><span>${l}</span></div>`).join("");
 
+    // Forms checklist for this entry: which forms have a shiny, and in which games.
+    const alts = altsOf(m), own = shiniesOf(m);
+    $("#enAlts").hidden = !alts.length;
+    if (alts.length) {
+      const gamesOf = id => [...new Set(own.filter(l => l.alt === id).map(l => GAME_INFO[l.g].abbr || GAME_INFO[l.g].name))];
+      const got = alts.filter(f => gamesOf(f.id).length).length, unset = own.filter(l => !altOf(m, l.alt)).length;
+      // Long lists (Vivillon, Unown, Alcremie) start folded: collected forms plus the first ones, in order.
+      const LIMIT = 12, fold = !altsAll && alts.length > LIMIT + 3;
+      const keep = new Set(alts.filter(f => gamesOf(f.id).length).map(f => f.id));
+      for (const f of alts) if (keep.size < LIMIT) keep.add(f.id);
+      if (viewAlt) keep.add(viewAlt);
+      const shown = fold ? alts.filter(f => keep.has(f.id)) : alts;
+      $("#enAlts").innerHTML = `<div class="en-alts-head"><span class="dr-label">Forms</span>
+          <b class="${got === alts.length ? "done" : ""}">${got}/${alts.length}</b></div>
+        <div class="en-alts">${shown.map(f => {
+          const gs = gamesOf(f.id);
+          return `<button class="en-alt ${gs.length ? "got" : ""} ${f.id === viewAlt ? "sel" : ""}" data-alt-view="${f.id}" aria-pressed="${f.id === viewAlt}" title="${gs.length ? `Shiny ${esc(f.n)} in ${esc(gs.join(", "))}` : `${esc(f.n)}: not caught yet`}">
+            <span class="en-alt-img"><img src="${altSprite(m, f.id)}" alt="" loading="lazy">${gs.length ? `<i class="en-alt-check">✓</i>` : ""}</span>
+            <b>${esc(f.n)}</b><small>${gs.length ? esc(gs.join(" · ")) : "Not yet"}</small></button>`;
+        }).join("")}</div>
+        ${shown.length < alts.length ? `<button class="en-alts-more" data-alts-all>Show all ${alts.length} forms</button>` : ""}
+        ${unset ? `<p class="en-alts-note">${unset === 1 ? "1 shiny has" : `${unset} shinies have`} no form yet — tap it in the log to set one.</p>` : ""}`;
+    }
+
 
     en.log.innerHTML = logs.length ? logs.map(l => {
       const g = GAME_INFO[l.g], key = `${l.g}:${l.m.id}:${l.i}`, open = editing === key;
       const d = new Date(l.ts), local = l.ts ? new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16) : "";
-      return `<li class="en-item ${open ? "open" : ""}" style="--accent:${g.accent};--accent2:${g.accent2}">
+      const mark = !viewAlt ? "" : l.m.id === m.id && l.alt === viewAlt ? "hl" : "dim";
+      return `<li class="en-item ${open ? "open" : ""} ${mark}" style="--accent:${g.accent};--accent2:${g.accent2}">
         <button class="en-row" data-edit="${key}">
-          <span class="en-thumb">${l.m.sprite ? `<img src="${l.m.sprite}" alt="">` : ""}</span>
+          <span class="en-thumb">${l.m.sprite ? `<img src="${altSprite(l.m, l.alt)}" alt="">` : ""}</span>
           <span class="en-main">
-            <b>${esc(l.m.name)}${l.m.form ? ` <em>${esc(l.m.form)}</em>` : ""}</b>
+            <b>${esc(l.m.name)}${formText(l.m, l.alt) ? ` <em>${esc(formText(l.m, l.alt))}</em>` : ""}</b>
             <span class="en-game">${esc(g.name)}${l.caughtIn && GAME_INFO[l.caughtIn] ? ` <em class="en-from">· caught in ${esc(GAME_INFO[l.caughtIn].abbr || GAME_INFO[l.caughtIn].name)}</em>` : ""}</span>
             <small>${fmtDate(l.ts)}${l.method ? ` · ${esc(l.method)}` : ""}${l.odds && !GAME_INFO[l.g].noOdds ? ` · 1/${l.odds}` : ""}${l.phases ? ` · after ${l.phases} ${l.phases === 1 ? "phase" : "phases"}` : ""}</small>
           </span>
@@ -1078,6 +1222,7 @@
           <label>Min<input type="number" min="0" max="59" name="m" value="${Math.floor(l.time / 60) % 60}"></label>
           <label>Sec<input type="number" min="0" max="59" name="s" value="${l.time % 60}"></label>
           <label class="wide">Caught on<input type="datetime-local" name="ts" value="${local}"></label>
+          ${altsOf(l.m).length ? `<div class="wide en-fp"><span>Form</span>${formPicker(l.m, l.alt)}</div>` : ""}
           ${(() => {
             const prev = (l.evolvedFrom || []).length && mons.find(x => x.id === l.evolvedFrom.at(-1));
             return prev ? `<button class="en-devolve" data-devolve title="Move this shiny back to ${esc(prev.name)}">
@@ -1119,12 +1264,13 @@
         <label>Sec<input type="number" min="0" max="59" name="s" value="0"></label>
         <div class="wide en-setup" id="enSetup"></div>
         <label class="wide">Caught on<input type="datetime-local" name="ts" value="${nowLocal}"></label>
+        ${alts.length ? `<div class="wide en-fp"><span>Form</span>${formPicker(m, viewAlt)}</div>` : ""}
         <div class="en-edit-actions">
           <button class="en-save" data-add-save>Add ${esc(m.name)}${m.form && m.form !== "Original" ? ` (${esc(m.form)})` : ""} ✦</button>
           <button class="dr-danger en-cancel" data-add-cancel>Cancel</button>
         </div>
       </div>`
-      : `<button class="en-add-btn" data-add-open><span>+</span> Add a shiny manually</button>`;
+      : `<button class="en-add-btn" data-add-open><span>+</span> Add a shiny${altOf(m, viewAlt) ? ` ${esc(altOf(m, viewAlt).n)}` : " manually"}</button>`;
     if (adding) paintAddSetup(preset);
 
     const games = GAMES.filter(gid => m.games[gid]);
@@ -1155,7 +1301,18 @@
   en.root.addEventListener("click", e => {
     if (e.target.closest("[data-eclose]")) return closeEntry();
     if (e.target.closest("[data-add-open]")) { adding = true; addSetup = null; editing = null; return paintEntry(); }
-    if (e.target.closest("[data-add-cancel]")) { adding = false; return paintEntry(); }
+    if (e.target.closest("[data-add-cancel]")) { adding = false; viewAlt = ""; return paintEntry(); }
+    if (e.target.closest("[data-alts-all]")) { altsAll = true; return paintEntry(); }
+    const altView = e.target.closest("[data-alt-view]");
+    if (altView) {
+      viewAlt = viewAlt === altView.dataset.altView ? "" : altView.dataset.altView;
+      paintEntry();
+      const hero = $("#entry .en-sprite");
+      hero.classList.remove("pop");
+      void hero.offsetWidth;
+      hero.classList.add("pop");
+      return;
+    }
     const setupBtn = e.target.closest("#enSetup button");
     if (setupBtn) {
       const g = en.root.querySelector('.en-add-form [name="game"]:checked').value, patch = setupPatch(setupBtn, addSetup);
@@ -1166,20 +1323,21 @@
     if (addBtn) {
       const f = addBtn.closest(".en-add-form"), val = n => f.querySelector(`[name="${n}"]:not([type="radio"]), [name="${n}"]:checked`).value;
       const g = val("game"), ts = new Date(val("ts")).getTime(), num = n => Math.max(0, +val(n) || 0);
-      const k = hk(g, entryMon.id);
-      (shinies[k] = shinies[k] || []).push({ count: num("count"), time: num("h") * 3600 + num("m") * 60 + num("s"), ...(GAME_INFO[g].noOdds || !HUNT_SETUP[g] ? { odds: null } : { odds: evalSetup(g, addSetup).odds, method: evalSetup(g, addSetup).label }), ts: isNaN(ts) ? Date.now() : ts, manual: true });
+      const k = hk(g, entryMon.id), alt = f.querySelector('[name="alt"]') ? f.querySelector('[name="alt"]').value : "";
+      (shinies[k] = shinies[k] || []).push({ count: num("count"), time: num("h") * 3600 + num("m") * 60 + num("s"), ...(GAME_INFO[g].noOdds || !HUNT_SETUP[g] ? { odds: null } : { odds: evalSetup(g, addSetup).odds, method: evalSetup(g, addSetup).label }), ...(alt ? { alt } : {}), ts: isNaN(ts) ? Date.now() : ts, manual: true });
       shinies[k].sort((x, y) => x.ts - y.ts);
       saveShinies();
       adding = false;
+      viewAlt = "";
       const r = addBtn.getBoundingClientRect();
       paintEntry();
       refreshHomeCard(entryMon.id);
       renderHomeStats();
       burst({ getBoundingClientRect: () => r });
-      return toast(`Shiny ${entryMon.name} logged in ${GAME_INFO[g].name} ✦`);
+      return toast(`Shiny ${entryMon.name}${altOf(entryMon, alt) ? ` (${altOf(entryMon, alt).n})` : ""} logged in ${GAME_INFO[g].name} ✦`);
     }
     const form = e.target.closest("[data-form]");
-    if (form) { entryMon = mons.find(m => m.id === +form.dataset.form); editing = null; return paintEntry(); }
+    if (form) { entryMon = mons.find(m => m.id === +form.dataset.form); editing = null; viewAlt = ""; altsAll = false; return paintEntry(); }
     const row = e.target.closest("[data-edit]");
     if (row) { editing = editing === row.dataset.edit ? null : row.dataset.edit; return paintEntry(); }
     const hunt = e.target.closest("[data-hunt]");
@@ -1255,6 +1413,8 @@
       const v = n => Math.max(0, +box.querySelector(`[name="${n}"]`).value || 0);
       const ts = new Date(box.querySelector('[name="ts"]').value).getTime();
       Object.assign(list[+i], { count: v("count"), time: v("h") * 3600 + v("m") * 60 + v("s"), ts: isNaN(ts) ? list[+i].ts : ts });
+      const altBox = box.querySelector('[name="alt"]');
+      if (altBox) { if (altBox.value) list[+i].alt = altBox.value; else delete list[+i].alt; }
       saveShinies();
       editing = null;
       paintEntry();
@@ -1421,7 +1581,7 @@
     d.body.style.setProperty("--accent2", g.accent2);
     d.body.classList.toggle("running", !!h.since);
     const img = d.querySelector(".pip-img");
-    const src = new URL(cur.sprite || "", location.href).href;
+    const src = new URL(altSprite(cur, huntAlt()) || "", location.href).href;
     if (img.src !== src) img.src = src;
     d.querySelector(".pip-game").textContent = g.abbr;
     d.querySelector(".pip-name").textContent = cur.name + (cur.form ? ` · ${cur.form}` : "");
@@ -1528,9 +1688,9 @@
   function route() {
     const id = location.pathname.startsWith(BASE) ? decodeURIComponent(location.pathname.slice(BASE.length)).replace(/\/$/, "") : "";
     const page = GAME_INFO[id] && !GAME_INFO[id].logOnly ? id : "";
-    const huntsView = id === "hunts", statsView = id === "stats";
-    if (page !== state.page || huntsView !== state.huntsView || statsView !== state.statsView) {
-      closeDrawer(); closeEntry(); state.page = page; state.huntsView = huntsView; state.statsView = statsView; state.tab = ""; el.gq.value = ""; scrollTo(0, 0);
+    const huntsView = id === "hunts", statsView = id === "stats", updatesView = id === "updates";
+    if (page !== state.page || huntsView !== state.huntsView || statsView !== state.statsView || updatesView !== state.updatesView) {
+      closeDrawer(); closeEntry(); state.page = page; state.huntsView = huntsView; state.statsView = statsView; state.updatesView = updatesView; state.tab = ""; el.gq.value = ""; scrollTo(0, 0);
     }
     document.body.classList.remove("menu-open");
     render();
@@ -1623,7 +1783,7 @@
   }
 
   const hasLocalData = () => caught.size > 0 || Object.keys(hunts).length > 0 || Object.keys(shinies).length > 0;
-  window.ShinyApp = { snapshot, applyData, hasLocalData, toast, render };
+  window.ShinyApp = { snapshot, applyData, hasLocalData, toast, render, whatsNew: () => whatsNew() };
 
 
   // ---------- Import from ShinyCheck V2 ----------
@@ -2335,7 +2495,7 @@
   async function drawShareCard(s) {
     const g = GAME_INFO[s.g], m = s.m;
     const { W, H, x, F, M, HOLO, holo, glow, spark, text, fit, spaced, panel, blob } = await cardCanvas(g.accent + "8c", g.accent2 + "80");
-    const [sprite, logo] = await Promise.all([loadImg(m.sprite), loadImg(g.logo)]);
+    const [sprite, logo] = await Promise.all([loadImg(altSprite(m, s.alt)), loadImg(g.logo)]);
     const rnd = seeded(m.id * 7919 + (s.ts || 1) % 104729 + 1);
     // Only around the sprite, so they never cover the name or the stats.
     for (let i = 0, n = 0; n < 18 && i < 200; i++) {
@@ -2392,7 +2552,7 @@
     text("SHINY FOUND", cx, 905, `700 26px ${M}`, holo(cx - 120, 0, cx + 120, 0), "center");
     spaced("0px");
     text(m.name, cx, 1010, fit(m.name, 800, 112, 56, W - 180), "#fff", "center");
-    const sub = [m.form && m.form !== "Original" ? m.form : "", g.name].filter(Boolean).join(" · ").toUpperCase();
+    const sub = [formText(m, s.alt), g.name].filter(Boolean).join(" · ").toUpperCase();
     spaced("3px");
     text(sub, cx, 1062, fit(sub, 700, 26, 16, W - 200, M), "rgba(255,255,255,.7)", "center");
     spaced("0px");
@@ -2525,6 +2685,87 @@
     paintPush();
   });
   document.addEventListener("keydown", e => { if (e.key === "Escape" && !pushDlg.hidden) { e.stopImmediatePropagation(); closePush(); } }, true);
+
+  // ---------- What's new: update log (/updates) and a one-time popup (updates.js) ----------
+  // "Seen" is kept per account (prefs, synced) and per device (localStorage), so the popup
+  // shows once. People new to ShinyCheck don't get it: every update is news to them anyway.
+  const UPDATES = window.UPDATES || [];
+  const SEEN = "shinycheck-v3-seen-update";
+  const seenUpdate = () => !UPDATES.length || prefs.seenUpdate === UPDATES[0].id || safe(() => localStorage.getItem(SEEN)) === UPDATES[0].id;
+  function markSeen() {
+    if (!UPDATES.length || seenUpdate()) return;
+    safe(() => localStorage.setItem(SEEN, UPDATES[0].id));
+    // Only in the account once it's loaded (whatsNew runs after that), so this never races the cloud.
+    if (wnReady) { prefs.seenUpdate = UPDATES[0].id; savePrefs(); }
+    renderSidebar();
+  }
+  const rich = t => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>");
+  const fmtDay = d => new Date(d + "T12:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+  const wnSteps = u => u.steps && u.steps.length ? `<ol class="wn-steps">${u.steps.map(t => `<li>${rich(t)}</li>`).join("")}</ol>` : "";
+  const wnShot = (u, lazy = true) => u.shot ? `<figure class="wn-shot"><img src="${u.shot}" alt="${esc(u.title)} on a phone" ${lazy ? 'loading="lazy"' : ""} decoding="async"></figure>` : "";
+  const wnAction = (u, cls) => u.action ? `<button class="${cls}" data-wn-go="${esc(u.action.go)}">${esc(u.action.label)} →</button>` : "";
+
+  function renderUpdates() {
+    $("#wnList").innerHTML = UPDATES.map((u, i) => `<li class="wn-item ${u.shot ? "has-shot" : ""}">
+        <div class="wn-text">
+          <p class="wn-date">${i === 0 ? `<span class="wn-new">New</span>` : ""}<time datetime="${u.date}">${fmtDay(u.date)}</time></p>
+          <h3>${esc(u.title)}</h3>
+          <p class="wn-desc">${rich(u.text)}</p>
+          ${wnSteps(u)}
+          ${wnAction(u, "wn-go")}
+        </div>
+        ${wnShot(u)}
+      </li>`).join("");
+    markSeen();
+  }
+
+  const wnDlg = $("#wnDlg");
+  let wnReady = false;
+  function openWhatsNew(u = UPDATES[0]) {
+    $("#wnBody").innerHTML = `${wnShot(u, false)}
+      <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> New in ShinyCheck</p>
+      <h3 class="wn-title" id="wnTitle">${esc(u.title)}</h3>
+      <p class="wn-desc">${rich(u.text)}</p>
+      ${wnSteps(u)}
+      <div class="rl-actions">
+        <button class="rl-again" data-wnclose>Got it</button>
+        ${u.action ? `<button class="rl-go wn-dlg-go" data-wn-go="${esc(u.action.go)}">${esc(u.action.label)}</button>` : ""}
+      </div>
+      <a class="wn-all" href="updates" data-wnclose>See all updates</a>`;
+    wnDlg.hidden = false;
+    document.body.classList.add("drawer-open");
+    setTimeout(() => wnDlg.querySelector(".rl-again").focus({ preventScroll: true }), 50);
+  }
+  const closeWhatsNew = () => { if (wnDlg.hidden) return; wnDlg.hidden = true; document.body.classList.remove("drawer-open"); };
+  // Called once the account's data is in (cloud.js), or right away without an account.
+  function whatsNew() {
+    wnReady = true;
+    if (seenUpdate()) return renderSidebar();
+    if (!hasLocalData()) return markSeen();
+    // Not on top of an open Hunt Deck, Dex Entry or another dialog: try again a bit later.
+    if (document.body.classList.contains("drawer-open") || document.body.classList.contains("gated")) return setTimeout(whatsNew, 4000);
+    openWhatsNew();
+    markSeen();
+  }
+  function wnGo(go) {
+    closeWhatsNew();
+    if (go.startsWith("entry:")) {
+      const m = mons.find(x => x.key === go.slice(6));
+      if (!m) return;
+      navigate("");
+      return setTimeout(() => openEntry(m.id), 60);
+    }
+    navigate(go);
+  }
+  document.addEventListener("click", e => {
+    const go = e.target.closest("[data-wn-go]");
+    if (go) return wnGo(go.dataset.wnGo);
+    if (e.target === wnDlg || (e.target.closest("[data-wnclose]") && e.target.closest("#wnDlg"))) {
+      if (!e.target.closest(".wn-all")) e.preventDefault();
+      closeWhatsNew();
+    }
+  });
+  addEventListener("keydown", e => { if (e.key === "Escape" && !wnDlg.hidden) { e.stopImmediatePropagation(); closeWhatsNew(); } }, true);
 
   route();
 })();

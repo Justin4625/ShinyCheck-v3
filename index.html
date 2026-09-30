@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260930114821">
+  <link rel="stylesheet" href="style.css?v=20260930162153">
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -78,6 +78,11 @@
           <span class="side-icon stats-icon"><svg viewBox="0 0 12 12" aria-hidden="true"><rect x="0" y="6" width="3" height="6" rx="1"/><rect x="4.5" y="2" width="3" height="10" rx="1"/><rect x="9" y="4" width="3" height="8" rx="1"/></svg></span>
           <span class="side-name">Stats</span>
           <span class="side-pct" id="sideShinyCount">0</span>
+        </a>
+        <a class="side-item side-updates" href="updates" data-page="updates">
+          <span class="side-icon updates-icon"><svg viewBox="0 0 100 100" aria-hidden="true"><use href="#spark"/></svg></span>
+          <span class="side-name">What's new</span>
+          <span class="side-new" id="sideNew" hidden>New</span>
         </a>
 
         <p class="side-label">Games</p>
@@ -234,6 +239,19 @@
         </div>
         <div id="stBody"></div>
       </section>
+
+      <!-- What's new: the update log (/updates), from updates.js -->
+      <section id="updatesView" class="hidden">
+        <div class="hero wn-hero">
+          <div class="hero-glow" aria-hidden="true"></div>
+          <div class="hero-text">
+            <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> Update log</p>
+            <h1>What's new</h1>
+            <p class="hero-sub">Everything ShinyCheck learned lately, newest first.</p>
+          </div>
+        </div>
+        <ol class="wn-list" id="wnList"></ol>
+      </section>
     </main>
   </div>
 
@@ -263,6 +281,7 @@
           <p class="dr-meta" id="drMeta"></p>
           <h2 id="drName"></h2>
           <p class="dr-sub" id="drSub"></p>
+          <div class="dr-alt" id="drAlt" hidden><span>Form</span><div class="dr-alt-box" id="drAltBox"></div></div>
         </div>
 
         <section class="dr-card dr-counter">
@@ -355,6 +374,8 @@
 
         <div id="enStatus"></div>
         <div class="en-stats" id="enStats"></div>
+
+        <section class="en-alts-sec" id="enAlts" hidden></section>
 
         <div class="en-add" id="enAdd"></div>
 
@@ -605,6 +626,14 @@
     </div>
   </div>
 
+  <!-- What's new popup: the newest update, shown once (see updates.js) -->
+  <div class="roulette wn-dlg" id="wnDlg" hidden>
+    <div class="rl-card wn-card" role="dialog" aria-modal="true" aria-labelledby="wnTitle">
+      <button class="dr-icon rl-close" data-wnclose aria-label="Close">✕</button>
+      <div id="wnBody"></div>
+    </div>
+  </div>
+
   <!-- Notifications: update news on this device -->
   <div class="roulette v2-import" id="pushDlg" hidden>
     <div class="rl-card v2-card" role="dialog" aria-modal="true" aria-labelledby="pushTitle">
@@ -664,9 +693,11 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=20260930114821"></script>
-  <script src="evo.js?v=20260930114821"></script>
-  <script src="app.js?v=20260930114821"></script>
-  <script type="module" src="cloud.js?v=20260930114821"></script>
+  <script src="data.js?v=20260930162153"></script>
+  <script src="forms.js?v=20260930162153"></script>
+  <script src="updates.js?v=20260930162153"></script>
+  <script src="evo.js?v=20260930162153"></script>
+  <script src="app.js?v=20260930162153"></script>
+  <script type="module" src="cloud.js?v=20260930162153"></script>
 </body>
 </html>
