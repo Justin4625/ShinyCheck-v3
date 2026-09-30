@@ -1149,6 +1149,8 @@ body.gated { overflow: hidden; }
 @keyframes shareShimmer { to { background-position: -200% 0; } }
 .share-dlg .rl-go:disabled, .share-dlg .rl-again:disabled { opacity: .45; }
 .share-dlg [hidden] { display: none; }
+.share-hint { margin-top: 10px; text-align: center; }
+.share-hint b { color: var(--text); }
 .push-state .v2-note { margin: 0; }
 .push-state .v2-note:not(.ok):not(.warn) { background: var(--surface-2); color: var(--muted); }
 .push-state .v2-note b { color: var(--text); }
