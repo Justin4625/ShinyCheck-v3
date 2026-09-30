@@ -6,6 +6,7 @@ Shiny Dex and shiny-hunt tracker for Pokémon. Plain HTML, CSS and JavaScript �
 - **Games** — Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
+- **Landing page** — shown before signing in (the gate in `index.html`): what shiny hunting is, the features with screenshots from `shots/`, and the sign-in card.
 - **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore.
 - **Notifications** — opt-in update news (Menu → Notifications), sent with Firebase Cloud Messaging.
 - **App** — installable (Add to Home Screen / Install app) and works offline via a service worker (`sw.js`); new versions show an Update prompt.
@@ -49,6 +50,11 @@ Setup (once):
 3. Publish the updated `firestore.rules` (it has the `pushTokens` section).
 
 On iPhone and iPad notifications only work in the installed app (Add to Home Screen, iOS 16.4+).
+
+## Screenshots
+
+The landing page images in `shots/` are real screenshots of the app with a demo collection, taken in headless
+Chrome (dark theme; desktop at 1280×800 @2x, phones at 390×844 @3x) and saved as WebP. Retake them when the UI changes.
 
 ## Data sources
 

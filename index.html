@@ -30,7 +30,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=20260930112847">
+  <link rel="stylesheet" href="style.css?v=20260930114451">
 </head>
 <body>
   <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -372,38 +372,202 @@
   </div>
 
   <!-- Login screen (only when Firebase is configured) -->
+  <!-- Landing page + sign in: what ShinyCheck is, what shiny hunting is, the features
+       (screenshots in shots/, made from the app with demo data). Shown until signed in. -->
   <div class="gate" id="gate" hidden>
     <div class="gate-bg" aria-hidden="true"></div>
-    <div class="gate-card">
-      <div class="logo gate-logo">
-        <svg class="logo-mark"><use href="#spark" fill="url(#holo)"/></svg>
-        <span>Shiny<b>Check</b></span>
+
+    <header class="lp-nav">
+      <a class="logo" href="./" data-lp-top><svg class="logo-mark"><use href="#spark" fill="url(#holo)"/></svg><span>Shiny<b>Check</b></span></a>
+      <nav class="lp-links" aria-label="Sections">
+        <a href="#lpHunting" data-lp-go>Shiny hunting</a>
+        <a href="#lpFeatures" data-lp-go>Features</a>
+        <a href="#lpGames" data-lp-go>Games</a>
+      </nav>
+      <button class="icon-btn lp-theme" id="lpTheme" type="button" aria-label="Toggle theme">◐</button>
+      <button class="lp-signin" type="button" data-mode="in" data-lp-login>Sign in</button>
+    </header>
+
+    <section class="lp-hero">
+      <div class="lp-hero-text">
+        <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> Free shiny tracker for Pokémon</p>
+        <h1>Every shiny you find.<br><span class="holo-text">One place.</span></h1>
+        <p class="lp-lead">ShinyCheck keeps your Shiny Dex, hunt counters and shiny log for 8 Pokémon games, from Sun &amp; Moon to Legends: Z-A. Synced between your phone and your laptop.</p>
+        <div class="lp-cta">
+          <button class="lp-go" type="button" data-mode="up" data-lp-login>Create a free account ✦</button>
+          <a class="lp-ghost" href="#lpHunting" data-lp-go>What's shiny hunting?</a>
+        </div>
+        <ul class="lp-facts">
+          <li><b>1,081</b><span>Pokémon &amp; forms</span></li>
+          <li><b>8</b><span>games</span></li>
+          <li><b>Real odds</b><span>for every hunt method</span></li>
+        </ul>
       </div>
-      <h1 id="gateTitle">Welcome back, Trainer</h1>
-      <p class="gate-sub">Your Shiny Dex, hunts and shiny log — saved to your account and synced across devices.</p>
+      <div class="gate-card" id="gateCard">
+        <div class="logo gate-logo">
+          <svg class="logo-mark"><use href="#spark" fill="url(#holo)"/></svg>
+          <span>Shiny<b>Check</b></span>
+        </div>
+        <h2 id="gateTitle">Welcome back, Trainer</h2>
+        <p class="gate-sub">Your Shiny Dex, hunts and shiny log — saved to your account and synced across devices.</p>
 
-      <button class="gate-google" id="gateGoogle" type="button">
-        <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
-        Continue with Google
-      </button>
-      <div class="gate-google-slot" id="gateGoogleSlot" hidden></div>
-      <div class="gate-or"><span>or</span></div>
+        <button class="gate-google" id="gateGoogle" type="button">
+          <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-7.9l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg>
+          Continue with Google
+        </button>
+        <div class="gate-google-slot" id="gateGoogleSlot" hidden></div>
+        <div class="gate-or"><span>or</span></div>
 
-      <form id="gateForm" novalidate>
-        <label>Email<input id="gateEmail" type="email" autocomplete="email" required></label>
-        <label class="gate-pw">Password<input id="gatePassword" type="password" autocomplete="current-password" minlength="6"></label>
-        <label class="gate-confirm">Confirm password<input id="gateConfirm" type="password" autocomplete="new-password" minlength="6"></label>
-        <p class="gate-error" id="gateError" role="alert"></p>
-        <button class="gate-submit" id="gateSubmit" type="submit">Sign in</button>
-      </form>
+        <form id="gateForm" novalidate>
+          <label>Email<input id="gateEmail" type="email" autocomplete="email" required></label>
+          <label class="gate-pw">Password<input id="gatePassword" type="password" autocomplete="current-password" minlength="6"></label>
+          <label class="gate-confirm">Confirm password<input id="gateConfirm" type="password" autocomplete="new-password" minlength="6"></label>
+          <p class="gate-error" id="gateError" role="alert"></p>
+          <button class="gate-submit" id="gateSubmit" type="submit">Sign in</button>
+        </form>
 
-      <p class="gate-legal">Protected by reCAPTCHA — Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy</a> &amp; <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Terms</a> apply.</p>
-      <p class="gate-switch">
-        <span class="only-in">New here? <button type="button" data-mode="up">Create an account</button> · <button type="button" data-mode="reset">Forgot password?</button></span>
-        <span class="only-up">Already have an account? <button type="button" data-mode="in">Sign in</button></span>
-        <span class="only-reset"><button type="button" data-mode="in">Back to sign in</button></span>
-      </p>
-    </div>
+        <p class="gate-legal">Protected by reCAPTCHA — Google <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Privacy</a> &amp; <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Terms</a> apply.</p>
+        <p class="gate-switch">
+          <span class="only-in">New here? <button type="button" data-mode="up">Create an account</button> · <button type="button" data-mode="reset">Forgot password?</button></span>
+          <span class="only-up">Already have an account? <button type="button" data-mode="in">Sign in</button></span>
+          <span class="only-reset"><button type="button" data-mode="in">Back to sign in</button></span>
+        </p>
+      </div>
+    </section>
+
+    <section class="lp-section" id="lpHunting">
+      <div class="lp-head">
+        <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> Shiny hunting 101</p>
+        <h2>Rare colors. Real patience.</h2>
+        <p>A shiny Pokémon is a rare, differently colored version of a Pokémon. It sparkles when it appears, and that's all it does: it's no stronger, just rare. Shiny hunters go after one on purpose, meeting the same Pokémon again and again, hatching eggs or clearing outbreaks until one sparkles.</p>
+      </div>
+      <ul class="lp-mons">
+        <li><img src="sprites/23.png" alt="Shiny Charizard" loading="lazy"><b>Charizard</b><span>black instead of orange</span></li>
+        <li><img src="sprites/233.png" alt="Shiny Gyarados" loading="lazy"><b>Gyarados</b><span>red instead of blue</span></li>
+        <li><img src="sprites/325.png" alt="Shiny Umbreon" loading="lazy"><b>Umbreon</b><span>blue rings instead of yellow</span></li>
+        <li><img src="sprites/573.png" alt="Shiny Rayquaza" loading="lazy"><b>Rayquaza</b><span>black instead of green</span></li>
+      </ul>
+      <div class="lp-odds">
+        <article>
+          <b class="lp-big">1 in 4,096</b>
+          <h3>The base odds</h3>
+          <p>That's the chance for any Pokémon you meet to be shiny, in every game since X &amp; Y. Before that it was 1 in 8,192.</p>
+        </article>
+        <article>
+          <b class="lp-big">1 in 512</b>
+          <h3>Methods stack up</h3>
+          <p>The Shiny Charm, the Masuda Method (breeding two Pokémon from games in different languages), outbreaks, SOS chains and Sparkling Power all add rolls. In Scarlet &amp; Violet the best wild setup gets you to 1 in 512.</p>
+        </article>
+        <article>
+          <b class="lp-big">63%</b>
+          <h3>Luck, not a countdown</h3>
+          <p>Odds don't count down. After exactly as many encounters as the odds, about 63% of hunters have found theirs, and the rest keep going.</p>
+          <div class="lp-luck" role="img" aria-label="Share of hunters with their shiny: 39% at half the odds, 63% at the odds, 86% at twice the odds, 95% at three times the odds">
+            <span style="--w:39%"><i></i><small>½× · 39%</small></span>
+            <span style="--w:63%"><i></i><small>1× · 63%</small></span>
+            <span style="--w:86%"><i></i><small>2× · 86%</small></span>
+            <span style="--w:95%"><i></i><small>3× · 95%</small></span>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <section class="lp-section" id="lpFeatures">
+      <div class="lp-head">
+        <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> What's inside</p>
+        <h2>Built by a shiny hunter, for long hunts.</h2>
+      </div>
+
+      <div class="lp-feature">
+        <div class="lp-copy">
+          <span class="lp-tag">Shiny Dex</span>
+          <h3>Your whole shiny collection</h3>
+          <p>All 1,081 Pokémon and forms in one living dex. A card lights up as soon as you've logged a shiny of it in any game, so you can see at a glance what's still missing.</p>
+        </div>
+        <figure class="lp-browser"><div class="lp-dots" aria-hidden="true"><i></i><i></i><i></i></div><img src="shots/dex.webp" width="2560" height="1600" alt="The Shiny Dex: Kanto cards glowing for every logged shiny" loading="lazy"></figure>
+      </div>
+
+      <div class="lp-feature flip">
+        <div class="lp-copy">
+          <span class="lp-tag">Hunt Deck</span>
+          <h3>A counter made for the thousandth encounter</h3>
+          <ul class="lp-list">
+            <li>+1 with a big thumb button or the space bar</li>
+            <li>A timer that keeps running when you close it</li>
+            <li>Pick your method and bonuses, and the odds are worked out for you</li>
+            <li>A luck meter, phases and a pop-out mini window</li>
+          </ul>
+        </div>
+        <figure class="lp-phone"><img src="shots/hunt.webp" width="1170" height="2532" alt="The Hunt Deck on a phone: 1,873 Masuda encounters for Ralts at 1/512" loading="lazy"></figure>
+      </div>
+
+      <div class="lp-feature">
+        <div class="lp-copy">
+          <span class="lp-tag">Games</span>
+          <h3>Every game's own dex</h3>
+          <p>Each game shows its regional dexes the way they are in the game, with Pokémon from outside the dex in their own tab. Shiny-locked Pokémon are marked and don't count against you.</p>
+        </div>
+        <figure class="lp-browser"><div class="lp-dots" aria-hidden="true"><i></i><i></i><i></i></div><img src="shots/game.webp" width="2560" height="1600" alt="The Scarlet &amp; Violet page with the Paldea dex" loading="lazy"></figure>
+      </div>
+
+      <div class="lp-feature flip">
+        <div class="lp-copy">
+          <span class="lp-tag">Gotcha!</span>
+          <h3>Found one? Show it off.</h3>
+          <p>Every shiny gets a share card with its encounters, hunt time and odds, ready for WhatsApp, Instagram, Discord or your camera roll.</p>
+        </div>
+        <figure class="lp-card-shot"><img src="shots/share-card.webp" width="720" height="900" alt="Share card for a shiny Charizard" loading="lazy"></figure>
+      </div>
+
+      <div class="lp-feature">
+        <div class="lp-copy">
+          <span class="lp-tag">Stats</span>
+          <h3>Your Shiny Wrapped</h3>
+          <p>Records like your luckiest shiny and your longest grind, charts per month, game and method, and a Wrapped card for the whole year.</p>
+        </div>
+        <div class="lp-pair">
+          <figure class="lp-phone"><img src="shots/stats.webp" width="1170" height="2532" alt="The Stats page on a phone" loading="lazy"></figure>
+          <figure class="lp-card-shot small"><img src="shots/wrapped.webp" width="720" height="900" alt="A Shiny Wrapped card" loading="lazy"></figure>
+        </div>
+      </div>
+
+      <ul class="lp-extras">
+        <li><b>Synced everywhere</b><span>Sign in with Google or email; your phone and laptop stay in step.</span></li>
+        <li><b>Works offline</b><span>Install it as an app and keep counting without a connection.</span></li>
+        <li><b>Weekly backups</b><span>The latest 8 are kept in your account, ready to restore.</span></li>
+        <li><b>Pokémon GO &amp; HOME</b><span>Log shinies from there too, and move them between games.</span></li>
+      </ul>
+    </section>
+
+    <section class="lp-section" id="lpGames">
+      <div class="lp-head">
+        <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> Supported games</p>
+        <h2>From Alola to Lumiose.</h2>
+      </div>
+      <ul class="lp-games">
+          <li><img src="logos/plzaLogo.png" alt="" loading="lazy"><b>Legends: Z-A</b><small>2025</small></li>
+          <li><img src="logos/svLogo.png" alt="" loading="lazy"><b>Scarlet &amp; Violet</b><small>2022</small></li>
+          <li><img src="logos/plaLogo.png" alt="" loading="lazy"><b>Legends: Arceus</b><small>2022</small></li>
+          <li><img src="logos/bdspLogo.png" alt="" loading="lazy"><b>Brilliant Diamond &amp; Shining Pearl</b><small>2021</small></li>
+          <li><img src="logos/swshLogo.png" alt="" loading="lazy"><b>Sword &amp; Shield</b><small>2019</small></li>
+          <li><img src="logos/lgpeLogo.png" alt="" loading="lazy"><b>Let's Go Pikachu &amp; Eevee</b><small>2018</small></li>
+          <li><img src="logos/usumLogo.png" alt="" loading="lazy"><b>Ultra Sun &amp; Ultra Moon</b><small>2017</small></li>
+          <li><img src="logos/smLogo.png" alt="" loading="lazy"><b>Sun &amp; Moon</b><small>2016</small></li>
+      </ul>
+    </section>
+
+    <section class="lp-final">
+      <h2>Your next shiny is out there <span class="holo-text">✦</span></h2>
+      <p>Free, no ads. Start with the Pokémon you're hunting right now.</p>
+      <div class="lp-cta">
+        <button class="lp-go" type="button" data-mode="up" data-lp-login>Create a free account</button>
+        <button class="lp-ghost" type="button" data-mode="in" data-lp-login>Sign in</button>
+      </div>
+    </section>
+
+    <footer class="lp-foot">
+      <p>ShinyCheck is a fan-made tracker and isn't affiliated with Nintendo, Game Freak or The Pokémon Company. Pokémon and Pokémon names are trademarks of their respective owners.</p>
+    </footer>
   </div>
 
   <!-- Random hunt roulette (game pages) -->
@@ -500,9 +664,9 @@
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-  <script src="data.js?v=20260930112847"></script>
-  <script src="evo.js?v=20260930112847"></script>
-  <script src="app.js?v=20260930112847"></script>
-  <script type="module" src="cloud.js?v=20260930112847"></script>
+  <script src="data.js?v=20260930114451"></script>
+  <script src="evo.js?v=20260930114451"></script>
+  <script src="app.js?v=20260930114451"></script>
+  <script type="module" src="cloud.js?v=20260930114451"></script>
 </body>
 </html>

@@ -267,6 +267,18 @@ async function start() {
   gate.addEventListener("click", e => {
     const t = e.target.closest("[data-mode]");
     if (t && t !== gate) setMode(t.dataset.mode);
+    // Landing page: buttons that lead to the sign-in card, links to its sections.
+    if (e.target.closest("[data-lp-login]")) {
+      $("#gateCard").scrollIntoView({ behavior: "smooth", block: "center" });
+      setTimeout(() => $("#gateEmail").focus({ preventScroll: true }), 400);
+    }
+    const go = e.target.closest("[data-lp-go], [data-lp-top]");
+    if (go) {
+      e.preventDefault();
+      e.stopPropagation();
+      if (go.dataset.lpTop !== undefined) gate.scrollTo({ top: 0, behavior: "smooth" });
+      else $(go.getAttribute("href")).scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
   // Google sign-in. With a client ID we use Google's own "Sign in with Google" button:
   // it runs on this domain and hands Firebase an ID token, which avoids Firebase's
@@ -354,7 +366,8 @@ function showGate() {
   document.body.classList.remove("locked");
   document.body.classList.add("gated");
   gate.hidden = false;
-  setTimeout(() => $("#gateEmail") && $("#gateEmail").focus(), 50);
+  // Only on wide screens: on phones the card sits below the intro, and focusing would jump to it.
+  if (matchMedia("(min-width: 1001px)").matches) setTimeout(() => $("#gateEmail") && $("#gateEmail").focus({ preventScroll: true }), 50);
 }
 function hideGate() {
   document.body.classList.remove("locked", "gated");

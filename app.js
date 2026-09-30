@@ -1574,6 +1574,7 @@
   };
   $("#themeBtn").addEventListener("click", flipTheme);
   $("#themeBtnTop").addEventListener("click", flipTheme);
+  $("#lpTheme").addEventListener("click", flipTheme);
 
   // ---------- Serialisation ----------
   // Locally everything is keyed by entry id; backups and the cloud use the sheet's stable
