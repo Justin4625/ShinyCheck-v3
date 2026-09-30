@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "hgss-2026-09",
+    date: "2026-09-30",
+    title: "HeartGold & SoulSilver",
+    text: "Johto is in: the Johto dex, plus every Pokémon you can get beyond it (Kanto, the Safari Zone, the Hoenn and Sinnoh Sound on the radio, the Pokéwalker, Steven's Hoenn starters). Hunts use Gen 4's odds of 1 in 8,192, with the Masuda Method at 1 in 1,639.",
+    steps: [
+      "Open **HeartGold & SoulSilver** in the menu.",
+      "Start a hunt: **Wild**, **Breeding** or **Masuda**.",
+      "Turn on **Count outside the dex** to count the Pokémon from other regions too.",
+    ],
+    shot: "shots/updates/hgss.webp",
+    action: { label: "Open HeartGold & SoulSilver", go: "hgss" },
+  },
+  {
     id: "bw2-2026-09",
     date: "2026-09-30",
     title: "Black 2 & White 2",

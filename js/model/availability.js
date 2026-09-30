@@ -27,6 +27,8 @@ export const EVENT_ONLY = {
 // Zone 20, the PLA starters in outbreaks). "dex:Form" locks only that form; evolutions of a
 // locked-only line are locked too.
 const GAME_LOCKS = {
+  // HeartGold & SoulSilver: Mew and Celebi are in the Johto dex but only came through events there.
+  hgss: [151, 251],
   // Black & White and Black 2 & White 2: Reshiram, Zekrom, Keldeo and Meloetta can't be shiny in Gen 5 and Genesect only
   // via later events (Bulbapedia); Rotom is only an in-game trade, which is never shiny, and can't breed.
   bw: [479, 643, 644, 647, 648, 649],

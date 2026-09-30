@@ -29,6 +29,8 @@ function dexNavOdds(level, chain, charm) {
   return Math.round(1 / ((1 - h) * base + h));
 }
 export const HUNT_SETUP = {
+  // HeartGold & SoulSilver (RotomLabs): 1/8192; the Masuda Method gives 5 rolls (1/1639). No Shiny Charm.
+  hgss: { rate: 8192, methods: [["wild", "Wild", 1, []], ["breed", "Breeding", 1, []], ["masuda", "Masuda", 5, []]], bonus: [] },
   // Black & White (RotomLabs): 1/8192, no Shiny Charm yet; the Masuda Method gives 6 rolls (1/1366).
   bw: { rate: 8192, methods: [["wild", "Wild", 1, []], ["breed", "Breeding", 1, []], ["masuda", "Masuda", 6, []]], bonus: [] },
   // Black 2 & White 2 (RotomLabs, Serebii): the Shiny Charm arrives, +2 rolls in the wild and for eggs
