@@ -151,23 +151,6 @@ button, a, label, .pcard, .region { touch-action: manipulation; -webkit-tap-high
   .en-add-form > label:not(.wide):first-of-type, .en-edit > label:not(.wide):first-of-type { grid-column: 1 / -1; }
   .en-add-form input, .en-edit input { font-size: 16px; padding: 10px 8px; }
 
-  /* ---------- Hunt Deck on phones ---------- */
-  .dr-pop { display: none; }
-  /* Counter: one big centered number with the phase row under it. */
-  .dr-counter { display: block; text-align: center; padding: 12px; }
-  .dr-count { margin: 2px 0 6px; font-size: 58px; }
-  /* Thumb dock: big +1 with −1 next to it, Delete hunt and Gotcha! under it. */
-  .dr-foot { flex-wrap: wrap; gap: 8px; padding: 10px 10px calc(10px + env(safe-area-inset-bottom)); }
-  .dr-foot .dr-count-actions { order: -1; width: 100%; display: flex; gap: 8px; }
-  .dr-foot .dr-minus { width: 68px; height: 78px; border-radius: 18px; font-size: 17px; }
-  .dr-foot .dr-plus { flex: 1; width: auto; height: 78px; border-radius: 18px; font-size: 32px; }
-  .dr-foot .dr-plus.idle { font-size: 22px; }
-  .dr-foot .dr-plus kbd { display: none; }
-  .dr-foot .dr-cancel, .dr-foot .dr-gotcha { height: 48px; border-radius: 15px; }
-  .dr-foot .dr-gotcha { font-size: 16px; }
-
-  /* Hunt Deck and the other panels respect the home indicator. */
-  .dr-foot { padding-bottom: calc(10px + env(safe-area-inset-bottom)); }
 }
 
 @media (max-width: 360px) {

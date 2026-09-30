@@ -83,6 +83,7 @@ export function openDrawer(id, gid = state.page) {
   $("#drGame").textContent = g.name;
   $("#drMeta").textContent = `#${cur.dex} · ${g.short || g.name} ${codeLabel(cur, curGame)}${whereIn(cur, curGame) ? " · " + whereIn(cur, curGame) : ""}`;
   $("#drName").textContent = cur.name;
+  $("#drWiki").href = cur.url;
   $("#drSub").innerHTML = (cur.form ? `<span class="form-tag">${esc(cur.form)}</span>` : "") + statusNote(cur, curGame);
   dr.celebrate.classList.remove("show");
   paintAlt();

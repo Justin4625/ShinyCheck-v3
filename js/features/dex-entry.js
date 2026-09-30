@@ -73,6 +73,7 @@ export function paintEntry() {
   $("#enChip").textContent = `National Dex #${m.dex}`;
   $("#enImg").src = altSprite(m, viewAlt) || "";
   $("#enMeta").textContent = `${region(m.gen)} · Gen ${m.gen}`;
+  $("#enWiki").href = m.url;
   $("#enStatus").innerHTML = statusNote(m);
   $("#enName").innerHTML = `${esc(m.name)}${logs.length ? ` <span class="en-x">✦${logs.length}</span>` : ""}`;
   $("#enForms").innerHTML = forms.length > 1

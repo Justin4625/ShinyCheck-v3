@@ -10,7 +10,7 @@
 .dr-cancel:hover { color: #ff5f7a; border-color: #ff5f7a; }
 .dr-cancel.armed { background: #ff5f7a; border-color: transparent; color: #fff; }
 .dr-gotcha { flex: 1; }
-@media (max-height: 640px), (max-width: 420px) { .dr-cancel { height: 44px; border-radius: 14px; padding: 0 12px; } }
+@media (max-height: 640px) and (min-width: 561px) { .dr-cancel { height: 44px; border-radius: 14px; padding: 0 12px; } }
 /* Toast with an action */
 .toast.has-action { pointer-events: auto; display: flex; align-items: center; gap: 14px; }
 .toast-action {
@@ -74,7 +74,7 @@
 .dr-phases img { width: 28px; height: 28px; object-fit: contain; }
 .dr-phases span { flex: 1; }
 .dr-phases small { font: 700 10px/1 var(--mono); color: var(--faint); }
-@media (max-height: 640px), (max-width: 420px) {
+@media (max-height: 640px) and (min-width: 561px) {
   .dr-counter { flex-wrap: wrap; }
   .dr-phase-row, .dr-phase-pick, .dr-phases { flex-basis: 100%; }
 }

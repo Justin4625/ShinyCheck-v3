@@ -31,31 +31,32 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <!-- css:start -->
-  <link rel="stylesheet" href="css/01-base.css?v=20260930223224">
-  <link rel="stylesheet" href="css/02-shell-sidebar.css?v=20260930223224">
-  <link rel="stylesheet" href="css/03-page.css?v=20260930223224">
-  <link rel="stylesheet" href="css/04-cards.css?v=20260930223224">
-  <link rel="stylesheet" href="css/05-game-page.css?v=20260930223224">
-  <link rel="stylesheet" href="css/06-toast.css?v=20260930223224">
-  <link rel="stylesheet" href="css/07-mobile-layout.css?v=20260930223224">
-  <link rel="stylesheet" href="css/08-card-hunts.css?v=20260930223224">
-  <link rel="stylesheet" href="css/09-hunt-deck.css?v=20260930223224">
-  <link rel="stylesheet" href="css/10-dex-entry.css?v=20260930223224">
-  <link rel="stylesheet" href="css/11-accounts.css?v=20260930223224">
-  <link rel="stylesheet" href="css/12-labels-pickers.css?v=20260930223224">
-  <link rel="stylesheet" href="css/13-stats.css?v=20260930223224">
-  <link rel="stylesheet" href="css/14-home-extras.css?v=20260930223224">
-  <link rel="stylesheet" href="css/15-roulette.css?v=20260930223224">
-  <link rel="stylesheet" href="css/16-dialogs.css?v=20260930223224">
-  <link rel="stylesheet" href="css/17-landing.css?v=20260930223224">
-  <link rel="stylesheet" href="css/18-hunt-tools.css?v=20260930223224">
-  <link rel="stylesheet" href="css/19-phones.css?v=20260930223224">
-  <link rel="stylesheet" href="css/20-touch.css?v=20260930223224">
-  <link rel="stylesheet" href="css/21-install.css?v=20260930223224">
-  <link rel="stylesheet" href="css/22-whats-new.css?v=20260930223224">
-  <link rel="stylesheet" href="css/23-radar-chain.css?v=20260930223224">
-  <link rel="stylesheet" href="css/24-dex-only.css?v=20260930223224">
-  <link rel="stylesheet" href="css/25-side-foot.css?v=20260930223224">
+  <link rel="stylesheet" href="css/01-base.css?v=20260930224250">
+  <link rel="stylesheet" href="css/02-shell-sidebar.css?v=20260930224250">
+  <link rel="stylesheet" href="css/03-page.css?v=20260930224250">
+  <link rel="stylesheet" href="css/04-cards.css?v=20260930224250">
+  <link rel="stylesheet" href="css/05-game-page.css?v=20260930224250">
+  <link rel="stylesheet" href="css/06-toast.css?v=20260930224250">
+  <link rel="stylesheet" href="css/07-mobile-layout.css?v=20260930224250">
+  <link rel="stylesheet" href="css/08-card-hunts.css?v=20260930224250">
+  <link rel="stylesheet" href="css/09-hunt-deck.css?v=20260930224250">
+  <link rel="stylesheet" href="css/10-dex-entry.css?v=20260930224250">
+  <link rel="stylesheet" href="css/11-accounts.css?v=20260930224250">
+  <link rel="stylesheet" href="css/12-labels-pickers.css?v=20260930224250">
+  <link rel="stylesheet" href="css/13-stats.css?v=20260930224250">
+  <link rel="stylesheet" href="css/14-home-extras.css?v=20260930224250">
+  <link rel="stylesheet" href="css/15-roulette.css?v=20260930224250">
+  <link rel="stylesheet" href="css/16-dialogs.css?v=20260930224250">
+  <link rel="stylesheet" href="css/17-landing.css?v=20260930224250">
+  <link rel="stylesheet" href="css/18-hunt-tools.css?v=20260930224250">
+  <link rel="stylesheet" href="css/19-phones.css?v=20260930224250">
+  <link rel="stylesheet" href="css/20-touch.css?v=20260930224250">
+  <link rel="stylesheet" href="css/21-install.css?v=20260930224250">
+  <link rel="stylesheet" href="css/22-whats-new.css?v=20260930224250">
+  <link rel="stylesheet" href="css/23-radar-chain.css?v=20260930224250">
+  <link rel="stylesheet" href="css/24-dex-only.css?v=20260930224250">
+  <link rel="stylesheet" href="css/25-side-foot.css?v=20260930224250">
+  <link rel="stylesheet" href="css/26-deck-phone.css?v=20260930224250">
   <!-- css:end -->
 </head>
 <body>
@@ -304,6 +305,7 @@
           <p class="dr-meta" id="drMeta"></p>
           <h2 id="drName"></h2>
           <p class="dr-sub" id="drSub"></p>
+          <a class="wiki-link" id="drWiki" href="#" target="_blank" rel="noopener">Bulbapedia <span aria-hidden="true">↗</span></a>
           <div class="dr-alt" id="drAlt" hidden><span>Form</span><div class="dr-alt-box" id="drAltBox"></div></div>
         </div>
 
@@ -402,6 +404,7 @@
           <div class="en-hero-text">
             <p class="dr-meta" id="enMeta"></p>
             <h2 id="enName"></h2>
+            <a class="wiki-link" id="enWiki" href="#" target="_blank" rel="noopener">Bulbapedia <span aria-hidden="true">↗</span></a>
             <div class="en-forms" id="enForms"></div>
           </div>
         </div>
@@ -620,7 +623,7 @@
           <li><img src="logos/rsLogo.png" alt="" loading="lazy"><b>Ruby &amp; Sapphire</b><small>2002</small></li>
           <li><img src="logos/crystalLogo.png" alt="" loading="lazy"><b>Crystal</b><small>2000</small></li>
           <li><img src="logos/gsLogo.png" alt="" loading="lazy"><b>Gold &amp; Silver</b><small>1999</small></li>
-          <li><img src="logos/rbyLogo.png" alt="" loading="lazy"><b>Red, Blue &amp; Yellow</b><small>1996 · no shinies yet</small></li>
+          <li><img src="logos/rbyLogo.png" alt="" loading="lazy"><b>Red, Blue &amp; Yellow</b><small>1996 · no shinies</small></li>
       </ul>
     </section>
 
@@ -723,71 +726,71 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <!-- Content: plain scripts that set window.DEX, FORMS, UPDATES and EVO (see data/) -->
-  <script src="data/pokedex.js?v=20260930223224"></script>
-  <script src="data/forms.js?v=20260930223224"></script>
-  <script src="data/updates.js?v=20260930223224"></script>
-  <script src="data/evolutions.js?v=20260930223224"></script>
+  <script src="data/pokedex.js?v=20260930224250"></script>
+  <script src="data/forms.js?v=20260930224250"></script>
+  <script src="data/updates.js?v=20260930224250"></script>
+  <script src="data/evolutions.js?v=20260930224250"></script>
   <!-- App: ES modules in js/. The import map gives each module the current ?v= (scripts/bump-version.mjs). -->
   <!-- importmap:start -->
   <script type="importmap">
   {
     "imports": {
-      "./js/components/burst.js": "./js/components/burst.js?v=20260930223224",
-      "./js/components/card.js": "./js/components/card.js?v=20260930223224",
-      "./js/components/form-picker.js": "./js/components/form-picker.js?v=20260930223224",
-      "./js/components/game-picker.js": "./js/components/game-picker.js?v=20260930223224",
-      "./js/components/hunt-setup.js": "./js/components/hunt-setup.js?v=20260930223224",
-      "./js/components/icons.js": "./js/components/icons.js?v=20260930223224",
-      "./js/components/progress.js": "./js/components/progress.js?v=20260930223224",
-      "./js/components/section.js": "./js/components/section.js?v=20260930223224",
-      "./js/components/sidebar.js": "./js/components/sidebar.js?v=20260930223224",
-      "./js/components/status.js": "./js/components/status.js?v=20260930223224",
-      "./js/components/toast.js": "./js/components/toast.js?v=20260930223224",
-      "./js/components/two-step.js": "./js/components/two-step.js?v=20260930223224",
-      "./js/core/collection.js": "./js/core/collection.js?v=20260930223224",
-      "./js/core/config.js": "./js/core/config.js?v=20260930223224",
-      "./js/core/format.js": "./js/core/format.js?v=20260930223224",
-      "./js/core/state.js": "./js/core/state.js?v=20260930223224",
-      "./js/core/store.js": "./js/core/store.js?v=20260930223224",
-      "./js/core/util.js": "./js/core/util.js?v=20260930223224",
-      "./js/features/app-install.js": "./js/features/app-install.js?v=20260930223224",
-      "./js/features/backups.js": "./js/features/backups.js?v=20260930223224",
-      "./js/features/dex-entry.js": "./js/features/dex-entry.js?v=20260930223224",
-      "./js/features/hunt-deck/chain.js": "./js/features/hunt-deck/chain.js?v=20260930223224",
-      "./js/features/hunt-deck/deck.js": "./js/features/hunt-deck/deck.js?v=20260930223224",
-      "./js/features/hunt-deck/pace.js": "./js/features/hunt-deck/pace.js?v=20260930223224",
-      "./js/features/hunt-deck/phases.js": "./js/features/hunt-deck/phases.js?v=20260930223224",
-      "./js/features/hunt-deck/pop-out.js": "./js/features/hunt-deck/pop-out.js?v=20260930223224",
-      "./js/features/install-help.js": "./js/features/install-help.js?v=20260930223224",
-      "./js/features/notifications.js": "./js/features/notifications.js?v=20260930223224",
-      "./js/features/roulette.js": "./js/features/roulette.js?v=20260930223224",
-      "./js/features/share-card.js": "./js/features/share-card.js?v=20260930223224",
-      "./js/features/side-menu.js": "./js/features/side-menu.js?v=20260930223224",
-      "./js/features/sync.js": "./js/features/sync.js?v=20260930223224",
-      "./js/features/theme.js": "./js/features/theme.js?v=20260930223224",
-      "./js/features/whats-new.js": "./js/features/whats-new.js?v=20260930223224",
-      "./js/main.js": "./js/main.js?v=20260930223224",
-      "./js/model/availability.js": "./js/model/availability.js?v=20260930223224",
-      "./js/model/dex.js": "./js/model/dex.js?v=20260930223224",
-      "./js/model/evolutions.js": "./js/model/evolutions.js?v=20260930223224",
-      "./js/model/forms.js": "./js/model/forms.js?v=20260930223224",
-      "./js/model/game-dex.js": "./js/model/game-dex.js?v=20260930223224",
-      "./js/model/games.js": "./js/model/games.js?v=20260930223224",
-      "./js/model/hunt-pace.js": "./js/model/hunt-pace.js?v=20260930223224",
-      "./js/model/hunt-setup.js": "./js/model/hunt-setup.js?v=20260930223224",
-      "./js/pages/game.js": "./js/pages/game.js?v=20260930223224",
-      "./js/pages/home.js": "./js/pages/home.js?v=20260930223224",
-      "./js/pages/hunts.js": "./js/pages/hunts.js?v=20260930223224",
-      "./js/pages/router.js": "./js/pages/router.js?v=20260930223224",
-      "./js/pages/stats.js": "./js/pages/stats.js?v=20260930223224",
-      "./js/pages/toolbar.js": "./js/pages/toolbar.js?v=20260930223224",
-      "./js/pages/updates.js": "./js/pages/updates.js?v=20260930223224",
-      "./js/services/cloud.js": "./js/services/cloud.js?v=20260930223224"
+      "./js/components/burst.js": "./js/components/burst.js?v=20260930224250",
+      "./js/components/card.js": "./js/components/card.js?v=20260930224250",
+      "./js/components/form-picker.js": "./js/components/form-picker.js?v=20260930224250",
+      "./js/components/game-picker.js": "./js/components/game-picker.js?v=20260930224250",
+      "./js/components/hunt-setup.js": "./js/components/hunt-setup.js?v=20260930224250",
+      "./js/components/icons.js": "./js/components/icons.js?v=20260930224250",
+      "./js/components/progress.js": "./js/components/progress.js?v=20260930224250",
+      "./js/components/section.js": "./js/components/section.js?v=20260930224250",
+      "./js/components/sidebar.js": "./js/components/sidebar.js?v=20260930224250",
+      "./js/components/status.js": "./js/components/status.js?v=20260930224250",
+      "./js/components/toast.js": "./js/components/toast.js?v=20260930224250",
+      "./js/components/two-step.js": "./js/components/two-step.js?v=20260930224250",
+      "./js/core/collection.js": "./js/core/collection.js?v=20260930224250",
+      "./js/core/config.js": "./js/core/config.js?v=20260930224250",
+      "./js/core/format.js": "./js/core/format.js?v=20260930224250",
+      "./js/core/state.js": "./js/core/state.js?v=20260930224250",
+      "./js/core/store.js": "./js/core/store.js?v=20260930224250",
+      "./js/core/util.js": "./js/core/util.js?v=20260930224250",
+      "./js/features/app-install.js": "./js/features/app-install.js?v=20260930224250",
+      "./js/features/backups.js": "./js/features/backups.js?v=20260930224250",
+      "./js/features/dex-entry.js": "./js/features/dex-entry.js?v=20260930224250",
+      "./js/features/hunt-deck/chain.js": "./js/features/hunt-deck/chain.js?v=20260930224250",
+      "./js/features/hunt-deck/deck.js": "./js/features/hunt-deck/deck.js?v=20260930224250",
+      "./js/features/hunt-deck/pace.js": "./js/features/hunt-deck/pace.js?v=20260930224250",
+      "./js/features/hunt-deck/phases.js": "./js/features/hunt-deck/phases.js?v=20260930224250",
+      "./js/features/hunt-deck/pop-out.js": "./js/features/hunt-deck/pop-out.js?v=20260930224250",
+      "./js/features/install-help.js": "./js/features/install-help.js?v=20260930224250",
+      "./js/features/notifications.js": "./js/features/notifications.js?v=20260930224250",
+      "./js/features/roulette.js": "./js/features/roulette.js?v=20260930224250",
+      "./js/features/share-card.js": "./js/features/share-card.js?v=20260930224250",
+      "./js/features/side-menu.js": "./js/features/side-menu.js?v=20260930224250",
+      "./js/features/sync.js": "./js/features/sync.js?v=20260930224250",
+      "./js/features/theme.js": "./js/features/theme.js?v=20260930224250",
+      "./js/features/whats-new.js": "./js/features/whats-new.js?v=20260930224250",
+      "./js/main.js": "./js/main.js?v=20260930224250",
+      "./js/model/availability.js": "./js/model/availability.js?v=20260930224250",
+      "./js/model/dex.js": "./js/model/dex.js?v=20260930224250",
+      "./js/model/evolutions.js": "./js/model/evolutions.js?v=20260930224250",
+      "./js/model/forms.js": "./js/model/forms.js?v=20260930224250",
+      "./js/model/game-dex.js": "./js/model/game-dex.js?v=20260930224250",
+      "./js/model/games.js": "./js/model/games.js?v=20260930224250",
+      "./js/model/hunt-pace.js": "./js/model/hunt-pace.js?v=20260930224250",
+      "./js/model/hunt-setup.js": "./js/model/hunt-setup.js?v=20260930224250",
+      "./js/pages/game.js": "./js/pages/game.js?v=20260930224250",
+      "./js/pages/home.js": "./js/pages/home.js?v=20260930224250",
+      "./js/pages/hunts.js": "./js/pages/hunts.js?v=20260930224250",
+      "./js/pages/router.js": "./js/pages/router.js?v=20260930224250",
+      "./js/pages/stats.js": "./js/pages/stats.js?v=20260930224250",
+      "./js/pages/toolbar.js": "./js/pages/toolbar.js?v=20260930224250",
+      "./js/pages/updates.js": "./js/pages/updates.js?v=20260930224250",
+      "./js/services/cloud.js": "./js/services/cloud.js?v=20260930224250"
     }
   }
   </script>
   <!-- importmap:end -->
-  <script type="module" src="js/main.js?v=20260930223224"></script>
-  <script type="module" src="js/services/cloud.js?v=20260930223224"></script>
+  <script type="module" src="js/main.js?v=20260930224250"></script>
+  <script type="module" src="js/services/cloud.js?v=20260930224250"></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
 // The tracked games: names, colours, logos, regional dex sections and dex-number helpers.
 // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
 export const GAME_INFO = {
-  // Gen 1 had no shinies yet: noShiny games only show their dex (see DEX_ONLY in config.js).
+  // Gen 1 has no shinies: noShiny games only show their dex (see DEX_ONLY in config.js).
   rby:  { name: "Red, Blue & Yellow", abbr: "RBY", released: "1996-02-27", accent: "#e3350d", accent2: "#f2c230", logo: "logos/rbyLogo.png",
           noShiny: true, sections: [["", "Kanto"]] },
   // Gen 1 and 2 have no separate English logo: these are the logos from the games' title screens.

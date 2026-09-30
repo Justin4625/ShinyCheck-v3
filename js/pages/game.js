@@ -18,7 +18,7 @@ const inTab = (gid, p) => m => p === "O" ? !!m.games[gid] && isExtraForm(m, gid)
 
 export function renderGame() {
   const gid = state.page, g = GAME_INFO[gid];
-  // Red, Blue & Yellow: no shinies yet, so no hunts, totals or hunt buttons, only the dex.
+  // Red, Blue & Yellow have no shinies, so no hunts, totals or hunt buttons, only the dex.
   el.game.classList.toggle("no-shiny", !!g.noShiny);
   if (g.noShiny && state.tab === "hunts") state.tab = "";
   $("#gForms").hidden = !g.sections.some(([p]) => p === "O");

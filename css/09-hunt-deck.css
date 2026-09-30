@@ -183,17 +183,11 @@ body.drawer-open { overflow: hidden; }
 .dr-gotcha:active { transform: scale(.98); }
 .dr-gotcha.armed { background: var(--holo) padding-box, var(--holo-conic) border-box; color: #14121f; }
 
-@media (max-width: 560px) {
-  .drawer-panel { top: auto; left: 0; right: 0; bottom: 0; width: 100%; height: 92vh; border-radius: 26px 26px 0 0; transform: translateY(100%); }
-  .dr-stage { height: 200px; }
-  .dr-sprite { width: 140px; height: 140px; }
-  .dr-count { font-size: 52px; }
-}
 
 .dr-pop.on { color: var(--accent); border-color: var(--accent); }
 
-/* ---------- Compact Hunt Deck for small windows (e.g. next to YouTube) ---------- */
-@media (max-height: 640px), (max-width: 420px) {
+/* ---------- Compact Hunt Deck for short windows (e.g. next to YouTube); phones: 26-deck-phone.css ---------- */
+@media (max-height: 640px) and (min-width: 561px) {
   .drawer-panel {
     top: 6px; right: 6px; bottom: 6px; left: auto; height: auto; width: min(460px, calc(100vw - 12px));
     border-radius: 20px; transform: translateX(calc(100% + 30px));

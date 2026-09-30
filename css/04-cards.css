@@ -41,14 +41,6 @@
 .pcard:hover .types { opacity: 1; }
 
 .form-tag.blank { visibility: hidden; }
-.wiki {
-  margin-left: auto; width: 22px; height: 22px; border-radius: 7px; display: grid; place-items: center;
-  font: 700 12px/1 var(--mono); text-decoration: none; color: var(--muted); background: var(--surface-2); border: 1px solid var(--border);
-  opacity: 0; pointer-events: none; transition: opacity .2s;
-}
-.wiki:hover { color: var(--text); border-color: var(--border-2); }
-.pcard:hover .wiki { opacity: 1; pointer-events: auto; }
-.wiki + .seal { margin-left: 0; }
 
 .seal { flex: none; width: 22px; height: 22px; margin-left: auto; transform: scale(0) rotate(-90deg); transition: transform .45s cubic-bezier(.3, 1.6, .5, 1); }
 

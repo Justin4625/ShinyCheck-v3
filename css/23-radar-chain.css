@@ -21,7 +21,7 @@
 .dr-chain-reset:disabled { visibility: hidden; }
 @media (hover: hover) { .dr-chain-reset:not(:disabled):hover { color: var(--text); } }
 @media (hover: hover) { .dr-chain-break:not(:disabled):hover { color: #ff5f7a; border-color: #ff5f7a; } }
-@media (max-height: 640px), (max-width: 420px) { .dr-chain { flex-basis: 100%; } }
+@media (max-height: 640px) and (min-width: 561px) { .dr-chain { flex-basis: 100%; } }
 
 /* Pop-out: a small Chain broke button left of −1; +1 gets a little narrower to make room. */
 .pip-break {

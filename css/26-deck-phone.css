@@ -1,0 +1,82 @@
+/* Bulbapedia link (Hunt Deck and Dex Entry), and the Hunt Deck on phones.
+   Files in css/ load in name order (index.html); later files win on equal selectors. */
+.wiki-link {
+  display: inline-flex; align-items: center; gap: 5px; height: 28px; padding: 0 11px; border-radius: 99px;
+  font-size: 12px; font-weight: 700; color: var(--muted); text-decoration: none;
+  background: var(--surface-2); border: 1px solid var(--border); transition: color .2s, border-color .2s;
+}
+.wiki-link span { font-family: var(--mono); font-size: 11px; }
+@media (hover: hover) { .wiki-link:hover { color: var(--text); border-color: var(--border-2); } }
+.dr-title .wiki-link { margin-top: 10px; vertical-align: middle; }
+/* A plain form label sits on one row with the link; a shiny-lock / event note keeps its own row. */
+.dr-title .dr-sub:not(:has(.status-note)) { display: inline-flex; vertical-align: middle; margin: 10px 6px 0 0; }
+.en-hero-text .wiki-link { margin: 0 0 10px; }
+@media (max-height: 640px) and (min-width: 561px) { .dr-title .wiki-link { display: none; } }
+
+/* ---------- Hunt Deck on phones ----------
+   Same look as on a computer (stage, name, cards), as a sheet from the bottom,
+   with a thumb dock (−1 / +1, Delete hunt, Gotcha!) that stays at the bottom. */
+@media (max-width: 560px) {
+  /* Both panels (Hunt Deck and Dex Entry) are sheets that stay clear of the notch / status bar. */
+  .drawer-panel {
+    top: calc(8px + env(safe-area-inset-top)); left: 0; right: 0; bottom: 0; width: 100%; height: auto;
+    border-radius: 26px 26px 0 0; border-bottom: 0; transform: translateY(100%);
+    box-shadow: 0 -24px 60px -20px rgba(0, 0, 0, .6);
+  }
+  /* The accent edge runs along the top of the sheet. */
+  #drawer .drawer-panel::before { left: 26px; right: 26px; top: 0; bottom: auto; width: auto; height: 3px; }
+
+  .dr-head { padding: 12px 12px 0 16px; }
+  .dr-pop { display: none; }
+  .dr-scroll { padding: 12px 12px 16px; gap: 10px; }
+
+  /* Stage: a smaller version of the computer one. */
+  .dr-stage { height: 178px; border-radius: 22px; }
+  .dr-stage::after { bottom: 20px; width: 110px; height: 16px; }
+  .dr-orbit { width: 156px; height: 156px; }
+  .dr-sprite { width: 132px; height: 132px; }
+  .dr-celebrate b { font-size: 22px; }
+
+  .dr-title { padding: 2px 0 0; }
+  .dr-meta { font-size: 10px; }
+  .dr-title h2 { font-size: 30px; }
+  .dr-title .wiki-link { height: 32px; padding: 0 13px; }
+
+  /* Encounters and Duration read as one card: the count, then the clock under a dashed line. */
+  .dr-card { padding: 14px; border-radius: 20px; }
+  .dr-counter { display: block; text-align: center; padding: 14px 14px 12px; border-radius: 20px 20px 0 0; border-bottom: 0; }
+  .dr-count { margin: 6px 0 4px; font-size: 60px; }
+  .dr-counter + .dr-row { margin-top: -10px; padding: 12px 12px 12px 16px; border-radius: 0 0 20px 20px; border-top: 1px dashed var(--border-2); }
+  .dr-row .dr-label { display: none; }
+  .dr-time { margin: 0 0 4px; font-size: 22px; }
+  .dr-hint { display: block; font-size: 11.5px; }
+  .dr-play { height: 44px; padding: 0 16px; border-radius: 13px; font-size: 13.5px; }
+  .dr-chain { margin-top: 8px; text-align: left; }
+
+  /* Thumb dock: −1 and a big +1, then Delete hunt and Gotcha!. */
+  .dr-foot {
+    flex-wrap: wrap; gap: 8px; padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
+    background:
+      radial-gradient(120% 140% at 50% 120%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+      var(--bg-2);
+  }
+  .dr-foot .dr-count-actions { order: -1; width: 100%; display: flex; gap: 8px; }
+  .dr-foot .dr-minus { width: 72px; height: 70px; border-radius: 20px; font-size: 17px; }
+  .dr-foot .dr-plus { flex: 1; width: auto; height: 70px; border-radius: 20px; font-size: 32px; }
+  .dr-foot .dr-plus.idle { font-size: 22px; }
+  .dr-foot .dr-plus kbd { display: none; }
+  .dr-foot .dr-cancel, .dr-foot .dr-gotcha { height: 50px; border-radius: 16px; }
+  .dr-foot .dr-cancel { padding: 0 14px; }
+  .dr-foot .dr-gotcha { font-size: 16px; }
+}
+/* Short phones (e.g. iPhone SE): a lower stage, so the count stays in view. */
+@media (max-width: 560px) and (max-height: 700px) {
+  .dr-stage { height: 132px; }
+  .dr-orbit { width: 118px; height: 118px; }
+  .dr-sprite { width: 100px; height: 100px; }
+  .dr-stage::after { bottom: 12px; width: 80px; }
+  .dr-title h2 { font-size: 26px; }
+  .dr-count { font-size: 52px; }
+  .dr-foot .dr-minus, .dr-foot .dr-plus { height: 60px; }
+  .dr-foot .dr-cancel, .dr-foot .dr-gotcha { height: 46px; }
+}

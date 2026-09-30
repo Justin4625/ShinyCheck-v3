@@ -21,7 +21,6 @@ export function card(m, gid) {
         <span class="no">#${m.dex}</span>${statusChip(m, gid)}
         ${found ? `<span class="shiny-count" title="${found} shiny found">${sparkSvg("", "#fff")}${found}</span>` : ""}
         ${via ? `<span class="via-chip" title="Counted via ${esc(viaLabel(m))} (Share across games)">via ${esc(loggedIn(m).map(g => GAME_INFO[g].abbr).join("·"))}</span>` : ""}
-        <a class="wiki" href="${m.url}" target="_blank" rel="noopener" title="Open on Bulbapedia">↗</a>
         ${sparkSvg("seal")}
       </div>
       <div class="sprite">${m.sprite ? `<img src="${m.sprite}" alt="" loading="lazy" decoding="async">` : `<span class="nosprite">?</span>`}</div>
@@ -42,7 +41,6 @@ export function init() {
     // The Shiny Dex and games without shinies (Red, Blue & Yellow) open Dex Entry; game pages open the Hunt Deck.
     const activate = c => root === el.cards || GAME_INFO[gameOf(c)].noShiny ? openEntry(+c.dataset.id) : openDrawer(+c.dataset.id, gameOf(c));
     root.addEventListener("click", e => {
-      if (e.target.closest(".wiki")) return;
       const c = e.target.closest(".pcard");
       if (c) activate(c);
     });

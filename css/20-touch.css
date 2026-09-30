@@ -18,10 +18,6 @@
 .dr-scroll, .sidebar, .gate, .roulette, .dr-phase-list { overscroll-behavior: contain; }
 
 @media (max-width: 560px) {
-  /* Panels stay clear of the notch / status bar (also when opened from the Home Screen). */
-  .drawer-panel { top: calc(6px + env(safe-area-inset-top)); bottom: calc(6px + env(safe-area-inset-bottom)); }
-  .dr-foot { padding-bottom: 10px; }
-
   /* Tap targets of at least ~40px. */
   .chip-toggle, .random-btn { height: 40px; }
   .hs-chip { min-height: 40px; padding: 8px 14px; font-size: 13.5px; border-radius: 12px; }
