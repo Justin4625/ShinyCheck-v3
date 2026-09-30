@@ -32,7 +32,8 @@ const GAME_LOCKS = {
   // Black & White and Black 2 & White 2: Reshiram, Zekrom, Keldeo and Meloetta can't be shiny in Gen 5 and Genesect only
   // via later events (Bulbapedia); Rotom is only an in-game trade, which is never shiny, and can't breed.
   bw: [479, 643, 644, 647, 648, 649],
-  bw2: [479, 643, 644, 647, 648, 649],
+  // Black 2 & White 2 also has Tornadus, Thundurus and Landorus in its dex, only via the Dream Radar.
+  bw2: [479, 641, 642, 643, 644, 645, 647, 648, 649],
   // Bulbapedia's shiny-lock table: in X & Y the legendary birds, Mewtwo and the Kalos trio can't be shiny.
   xy: [144, 145, 146, 150, 716, 717, 718],
   // Kyogre and Groudon are each only in one version, both locked there.
