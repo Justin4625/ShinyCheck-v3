@@ -6,8 +6,9 @@
 .topbar { display: none; }
 
 /* ---------- Sidebar ---------- */
+/* Only the nav scrolls; the logo stays on top and the foot (Install app and below) at the bottom. */
 .sidebar {
-  position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  position: sticky; top: 0; height: 100vh; overflow: hidden;
   display: flex; flex-direction: column; gap: 24px; padding: 26px 18px 20px;
   background: var(--bg-2); border-right: 1px solid var(--border);
   scrollbar-width: none;
@@ -22,7 +23,9 @@
 }
 @keyframes twinkle { 0%, 100% { transform: rotate(0) scale(1); } 50% { transform: rotate(45deg) scale(.86); } }
 
-.side-nav { display: flex; flex-direction: column; gap: 4px; }
+.side-nav { flex: 1; min-height: 0; overflow-y: auto; scrollbar-width: none; display: flex; flex-direction: column; gap: 4px; margin: 0 -6px; padding: 0 6px 18px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent); }
+.side-nav::-webkit-scrollbar { display: none; }
 .side-label { margin: 14px 10px 6px; font: 700 10px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
 .side-item {
   position: relative; display: grid; grid-template-columns: 22px 1fr auto; align-items: center; column-gap: 10px; row-gap: 7px;
@@ -39,7 +42,7 @@
 .side-bar { grid-column: 2 / 4; height: 3px; border-radius: 9px; background: var(--border); overflow: hidden; }
 .side-bar i { display: block; height: 100%; width: 0; border-radius: inherit; background: var(--g, var(--holo)); transition: width .6s cubic-bezier(.2, .8, .2, 1); }
 
-.side-foot { margin-top: auto; display: flex; flex-direction: column; gap: 10px; }
+.side-foot { flex: none; display: flex; flex-direction: column; gap: 10px; }
 .side-actions { display: flex; gap: 6px; }
 .ghost-btn {
   flex: 1; display: grid; place-items: center; height: 38px; padding: 0 10px; border-radius: 12px; cursor: pointer;

@@ -485,7 +485,7 @@ step("dex entry: evolve and undo", async () => {
 });
 step("dialogs", async () => {
   await nav("", 300);
-  for (const [open, dlg, close] of [["#backupsOpen", "#backups", "Escape"], ["#pushOpen", "#pushDlg", "Escape"], ["#v2Open", "#v2Import", "Escape"]]) {
+  for (const [open, dlg, close] of [["#backupsOpen", "#backups", "Escape"], ["#pushOpen", "#pushDlg", "Escape"]]) {
     if (!(await exists(open)) || await js(`document.querySelector(${JSON.stringify(open)}).hidden`)) continue;
     await click(open, 400);
     await capture(`dialog ${open}`);
@@ -493,7 +493,7 @@ step("dialogs", async () => {
   }
   await click("#themeBtn", 200); await capture("light theme"); await click("#themeBtn", 200);
 });
-step("export / import round trip", async () => {
+step("snapshot / restore round trip", async () => {
   const before = await js(`JSON.stringify(window.ShinyApp.snapshot())`);
   await js(`window.ShinyApp.applyData(JSON.parse(${JSON.stringify(before)}))`, 400);
   const after = await js(`JSON.stringify(window.ShinyApp.snapshot())`);

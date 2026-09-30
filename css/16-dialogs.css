@@ -1,4 +1,4 @@
-/* Dialogs (V2 import and the ones built on it) and the reCAPTCHA notice.
+/* Dialogs (the shared v2-* dialog styles, first made for the V2 import) and the reCAPTCHA notice.
    Files in css/ load in name order (index.html); later files win on equal selectors. */
 /* ---------- V2 import ---------- */
 .v2-banner {

@@ -5,7 +5,6 @@ import { el, state } from "../core/state.js";
 import { $ } from "../core/util.js";
 import { closeEntry } from "../features/dex-entry.js";
 import { closeDrawer, openDrawer } from "../features/hunt-deck/deck.js";
-import { renderV2Banner } from "../features/v2-import.js";
 import { GAME_INFO } from "../model/games.js";
 import { renderGame } from "./game.js";
 import { renderHome } from "./home.js";
@@ -14,7 +13,6 @@ import { renderStats } from "./stats.js";
 import { renderUpdates } from "./updates.js";
 
 export function render() {
-  renderV2Banner();
   $("#fShare").setAttribute("aria-pressed", sharing());
   el.home.classList.toggle("hidden", !!state.page || state.huntsView || state.statsView || state.updatesView);
   el.game.classList.toggle("hidden", !state.page);
