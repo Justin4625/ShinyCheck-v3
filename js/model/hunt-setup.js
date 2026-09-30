@@ -30,6 +30,12 @@ function dexNavOdds(level, chain, charm) {
   return Math.round(1 / ((1 - h) * base + h));
 }
 export const HUNT_SETUP = {
+  // Diamond & Pearl (RotomLabs, PokéTools): 1/8192, Masuda 5 rolls (1/1639), no Shiny Charm. Poké Radar: the
+  // chance a patch is shiny, ⌈65535 / (8200 − 200 × chain)⌉ / 65536, from 1/8192 at 0 to 1/200 at 40.
+  dp: { rate: 8192, methods: [["wild", "Wild", 1, []], ["radar", "Poké Radar", lv => lv("rchain"), ["rchain"]],
+    ["breed", "Breeding", 1, []], ["masuda", "Masuda", 5, []]],
+    bonus: [{ id: "rchain", label: "Chain", type: "level", live: true, tag: lv => `chain ${lv}`,
+      levels: [["0–9", 8192], ["10+", 5958], ["20+", 4096], ["30+", 2185], ["35", 1192], ["36", 993], ["37", 799], ["38", 596], ["39", 400], ["40", 200]] }] },
   // HeartGold & SoulSilver (RotomLabs): 1/8192; the Masuda Method gives 5 rolls (1/1639). No Shiny Charm.
   hgss: { rate: 8192, methods: [["wild", "Wild", 1, []], ["breed", "Breeding", 1, []], ["masuda", "Masuda", 5, []]], bonus: [] },
   // Black & White (RotomLabs): 1/8192, no Shiny Charm yet; the Masuda Method gives 6 rolls (1/1366).

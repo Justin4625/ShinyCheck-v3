@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "dp-2026-09",
+    date: "2026-09-30",
+    title: "Diamond & Pearl",
+    text: "Sinnoh is in: the Sinnoh dex, every Pokémon you can get beyond it (Trophy Garden, the Great Marsh, swarms, the Poké Radar) and Poké Radar hunts that count your chain, from 1 in 8,192 up to 1 in 200 at a chain of 40.",
+    steps: [
+      "Open **Diamond & Pearl** in the menu.",
+      "Start a hunt and pick **Poké Radar**; every **+1** grows your chain.",
+      "Chain broke? Tap **Chain broke** and keep going.",
+    ],
+    shot: "shots/updates/dp.webp",
+    action: { label: "Open Diamond & Pearl", go: "dp" },
+  },
+  {
     id: "radar-chain-2026-09",
     date: "2026-09-30",
     title: "Poké Radar chains",

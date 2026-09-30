@@ -198,7 +198,7 @@ step("home: search + region + filters", async () => {
   await click("#recShuffle");
 });
 step("home: share across games", async () => { await click("#fShare"); await click("#fShare"); });
-for (const g of ["hgss", "bw", "bw2", "xy", "oras", "sm", "usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"]) {
+for (const g of ["dp", "hgss", "bw", "bw2", "xy", "oras", "sm", "usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"]) {
   step(`game ${g}`, async () => {
     await nav(g, 500);
     expect(await exists(".dex-tabs .seg, #dexTabs .seg"), `${g}: dex tabs`);
@@ -286,6 +286,13 @@ step("hunt deck: more hunt methods", async () => {
   await click('#drSetup [data-hm="brilliant"]'); await click('#drSetup [data-hb="charm"]'); await click('#drSetup [data-hl="ko:5"]');
   expect((await odds()) === "1/456", `Brilliant Aura, 500+ battled, charm is 1/456, got ${await odds()}`);
   await click('#drSetup [data-hm="wild"]'); await click('#drSetup [data-hb="charm"]');
+  await key("Escape");
+  await open("dp", "starly");
+  await click('#drSetup [data-hm="radar"]');
+  expect((await odds()) === "1/8,192", `Diamond & Pearl radar at chain 0 is 1/8,192, got ${await odds()}`);
+  await click('#drSetup [data-hl="rchain:9"]');
+  expect((await odds()) === "1/200", `Diamond & Pearl radar at chain 40 is 1/200, got ${await odds()}`);
+  await click('#drSetup [data-hm="wild"]');
   await key("Escape");
   await open("hgss", "chikorita");
   await click('#drSetup [data-hm="masuda"]');

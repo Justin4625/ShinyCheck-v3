@@ -4,7 +4,7 @@ Shiny Dex and shiny-hunt tracker for Pokémon. Plain HTML, CSS and JavaScript (E
 no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 
 - **Shiny Dex** — all 1,081 Pokémon and forms. A card glows once a shiny of it is logged in any game.
-- **Games** — HeartGold & SoulSilver, Black & White, Black 2 & White 2, X & Y, Omega Ruby & Alpha Sapphire, Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
+- **Games** — Diamond & Pearl, HeartGold & SoulSilver, Black & White, Black 2 & White 2, X & Y, Omega Ruby & Alpha Sapphire, Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, pace (encounters per hour, time to odds), Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
 - **Forms** — cosmetic forms, switchable forms and gender differences (Vivillon, Furfrou, Flabébé, Rotom, …) as a checklist in Dex Entry; pick the form when adding, editing or hunting. Any form counts the species; forms are extra.
@@ -131,6 +131,8 @@ Chrome (dark theme; desktop at 1280×800 @2x, phones at 390×844 @3x) and saved 
 ## Data sources
 
 - Pokémon, forms, sprites and regional dex numbers: a Pokémon HOME Living Dex spreadsheet.
+- Diamond & Pearl: Sinnoh dex from PokeAPI (`original-sinnoh`), Outside the dex and locations from Serebii's
+  per-species pages (Pal Park, the dual-slot Game Boy Advance encounters, trades and events don't count).
 - HeartGold & SoulSilver: Johto dex from PokeAPI (`updated-johto`), Outside the dex and locations from
   Serebii's per-species pages (Pokéwalker counts; Pal Park, the event-only Sinjoh Ruins and trades don't).
 - Black & White: Unova dex from PokeAPI (`original-unova`), Outside the dex and locations from Serebii's
