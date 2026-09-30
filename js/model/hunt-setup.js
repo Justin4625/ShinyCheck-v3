@@ -31,6 +31,10 @@ function dexNavOdds(level, chain, charm) {
 export const HUNT_SETUP = {
   // Black & White (RotomLabs): 1/8192, no Shiny Charm yet; the Masuda Method gives 6 rolls (1/1366).
   bw: { rate: 8192, methods: [["wild", "Wild", 1, []], ["breed", "Breeding", 1, []], ["masuda", "Masuda", 6, []]], bonus: [] },
+  // Black 2 & White 2 (RotomLabs, Serebii): the Shiny Charm arrives, +2 rolls in the wild and for eggs
+  // (1/2731), Masuda with the charm 1/1024. Hidden Grotto Pokémon can never be shiny.
+  bw2: { rate: 8192, methods: [["wild", "Wild", 1, ["charm"]], ["breed", "Breeding", 1, ["charm"]], ["masuda", "Masuda", 6, ["charm"]]],
+    bonus: [{ ...CHARM, rolls: 2 }] },
   // Omega Ruby & Alpha Sapphire (RotomLabs): the Shiny Charm adds 2 rolls, 1 for regular eggs. Chain
   // fishing adds 2 rolls per hook in a row, up to 20 (1/100, 1/96 with the charm). A horde is 5 Pokémon
   // with their own rolls: 1/820 per horde, 1/274 with the charm. DexNav: see dexNavOdds.

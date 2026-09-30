@@ -4,7 +4,7 @@ Shiny Dex and shiny-hunt tracker for Pokémon. Plain HTML, CSS and JavaScript (E
 no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 
 - **Shiny Dex** — all 1,081 Pokémon and forms. A card glows once a shiny of it is logged in any game.
-- **Games** — Black & White, X & Y, Omega Ruby & Alpha Sapphire, Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
+- **Games** — Black & White, Black 2 & White 2, X & Y, Omega Ruby & Alpha Sapphire, Sun & Moon, Ultra Sun & Ultra Moon, Let's Go Pikachu & Eevee, Sword & Shield, BD & SP, Legends: Arceus, Scarlet & Violet and Legends: Z-A (incl. Mega Dimension), each with its regional dexes, an Outside the dex tab and per-game shiny locks.
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, pace (encounters per hour, time to odds), Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
 - **Forms** — cosmetic forms, switchable forms and gender differences (Vivillon, Furfrou, Flabébé, Rotom, …) as a checklist in Dex Entry; pick the form when adding, editing or hunting. Any form counts the species; forms are extra.
@@ -133,6 +133,7 @@ Chrome (dark theme; desktop at 1280×800 @2x, phones at 390×844 @3x) and saved 
 - Pokémon, forms, sprites and regional dex numbers: a Pokémon HOME Living Dex spreadsheet.
 - Black & White: Unova dex from PokeAPI (`original-unova`), Outside the dex and locations from Serebii's
   per-species pages (Dream World, Dream Radar, transfers and events don't count).
+- Black 2 & White 2: Unova dex from PokeAPI (`updated-unova`), Outside the dex and locations the same way.
 - X & Y: Kalos dex from PokeAPI's `kalos-central`, `kalos-coastal` and `kalos-mountain`, numbered on as one
   dex (Central 1–150, Coastal 151–303, Mountain 304–454), Outside the dex and locations from Serebii's per-species pages.
 - Omega Ruby & Alpha Sapphire: Hoenn dex from PokeAPI (`updated-hoenn`), Outside the dex and locations from

@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "bw2-2026-09",
+    date: "2026-09-30",
+    title: "Black 2 & White 2",
+    text: "The new Unova dex of Black 2 & White 2 is in, plus every Pokémon you can get beyond it (swarms, Hidden Grottos, the Nature Preserve, legends like the Regis and Latios & Latias). The Shiny Charm is here too: 1 in 2,731 in the wild, 1 in 1,024 with the Masuda Method.",
+    steps: [
+      "Open **Black 2 & White 2** in the menu.",
+      "Start a hunt and turn on the **Shiny Charm** if you have it.",
+      "Turn on **Count outside the dex** to count the Pokémon from other regions too.",
+    ],
+    shot: "shots/updates/bw2.webp",
+    action: { label: "Open Black 2 & White 2", go: "bw2" },
+  },
+  {
     id: "bw-2026-09",
     date: "2026-09-30",
     title: "Black & White",

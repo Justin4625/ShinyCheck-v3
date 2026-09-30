@@ -1,6 +1,8 @@
 // The tracked games: names, colours, logos, regional dex sections and dex-number helpers.
 // Sections are keyed by the letter prefix of the regional dex number in the sheet ("" = no prefix).
 export const GAME_INFO = {
+  bw2:  { name: "Black 2 & White 2", abbr: "B2W2", released: "2012-06-23", short: "B2 & W2", accent: "#2f6fb8", accent2: "#d9434f", logo: "logos/bw2Logo.png",
+          sections: [["", "Unova"]] },
   bw:   { name: "Black & White", abbr: "BW", released: "2010-09-18", accent: "#5d6474", accent2: "#d4d8e2", logo: "logos/bwLogo.png",
           sections: [["", "Unova"]] },
   xy:   { name: "X & Y", abbr: "XY", released: "2013-10-12", accent: "#1b6fd8", accent2: "#e2203b", logo: "logos/xyLogo.png",
