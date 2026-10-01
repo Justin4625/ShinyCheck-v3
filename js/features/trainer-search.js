@@ -1,5 +1,4 @@
-// Find trainers: a dialog to look up profiles by @username or name, opened from the sidebar
-// (Community) and the feed. Results are trainer rows with a Follow button, like the follower lists.
+// Find trainers: a dialog to look up profiles by @username or name, opened from the feed page. Results are trainer rows with a Follow button, like the follower lists.
 import { closeDlg, openDlg, wireDlg } from "../components/dialog.js";
 import { toast } from "../components/toast.js";
 import { $ } from "../core/util.js";
@@ -26,7 +25,6 @@ async function search() {
 }
 
 export function openTrainerSearch() {
-  document.body.classList.remove("menu-open");
   if (social.localOnly()) return toast("Finding trainers needs an account.");
   input.value = "";
   out.innerHTML = hint("Type at least 2 letters of a name or @username.");

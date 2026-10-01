@@ -63,7 +63,7 @@ body.gated { overflow: hidden; }
 .acc { display: flex; align-items: center; gap: 10px; padding: 10px; border-radius: 14px; background: var(--surface); border: 1px solid var(--border); }
 .acc-avatar {
   flex: none; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; object-fit: cover;
-  background: var(--holo); color: #14121f; font-weight: 800;
+  background: var(--surface-2); color: var(--text); border: 1px solid var(--border-2); font-weight: 800;
 }
 .acc-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
 .acc-text b { font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
