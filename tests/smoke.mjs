@@ -284,6 +284,27 @@ step("hunt deck: start, count, pause, gotcha", async () => {
   await key("Escape", 300);
   await key("Escape");
 });
+step("hunt deck: mark", async () => {
+  await nav("sv", 400);
+  await type("#gq", "lechonk");
+  await click(`#gameCards .pcard`, 400);
+  expect(!(await js(`document.getElementById("drMark").hidden`)), "Scarlet & Violet shows the mark picker");
+  await click("#drMark .fp-btn"); await click('#drMark .fp-opt[data-v="jumbo"]');
+  await click("#drPlus"); await click("#drPlus");
+  expect((await js(`document.querySelector('#drMark [name="mark"]').value`)) === "jumbo", "the mark stays when the hunt starts");
+  await capture("hunt deck with mark");
+  await click("#drGotcha"); await click("#drGotcha", 600);
+  const log = `JSON.parse(localStorage.getItem("shinycheck-v3-shinies"))["sv:" + DEX.find(m => m.key === "lechonk").id]`;
+  expect((await js(`(${log} || [])[0]?.mark`)) === "jumbo", "Gotcha logs the mark");
+  expect((await js(`document.querySelector('#drMark [name="mark"]').value`)) === "", "the next hunt starts without a mark");
+  expect((await text("#drLog")).includes("Jumbo Mark"), "the Hunt Deck log shows the mark");
+  await key("Escape");
+  await nav("bdsp", 400);
+  await type("#gq", "gible");
+  await click(`#gameCards .pcard`, 400);
+  expect(await js(`document.getElementById("drMark").hidden`), "no mark picker for a game without marks");
+  await key("Escape");
+});
 step("hunt deck: pace and ETA", async () => {
   await nav("sv", 400);
   await type("#gq", "sneasel");
@@ -630,6 +651,18 @@ step("phone layout", async () => {
     const cut = await js(`[...document.querySelectorAll("#drPaceStats b")].filter(b => b.scrollWidth > b.clientWidth).length`);
     expect(cut === 0, `pace numbers fit at ${w}px (${cut} cut off)`);
     await capture(`phone hunt deck pace ${w}`);
+  }
+  await key("Escape");
+  // Form and mark pickers together (Vivillon in Scarlet & Violet), with the mark list open.
+  await nav("sv", 400); await type("#gq", "vivillon"); await click("#gameCards .pcard", 500);
+  for (const w of [414, 390, 360]) {
+    await size(w, 800, true);
+    await click("#drMark .fp-btn", 300);
+    const wideMark = await js(`[...document.querySelectorAll("#drawer .dr-title *")].filter(e => { const r = e.getBoundingClientRect(); return r.width && r.right > innerWidth + 1; }).length`);
+    expect(wideMark === 0, `form and mark pickers fit a ${w}px phone (${wideMark})`);
+    expect((await js(`document.querySelector("#drMark .fp-btn").getBoundingClientRect().height`)) >= 40, `mark picker is a 40px+ tap target at ${w}px`);
+    await capture(`phone hunt deck mark ${w}`);
+    await click("#drMark .fp-btn", 200);
   }
   await size(360, 800, true);
   await key("Escape");

@@ -1,4 +1,4 @@
-// Mark picker: the form picker's dropdown with a game's marks (add and edit in Dex Entry).
+// Mark picker: the form picker's dropdown with a game's marks (add and edit in Dex Entry, the Hunt Deck).
 // A hidden input named "mark" carries the mark id ("" = no mark).
 import { esc, norm } from "../core/util.js";
 import { markOf, marksFor } from "../model/marks.js";
