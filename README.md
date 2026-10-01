@@ -14,6 +14,11 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
   own) with their catches, whole collection (big cards with every fact, or mini tiles; search by name or dex number, sort by newest, dex number or name, filter by game with chips for only the games they have shinies in), likes, followers and following. A new catch (Gotcha, a phase, or a manual log
   dated in the last 3 days) is posted by itself; editing or deleting it updates the post. Profiles are public by default
   and can be made private in Edit profile (name, unique @username, picture). The bell shows new followers and likes on your shinies. **Find trainers** (on the feed page) looks people up by name or @username. Emails are never shown.
+- **Admin dashboard** — `/admin`, only for the admin account (`ADMIN_UID` in `js/core/config.js`, `isAdmin()` in
+  `firestore.rules`; reached from the ⚙ menu): accounts, trainers online now / today / this week, community totals and the
+  Firestore usage (reads, writes, deletes, stored data) against the free plan's limits. Online comes from `presence/{uid}`,
+  stamped every 4 minutes while the app is open (`features/presence.js`). Usage comes from Google Cloud Monitoring through a
+  separate Google sign-in (scope `monitoring.read`, lasts an hour; the Cloud Monitoring API must be on for the project).
 - **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore.
 - **What's new** — update log at `/updates`, filled from `data/updates.js` (newest first). The newest entry shows once as a popup with a short tutorial and screenshot (`shots/updates/`) to people who already use ShinyCheck; "seen" is kept in the account and on the device. To announce an update, add an entry at the top.
 - **Notifications** — opt-in update news (Menu → Notifications), sent with Firebase Cloud Messaging.
@@ -41,10 +46,11 @@ js/                     the app, as ES modules
   core/                   config, storage (store.js), UI state, formatting, helpers
   model/                  game data and rules: games, dex, shiny locks, per-game dex, hunt odds, forms
   components/             reusable UI: card, form picker, game picker, hunt setup, toast, sidebar, …
-  pages/                  one per route: home (/), game (/sv …), hunts, stats, updates, feed, profile, plus the router
+  pages/                  one per route: home (/), game (/sv …), hunts, stats, updates, feed, profile, admin, plus the router
   features/               drawers and dialogs: hunt-deck/, dex-entry, share card, backups, …
   services/cloud.js       Firebase: sign-in, Firestore sync, backups, push tokens (separate module)
   services/social.js      community data: profiles, usernames, posts, likes, follows (through cloud.js's connection)
+  services/admin.js       admin dashboard data: counts, who's online, Firestore usage from Cloud Monitoring
 scripts/                bump-version (asset versions), gen-forms.py, send-push.mjs (notifications)
 tests/smoke.mjs         end-to-end smoke test in headless Chrome
 sprites/ types/ logos/ icons/ shots/   images

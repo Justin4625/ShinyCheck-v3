@@ -34,7 +34,7 @@ export function renderSidebar() {
         <span class="side-pct">no shinies</span>
       </a>`;
   }).join("");
-  document.querySelector('.side-item[data-page=""]').classList.toggle("active", !state.page && !state.huntsView && !state.statsView && !state.updatesView && !state.feedView && !state.profileId);
+  document.querySelector('.side-item[data-page=""]').classList.toggle("active", !state.page && !state.huntsView && !state.statsView && !state.updatesView && !state.feedView && !state.adminView && !state.profileId);
   document.querySelector('.side-item[data-page="feed"]').classList.toggle("active", state.feedView);
   document.querySelector('.side-item[data-page="trainer"]').classList.toggle("active", state.profileId === "me");
   document.querySelector('.side-item[data-page="stats"]').classList.toggle("active", state.statsView);

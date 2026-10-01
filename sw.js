@@ -6,7 +6,7 @@
 // - Fonts and the Firebase SDK: served from the cache, refreshed in the background.
 // Firestore, sign-in and other API calls are never touched (Firestore keeps its own offline copy).
 // Also shows push notifications (update news) and opens the app when one is tapped.
-const VERSION = "20261001110803"; // stamped by scripts/bump-version.sh on every commit
+const VERSION = "20261001114707"; // stamped by scripts/bump-version.sh on every commit
 const SHELL = `shinycheck-shell-${VERSION}`;
 const RUNTIME = "shinycheck-runtime-v1";
 const CORE = [
@@ -40,6 +40,7 @@ const CORE = [
   `css/25-side-foot.css?v=${VERSION}`,
   `css/26-deck-phone.css?v=${VERSION}`,
   `css/27-social.css?v=${VERSION}`,
+  `css/28-admin.css?v=${VERSION}`,
   `data/evolutions.js?v=${VERSION}`,
   `data/forms.js?v=${VERSION}`,
   `data/pokedex.js?v=${VERSION}`,
@@ -47,6 +48,7 @@ const CORE = [
   `js/components/avatar.js?v=${VERSION}`,
   `js/components/burst.js?v=${VERSION}`,
   `js/components/card.js?v=${VERSION}`,
+  `js/components/chart-tip.js?v=${VERSION}`,
   `js/components/dialog.js?v=${VERSION}`,
   `js/components/form-picker.js?v=${VERSION}`,
   `js/components/game-picker.js?v=${VERSION}`,
@@ -78,6 +80,7 @@ const CORE = [
   `js/features/landing-feed.js?v=${VERSION}`,
   `js/features/notifications.js?v=${VERSION}`,
   `js/features/post-actions.js?v=${VERSION}`,
+  `js/features/presence.js?v=${VERSION}`,
   `js/features/profile-collection.js?v=${VERSION}`,
   `js/features/profile-edit.js?v=${VERSION}`,
   `js/features/roulette.js?v=${VERSION}`,
@@ -98,6 +101,7 @@ const CORE = [
   `js/model/games.js?v=${VERSION}`,
   `js/model/hunt-pace.js?v=${VERSION}`,
   `js/model/hunt-setup.js?v=${VERSION}`,
+  `js/pages/admin.js?v=${VERSION}`,
   `js/pages/feed.js?v=${VERSION}`,
   `js/pages/game.js?v=${VERSION}`,
   `js/pages/home.js?v=${VERSION}`,
@@ -107,6 +111,7 @@ const CORE = [
   `js/pages/stats.js?v=${VERSION}`,
   `js/pages/toolbar.js?v=${VERSION}`,
   `js/pages/updates.js?v=${VERSION}`,
+  `js/services/admin.js?v=${VERSION}`,
   `js/services/cloud.js?v=${VERSION}`,
   `js/services/social.js?v=${VERSION}`,
   // files:end

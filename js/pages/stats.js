@@ -1,4 +1,5 @@
 // Stats page (/stats): Shiny Wrapped highlights, charts and the Wrapped share card.
+import { chartTips, tipAttr } from "../components/chart-tip.js";
 import { renderSidebar } from "../components/sidebar.js";
 import { shiniesOf } from "../core/collection.js";
 import { LOG_GAMES } from "../core/config.js";
@@ -43,8 +44,6 @@ function statsFor(list) {
   };
 }
 
-// Bars carry their numbers in data-tip; one shared tooltip shows it on hover or tap.
-const tipAttr = html => `data-tip="${esc(html)}" tabindex="0"`;
 const plural = (n, one, many = one + "s") => `${nf(n)} ${n === 1 ? one : many}`;
 
 export function renderStats() {
@@ -156,18 +155,6 @@ export function renderStats() {
   $("#stBody").dataset.period = period;
   renderSidebar();
 }
-// Tooltip for the charts: hover with a mouse, tap or focus on touch.
-const stTip = Object.assign(document.createElement("div"), { className: "st-tip", role: "tooltip" });
-const hideTip = () => stTip.classList.remove("show");
-function showTip(t) {
-  stTip.innerHTML = t.dataset.tip;
-  stTip.classList.add("show");
-  const r = t.getBoundingClientRect(), w = stTip.offsetWidth, h = stTip.offsetHeight;
-  const bar = t.querySelector(".st-col-bar, .st-row-track i") || t, br = bar.getBoundingClientRect();
-  stTip.style.left = Math.min(innerWidth - w - 8, Math.max(8, br.left + br.width / 2 - w / 2)) + "px";
-  stTip.style.top = (br.top - h - 10 < 8 ? r.bottom + 10 : br.top - h - 10) + "px";
-}
-
 async function drawWrappedCard(st, label) {
   const { W, x, F, M, HOLO, holo, spark, text, fit, spaced, panel, blob } = await cardCanvas("#ff7ad966", "#9d7bff80");
   const recent = [...st.list].sort((a, b) => (b.ts || 0) - (a.ts || 0)).slice(0, 6);
@@ -261,12 +248,7 @@ export function init() {
     const b = e.target.closest("[data-entry]");
     if (b) openEntry(+b.dataset.entry);
   });
-  document.body.append(stTip);
-  $("#stBody").addEventListener("pointerover", e => { const t = e.target.closest("[data-tip]"); t ? showTip(t) : hideTip(); });
-  $("#stBody").addEventListener("pointerleave", hideTip);
-  $("#stBody").addEventListener("focusin", e => { const t = e.target.closest("[data-tip]"); if (t) showTip(t); });
-  $("#stBody").addEventListener("focusout", hideTip);
-  addEventListener("scroll", hideTip, { passive: true });
+  chartTips($("#stBody"));
 
   $("#stShare").addEventListener("click", () => {
     const all = mons.flatMap(shiniesOf);

@@ -80,6 +80,8 @@ async function start() {
     },
     flush: () => flush(),
     fb: { db, fs, auth },
+    // For the admin dashboard's Google Cloud sign-in (services/admin.js).
+    googleClientId,
   };
 
   async function flush() {
