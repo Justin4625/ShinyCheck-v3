@@ -11,7 +11,7 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 - **Landing page** — shown before signing in (the gate in `index.html`): what shiny hunting is, the features with screenshots from `shots/`, and the sign-in card.
 - **Community** — a feed (`/feed`) of everyone's new catches ("For you") or of the trainers you follow ("Following"),
   with likes (tap the heart or double-tap the Pokémon). Every trainer has a profile (`/@username`, or `/trainer` for your
-  own) with their catches, whole collection (search by name or dex number, sort by newest, dex number or name, filter by game), likes, followers and following. A new catch (Gotcha, a phase, or a manual log
+  own) with their catches, whole collection (search by name or dex number, sort by newest, dex number or name, filter by game with chips for only the games they have shinies in), likes, followers and following. A new catch (Gotcha, a phase, or a manual log
   dated in the last 3 days) is posted by itself; editing or deleting it updates the post. Profiles are public by default
   and can be made private in Edit profile (name, unique @username, picture). The bell shows new followers. Emails are never shown.
 - **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore.

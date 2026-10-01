@@ -221,19 +221,30 @@
 .pc-search { flex: 1 1 240px; }
 .pc-sort { margin: 0; }
 .pc-sort .seg { padding: 8px 14px; }
-.pc-game {
-  height: 44px; padding: 0 34px 0 14px; border-radius: 14px; border: 1px solid var(--border); cursor: pointer;
-  font: 700 14px var(--font); color: var(--text); background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center / 14px;
-  appearance: none; max-width: 100%;
+.pc-games {
+  display: flex; gap: 6px; overflow-x: auto; margin: -6px -2px 16px; padding: 2px; scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent); mask-image: linear-gradient(90deg, #000 calc(100% - 28px), transparent);
 }
+.pc-games::-webkit-scrollbar { display: none; }
+.pc-chip {
+  flex: none; height: 40px; display: inline-flex; align-items: center; gap: 7px; padding: 0 14px; border-radius: 12px; cursor: pointer;
+  font: 750 13px var(--font); color: var(--muted); background: var(--surface); border: 1px solid var(--border); white-space: nowrap;
+}
+.pc-chip i { width: 8px; height: 8px; border-radius: 50%; background: linear-gradient(140deg, var(--accent), var(--accent2)); }
+.pc-chip small { font: 700 10px/1 var(--mono); color: var(--faint); }
+.pc-chip.on { color: var(--text); background: linear-gradient(var(--surface-2), var(--surface-2)) padding-box, linear-gradient(140deg, var(--accent, #9d7bff), var(--accent2, #5ee7ff)) border-box; border: 1.5px solid transparent; }
+.pc-chip.all.on { background: var(--text); color: var(--bg); border: 1px solid var(--text); }
+.pc-chip.all.on small { color: var(--bg); opacity: .6; }
+@media (hover: hover) { .pc-chip:hover { color: var(--text); border-color: var(--border-2); } }
+/* With a mouse, swiping isn't a thing: the chips wrap onto more lines instead. */
+@media (hover: hover) and (min-width: 561px) { .pc-games { flex-wrap: wrap; -webkit-mask-image: none; mask-image: none; } }
 .pc-bar .result-count { margin-left: auto; }
 .pf-no { font: 700 10px/1 var(--mono); color: var(--faint); }
 .pc-none { grid-column: 1 / -1; }
 @media (max-width: 560px) {
   .pc-bar { gap: 8px; }
   .pc-search { flex: 1 1 100%; }
-  .pc-sort { flex: 1 1 auto; display: flex; }
   .pc-sort .seg { flex: 1; justify-content: center; padding: 9px 10px; }
-  .pc-game { flex: 1 1 140px; font-size: 16px; }
-  .pc-bar .result-count { flex: 1 1 100%; margin: 0; }
+  .pc-sort { flex: 1 1 100%; display: flex; }
+  .pc-games { margin-right: -16px; padding-right: 16px; }
 }
