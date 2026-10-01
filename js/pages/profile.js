@@ -1,18 +1,17 @@
 // Trainer profile (/trainer/<uid>, /trainer = your own): picture, name, shinies, likes,
 // followers and following, a Follow button, and their catches and whole collection.
-import { avatar, monByKey, trainerHref } from "../components/avatar.js";
+import { avatar, trainerHref } from "../components/avatar.js";
 import { postCard } from "../components/post-card.js";
 import { renderSidebar } from "../components/sidebar.js";
 import { toast } from "../components/toast.js";
-import { fmtDate, nf } from "../core/format.js";
+import { nf } from "../core/format.js";
 import { state } from "../core/state.js";
 import { $, esc } from "../core/util.js";
 import { openFollowList } from "../features/follow-list.js";
+import { collectionView, paintCollection } from "../features/profile-collection.js";
 import { isLiked, remember, wirePosts } from "../features/post-actions.js";
 import { openProfileEdit } from "../features/profile-edit.js";
 import { skeleton } from "./feed.js";
-import { altSprite } from "../model/forms.js";
-import { GAME_INFO } from "../model/games.js";
 import * as social from "../services/social.js";
 
 // Everything shown for the trainer on screen; `uid` says whose it is.
@@ -113,7 +112,7 @@ function paint() {
         <p class="hero-sub">Joined ${new Date(p.joined).toLocaleDateString("en-GB", { month: "long", year: "numeric" })}${!p.public ? " · Private" : ""}</p>
       </div>
       <div class="pf-actions">
-        ${mine ? `<button class="pf-btn" data-pf-edit>Edit profile</button>`
+        ${mine ? `<button class="pf-btn ghost" data-pf-edit>Edit profile</button>`
           : `<button class="pf-btn pf-follow ${shown.following ? "on" : ""}" data-pf-follow aria-pressed="${shown.following}">${shown.following ? "Following" : "Follow"}</button>`}
         ${p.public ? `<button class="pf-btn ghost" data-pf-link>Share profile</button>` : ""}
       </div>
@@ -130,21 +129,8 @@ function paint() {
   body.innerHTML = note + tabs + (tab === "catches"
     ? (posts.length ? `<div class="post-grid">${posts.map(x => postCard(x, p, isLiked(x.id))).join("")}</div>`
       : `<p class="feed-empty">${mine ? "Your new catches show up here — and in the feed — as soon as you log them ✦" : "No catches posted yet."}</p>`)
-    : collectionGrid(collection, mine));
-}
-
-// Every logged shiny, newest first.
-function collectionGrid(list, mine) {
-  const tiles = [...list].sort((a, b) => (b.ts || 0) - (a.ts || 0)).map(c => {
-    const m = monByKey(c.k), g = GAME_INFO[c.g];
-    if (!m || !g) return "";
-    const facts = [c.c ? `${nf(c.c)} encounters` : "", c.m || "", c.ts ? fmtDate(c.ts) : ""].filter(Boolean).join(" · ");
-    return `<div class="pf-tile" style="--accent:${g.accent};--accent2:${g.accent2}" title="${esc(`${m.name} · ${g.name}${facts ? ` · ${facts}` : ""}`)}">
-        <img src="${altSprite(m, c.a)}" alt="" loading="lazy" decoding="async">
-        <b>${esc(m.name)}</b><span>${esc(g.abbr || g.name)}</span>
-      </div>`;
-  }).join("");
-  return tiles ? `<div class="pf-grid">${tiles}</div>` : `<p class="feed-empty">${mine ? "Log your first shiny and it shows up here." : "No shinies logged yet."}</p>`;
+    : collectionView(collection, mine, shown.uid));
+  if (tab === "collection") paintCollection();
 }
 
 async function toggleFollow(btn) {

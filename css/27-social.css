@@ -215,3 +215,25 @@
   .social-dlg { align-items: flex-end; padding: 0; }
   .social-dlg .rl-card { width: 100%; border-radius: 26px 26px 0 0; padding-bottom: calc(20px + env(safe-area-inset-bottom)); max-height: 88dvh; }
 }
+
+/* ---------- Profile Collection: search, sort, game filter (js/features/profile-collection.js) ---------- */
+.pc-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 16px; }
+.pc-search { flex: 1 1 240px; }
+.pc-sort { margin: 0; }
+.pc-sort .seg { padding: 8px 14px; }
+.pc-game {
+  height: 44px; padding: 0 34px 0 14px; border-radius: 14px; border: 1px solid var(--border); cursor: pointer;
+  font: 700 14px var(--font); color: var(--text); background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center / 14px;
+  appearance: none; max-width: 100%;
+}
+.pc-bar .result-count { margin-left: auto; }
+.pf-no { font: 700 10px/1 var(--mono); color: var(--faint); }
+.pc-none { grid-column: 1 / -1; }
+@media (max-width: 560px) {
+  .pc-bar { gap: 8px; }
+  .pc-search { flex: 1 1 100%; }
+  .pc-sort { flex: 1 1 auto; display: flex; }
+  .pc-sort .seg { flex: 1; justify-content: center; padding: 9px 10px; }
+  .pc-game { flex: 1 1 140px; font-size: 16px; }
+  .pc-bar .result-count { flex: 1 1 100%; margin: 0; }
+}

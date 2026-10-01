@@ -182,7 +182,7 @@ export function paintEntry() {
     : `<button class="en-add-btn" data-add-open><span>+</span> Add a shiny${altOf(m, viewAlt) ? ` ${esc(altOf(m, viewAlt).n)}` : " manually"}</button>`;
   if (adding) paintAddSetup(preset);
 
-  const games = GAMES.filter(gid => m.games[gid]);
+  const games = [...GAMES].reverse().filter(gid => m.games[gid]);  // newest game first
   $("#enGames").innerHTML = games.length
     ? games.map(gid => {
       const g = GAME_INFO[gid], h = hunts[hk(gid, m.id)];

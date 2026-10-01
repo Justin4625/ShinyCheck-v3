@@ -34,6 +34,7 @@ import { init as initFeed } from "./pages/feed.js";
 import { init as initProfile } from "./pages/profile.js";
 import { init as initFollowList } from "./features/follow-list.js";
 import { init as initProfileEdit } from "./features/profile-edit.js";
+import { init as initProfileCollection } from "./features/profile-collection.js";
 import { init as initSocialBell } from "./features/social-bell.js";
 
 // Event wiring, in the order the features depend on (e.g. which Escape handler runs first).
@@ -64,6 +65,7 @@ initFeed();
 initProfile();
 initFollowList();
 initProfileEdit();
+initProfileCollection();
 initSocialBell();
 
 // Bridge for services/cloud.js (a separate module that loads Firebase).
