@@ -155,7 +155,9 @@ async function capture(name) {
   }
   return s;
 }
-const click = (sel, wait = 250) => js(`(() => { const e = document.querySelector(${JSON.stringify(sel)}); if (!e) throw new Error("no element: " + ${JSON.stringify(sel)}); e.click(); })()`, wait);
+// Polls a page expression until it's truthy (or the time is up), so slow machines don't fail on fixed waits.
+const until = async (expr, ms = 10000) => { for (const end = Date.now() + ms; Date.now() < end; await sleep(50)) if (await js(expr)) return true; return false; };
+const click = async (sel, wait = 250) => { await until(`!!document.querySelector(${JSON.stringify(sel)})`, 3000); return js(`(() => { const e = document.querySelector(${JSON.stringify(sel)}); if (!e) throw new Error("no element: " + ${JSON.stringify(sel)}); e.click(); })()`, wait); };
 const exists = sel => js(`!!document.querySelector(${JSON.stringify(sel)})`);
 const text = sel => js(`(document.querySelector(${JSON.stringify(sel)}) || {}).textContent || ""`);
 const key = (k, wait = 150) => js(`document.dispatchEvent(new KeyboardEvent("keydown", { key: ${JSON.stringify(k)}, bubbles: true }))`, wait);
@@ -163,6 +165,7 @@ const type = (sel, value, wait = 300) => js(`(() => { const e = document.querySe
 const go = async (path, wait = 1200) => {
   await cdp("Page.navigate", { url: ORIGIN + path });
   await sleep(wait);
+  await until(`document.readyState === "complete" && !!window.DEX && document.querySelectorAll("#cards .pcard").length > 0`, 8000);
   await js(`document.getElementById("gate").hidden = true; document.body.classList.remove("gated", "locked")`);
 };
 const nav = (path, wait = 350) => js(`history.pushState(null, "", "/${path}"); dispatchEvent(new PopStateEvent("popstate"))`, wait);
@@ -182,11 +185,13 @@ step("home", async () => {
   await go("/");
   await js(SEED);
   await go("/");
+  await until(`document.querySelectorAll("#cards .pcard").length > 1000 && document.getElementById("statCaught").textContent === "10"`);
   expect(await js(`document.querySelectorAll("#cards .pcard").length`) > 1000, "Shiny Dex shows every entry");
   expect((await text("#statCaught")) === "10", `Shiny Dex counts the 10 entries with a shiny, got ${await text("#statCaught")}`);
 });
 step("home: search + region + filters", async () => {
   await type("#q", "vivi");
+  await until(`document.querySelectorAll("#cards .pcard").length === 1`);
   expect(await js(`document.querySelectorAll("#cards .pcard").length`) === 1, "search finds Vivillon");
   await type("#q", "");
   await click('#regions [data-gen="6"]');
@@ -250,7 +255,9 @@ step("hunt deck: start, count, pause, gotcha", async () => {
 step("hunt deck: pace and ETA", async () => {
   await nav("sv", 400);
   await type("#gq", "sneasel");
+  await until(`(c => c.length > 0 && c.length < 5 && /sneasel/i.test(c[0].textContent))(document.querySelectorAll("#gameCards .pcard"))`);
   await click(`#gameCards .pcard`, 400);
+  await until(`document.querySelectorAll("#drPaceStats b").length === 3`);
   // Demo hunt: 212 encounters in 30 minutes at 1/1365 → 424 an hour.
   const stats = await js(`[...document.querySelectorAll("#drPaceStats b")].map(b => b.textContent).join(" | ")`);
   expect(stats === "424 | ~2h 43m | ~3h 13m", `pace stats, got ${stats}`);
@@ -488,6 +495,7 @@ step("dex entry: evolve and undo", async () => {
   await openEntry("floette");
   await click(".en-row", 300);
   await click(".en-edit [data-devolve]", 500);
+  await until(`!!document.querySelector(".en-edit [data-evolve]")`);
   await capture("devolved to flabebe");
   await click(".en-edit [data-evolve]", 500);
   await capture("evolved again");
