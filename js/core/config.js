@@ -13,5 +13,5 @@ export const DEX_ONLY = ["rby"];
 // (isAdmin() in firestore.rules), so hiding the page is only cosmetic: the data stays locked.
 export const ADMIN_UID = "uKIRqdQ6OIfzQST0yUdGplTiWc73";
 // "Buy me a lunch" (js/features/support.js): the Ko-fi page (ko-fi.com/…) and the price of one "sandwich"
-// as set there. Empty URL = the sandwich button stays hidden.
+// as set there. Empty URL = no "Buy me a lunch" anywhere.
 export const SUPPORT_URL = "https://ko-fi.com/shinycheck", SUPPORT_PRICE = "€3";

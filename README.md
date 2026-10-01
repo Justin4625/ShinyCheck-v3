@@ -23,7 +23,7 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 - **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore. On start the app shows the landing page or the app straight away, from what this device saw last
   (`shinycheck-v3-signed-in`, read in `index.html`'s head); `services/cloud.js` corrects it once Firebase knows.
 - **What's new** — update log at `/updates`, filled from `data/updates.js` (newest first). The newest entry shows once as a popup with a short tutorial and screenshot (`shots/updates/`) to people who already use ShinyCheck; "seen" is kept in the account and on the device. To announce an update, add an entry at the top.
-- **Buy me a lunch** — a small sandwich button in the sidebar's bottom bar opens a dialog that links to ShinyCheck's Ko-fi
+- **Buy me a lunch** — "Buy me a lunch" in the sidebar's ⚙ menu and a small card at the bottom of What's new opens a dialog that links to ShinyCheck's Ko-fi
   page (`SUPPORT_URL` and `SUPPORT_PRICE` in `js/core/config.js`; the button stays hidden while the URL is empty,
   `js/features/support.js`). Paying happens only on Ko-fi.
 - **Notifications** — opt-in update news (Menu → Notifications), sent with Firebase Cloud Messaging.

@@ -1,6 +1,22 @@
-/* Buy me a lunch (js/features/support.js): the sandwich button in the sidebar's bottom bar and its dialog.
+/* Buy me a lunch (js/features/support.js): "Buy me a lunch" in the ⚙ menu, the card at the bottom of What's new, and the dialog.
    Files in css/ load in name order (index.html); later files win on equal selectors. */
-@media (hover: hover) { .support-ico:hover { color: #ffb347; } }
+/* ⚙ menu item */
+.sp-menu-item { gap: 10px; }
+.sp-menu-item svg, .sp-card-ico svg { flex: none; width: 17px; height: 17px; fill: none; stroke: #f4b860; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* Card at the bottom of What's new */
+.sp-card {
+  display: flex; align-items: center; gap: 14px; width: 100%; margin-top: 28px; padding: 16px 18px; border-radius: 18px; cursor: pointer;
+  text-align: left; font: inherit; font-size: 14px; line-height: 1.45; color: var(--muted);
+  background: linear-gradient(var(--surface), var(--surface)) padding-box, linear-gradient(120deg, #f4b860, #ff7ad9) border-box;
+  border: 1px solid transparent; transition: transform .15s;
+}
+.sp-card[hidden] { display: none; }
+.sp-card b { color: var(--text); }
+.sp-card-ico { flex: none; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: color-mix(in srgb, #f4b860 14%, transparent); }
+.sp-card-ico svg { width: 20px; height: 20px; }
+.sp-card-go { margin-left: auto; font-size: 18px; color: var(--text); }
+@media (hover: hover) { .sp-card:hover { transform: translateY(-2px); } }
 
 .support-dlg .rl-card { width: min(440px, 100%); max-height: calc(100dvh - 24px); overflow-y: auto; }
 .sp-art { display: block; width: 150px; height: auto; margin: 0 auto 6px; color: var(--text); animation: spBob 3.2s ease-in-out infinite; }

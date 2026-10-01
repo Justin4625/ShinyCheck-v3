@@ -549,7 +549,7 @@ step("dialogs", async () => {
 step("buy me a lunch", async () => {
   // Hidden until SUPPORT_URL (core/config.js) has a Stripe link.
   const url = await js(`import("/js/core/config.js").then(c => c.SUPPORT_URL)`);
-  expect((await js(`document.getElementById("supportBtn").hidden`)) === !url, "sandwich button shows only with a support link");
+  expect((await js(`document.querySelector("[data-support]").hidden`)) === !url, "Buy me a lunch shows only with a support link");
 });
 step("install explainer on a computer", async () => {
   // A stand-in for Chrome's beforeinstallprompt: the explainer comes first, then the browser's prompt.
