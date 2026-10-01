@@ -127,7 +127,7 @@ function paint() {
       <button class="seg ${tab === "collection" ? "active" : ""}" data-pf-tab="collection" role="tab">Collection <small>${nf(collection.length)}</small></button>
     </div>`;
   body.innerHTML = note + tabs + (tab === "catches"
-    ? (posts.length ? `<div class="post-grid">${posts.map(x => postCard(x, p, isLiked(x.id))).join("")}</div>`
+    ? (posts.length ? `<div class="post-grid">${posts.map(x => postCard(x, p, isLiked(x.id), mine)).join("")}</div>`
       : `<p class="feed-empty">${mine ? "Your new catches show up here — and in the feed — as soon as you log them ✦" : "No catches posted yet."}</p>`)
     : collectionView(collection, mine, shown.uid));
   if (tab === "collection") paintCollection();

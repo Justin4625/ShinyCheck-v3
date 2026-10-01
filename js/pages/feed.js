@@ -29,7 +29,7 @@ function paint() {
     b.classList.toggle("active", b.dataset.feedTab === tab);
     b.setAttribute("aria-selected", b.dataset.feedTab === tab);
   });
-  const cards = posts.map(p => postCard(p, authors.get(p.uid), isLiked(p.id))).join("");
+  const cards = posts.map(p => postCard(p, authors.get(p.uid), isLiked(p.id), p.uid === social.myUid())).join("");
   const empty = tab === "following"
     ? `<div class="feed-empty"><p>Nothing here yet. Follow trainers to see their catches in this tab.</p><button class="rl-again" data-feed-tab="all">Browse For you</button></div>`
     : `<p class="feed-empty">No catches yet. Log a shiny and it shows up here ✦</p>`;

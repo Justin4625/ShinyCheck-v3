@@ -54,7 +54,7 @@ export function wirePosts(root) {
       return toggleLike(postEl, on);
     }
     if (e.target.closest("[data-post-share]")) {
-      const s = postShiny(known.get(postEl.dataset.post) || {});
+      const p = known.get(postEl.dataset.post) || {}, s = p.uid === social.myUid() && postShiny(p);
       return s && openShare(s);
     }
     const stage = e.target.closest("[data-like-tap]");

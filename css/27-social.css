@@ -240,11 +240,19 @@
 @media (hover: hover) and (min-width: 561px) { .pc-games { flex-wrap: wrap; -webkit-mask-image: none; mask-image: none; } }
 .pc-bar .result-count { margin-left: auto; }
 .pf-no { font: 700 10px/1 var(--mono); color: var(--faint); }
-.pc-none { grid-column: 1 / -1; }
+.pc-none, .pc-more { grid-column: 1 / -1; }
+.pc-more { justify-self: center; }
+.pc-view { margin: 0; }
+.pc-view .seg { gap: 7px; padding: 8px 12px; }
+.pc-view svg { width: 15px; height: 15px; fill: currentColor; }
+.pc-dex { font: 700 12px/1 var(--mono); color: var(--muted); }
+.pc-card .post-actions { justify-content: flex-end; }
 @media (max-width: 560px) {
   .pc-bar { gap: 8px; }
   .pc-search { flex: 1 1 100%; }
   .pc-sort .seg { flex: 1; justify-content: center; padding: 9px 10px; }
-  .pc-sort { flex: 1 1 100%; display: flex; }
+  .pc-sort { flex: 1 1 0; display: flex; }
+  .pc-view .seg { padding: 9px 11px; }
+  .pc-view .seg span { display: none; }
   .pc-games { margin-right: -16px; padding-right: 16px; }
 }
