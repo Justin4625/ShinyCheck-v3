@@ -118,10 +118,10 @@ function paint() {
         ${p.public ? `<button class="pf-btn ghost" data-pf-link>Share profile</button>` : ""}
       </div>
     </div>
-    ${owner ? `<div class="pf-owner">${ownerLinks()}</div>` : ""}
     <div class="stats pf-stats">
       ${stat(hidden ? 0 : p.shinies, "Shinies")}${stat(likes, "Likes")}${stat(counts.followers, "Followers", "followers")}${stat(counts.following, "Following", "following")}
-    </div>`;
+    </div>
+    ${owner ? `<div class="pf-owner"><p class="pf-owner-label">Socials</p>${ownerLinks()}</div>` : ""}`;
   if (hidden) { body.innerHTML = `<p class="feed-empty">${esc(p.name)} keeps their shinies private.</p>`; return; }
   const note = mine && !p.public ? `<p class="pf-note">Your profile is private: only you see this. Turn it on in <b>Edit profile</b> to show up in the feed.</p>` : "";
   const tabs = `<div class="segmented pf-tabs" role="tablist">

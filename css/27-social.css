@@ -134,7 +134,7 @@
 .pf-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .pf-ghost { background: var(--surface-2); animation: ghost 1.4s ease-in-out infinite; }
 .pf-ghost-line { width: 240px; max-width: 100%; border-radius: 14px; background: var(--surface-2); }
-.pf-stats { position: relative; }
+.pf-stats { position: relative; margin-top: 0; }
 .pf-stat { font: inherit; color: inherit; text-align: left; cursor: pointer; }
 @media (hover: hover) { .pf-stat:hover { border-color: var(--border-2); background: var(--surface); } }
 .pf-tabs { margin: 0 0 16px; }

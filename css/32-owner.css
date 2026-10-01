@@ -21,10 +21,22 @@
 .pf-handle:has(.owner-badge) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
 .owner-badge svg { width: 12px; height: 12px; }
 .owner-badge svg use { fill: #14121f; }
-.pf-owner { position: relative; margin-top: 18px; }
+/* On the owner's profile: under the stats, as its own row of the hero card. */
+.pf-owner { position: relative; flex: 1 1 100%; min-width: 0; padding-top: 22px; border-top: 1px solid var(--border); }
+.pf-owner-label { margin: 0 0 12px; font: 700 11px/1 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--faint); }
 .pf-owner .owner-links { justify-content: flex-start; }
+.pf-owner .owner-link { min-height: 38px; font-size: 13px; }
 
 @media (max-width: 560px) {
   .site-foot { margin-top: 40px; }
   .owner-link { padding: 0 12px; font-size: 13px; }
+  /* Phones: the owner's socials as one swipeable row that runs to the card's edge. */
+  .pf-owner .owner-links {
+    flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; overscroll-behavior-x: contain; scroll-snap-type: x proximity;
+    margin: 0 -18px; padding: 0 18px 2px; scroll-padding: 0 18px;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 28px), transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 18px, #000 calc(100% - 28px), transparent);
+  }
+  .pf-owner .owner-links::-webkit-scrollbar { display: none; }
+  .pf-owner .owner-links li { flex: none; scroll-snap-align: start; }
 }
