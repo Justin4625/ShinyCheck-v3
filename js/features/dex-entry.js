@@ -19,7 +19,7 @@ import { markPost } from "./social-sync.js";
 import { EVENT_ONLY } from "../model/availability.js";
 import { mons, region, speciesOf } from "../model/dex.js";
 import { evolutionsOf } from "../model/evolutions.js";
-import { altOf, altSprite, altsOf, formText } from "../model/forms.js";
+import { altId, altOf, altSprite, altsOf, formText } from "../model/forms.js";
 import { codeLabel } from "../model/game-dex.js";
 import { GAME_INFO } from "../model/games.js";
 import { HUNT_SETUP, defaultSetup, evalSetup, patchSetup } from "../model/hunt-setup.js";
@@ -91,7 +91,7 @@ export function paintEntry() {
   const alts = altsOf(m), own = shiniesOf(m);
   $("#enAlts").hidden = !alts.length;
   if (alts.length) {
-    const gamesOf = id => [...new Set(own.filter(l => l.alt === id).map(l => GAME_INFO[l.g].abbr || GAME_INFO[l.g].name))];
+    const gamesOf = id => [...new Set(own.filter(l => altId(m, l.alt) === id).map(l => GAME_INFO[l.g].abbr || GAME_INFO[l.g].name))];
     const got = alts.filter(f => gamesOf(f.id).length).length, unset = own.filter(l => !altOf(m, l.alt)).length;
     // Long lists (Vivillon, Unown, Alcremie) start folded: collected forms plus the first ones, in order.
     const LIMIT = 12, fold = !altsAll && alts.length > LIMIT + 3;
@@ -114,7 +114,7 @@ export function paintEntry() {
   en.log.innerHTML = logs.length ? logs.map(l => {
     const g = GAME_INFO[l.g], key = `${l.g}:${l.m.id}:${l.i}`, open = editing === key;
     const d = new Date(l.ts), local = l.ts ? new Date(d - d.getTimezoneOffset() * 6e4).toISOString().slice(0, 16) : "";
-    const mark = !viewAlt ? "" : l.m.id === m.id && l.alt === viewAlt ? "hl" : "dim";
+    const mark = !viewAlt ? "" : l.m.id === m.id && altId(m, l.alt) === viewAlt ? "hl" : "dim";
     return `<li class="en-item ${open ? "open" : ""} ${mark}" style="--accent:${g.accent};--accent2:${g.accent2}">
         <button class="en-row" data-edit="${key}">
           <span class="en-thumb">${l.m.sprite ? `<img src="${altSprite(l.m, l.alt)}" alt="">` : ""}</span>

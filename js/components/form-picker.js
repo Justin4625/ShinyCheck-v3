@@ -1,7 +1,7 @@
 // Form picker: dropdown with sprites to choose a Pokémon's form (add, edit, Hunt Deck).
 import { $, esc, norm } from "../core/util.js";
 import { mons } from "../model/dex.js";
-import { altOf, altSprite, altsOf } from "../model/forms.js";
+import { altId, altOf, altSprite, altsOf } from "../model/forms.js";
 
 // Form picker: one dropdown for every place a form is chosen (add, edit, Hunt Deck). It is built
 // from data/forms.js only, so new forms show up by themselves. A hidden input carries the value and
@@ -14,13 +14,13 @@ const fpFace = (m, id) => {
 export const formPicker = (m, id, label = "Form") => {
   const alts = altsOf(m);
   return `<div class="fp" data-mon="${m.id}">
-      <input type="hidden" name="alt" value="${id && altOf(m, id) ? id : ""}">
+      <input type="hidden" name="alt" value="${altOf(m, id) ? altId(m, id) : ""}">
       <button type="button" class="fp-btn" aria-haspopup="listbox" aria-expanded="false" aria-label="${esc(label)}">${fpFace(m, id)}<svg class="fp-chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
       <div class="fp-pop" hidden>
         ${alts.length > FP_FILTER ? `<input type="search" class="fp-q" placeholder="Filter ${alts.length} forms…" aria-label="Filter forms" autocomplete="off">` : ""}
         <div class="fp-list" role="listbox" aria-label="${esc(label)}">
           <button type="button" role="option" class="fp-opt" data-v="" aria-selected="${!altOf(m, id)}"><span class="fp-none">?</span><span class="fp-label">Form not set</span></button>
-          ${alts.map(f => `<button type="button" role="option" class="fp-opt" data-v="${f.id}" data-q="${esc(norm(f.n))}" aria-selected="${f.id === id}">
+          ${alts.map(f => `<button type="button" role="option" class="fp-opt" data-v="${f.id}" data-q="${esc(norm(f.n))}" aria-selected="${f.id === altId(m, id)}">
             <img src="${altSprite(m, f.id)}" alt="" loading="lazy"><span class="fp-label">${esc(f.n)}</span></button>`).join("")}
         </div>
         <p class="fp-empty" hidden>No form matches.</p>
