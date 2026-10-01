@@ -12,3 +12,7 @@ export const DEX_ONLY = ["rby"];
 // The one account that sees the admin dashboard (/admin). Firestore's rules check the same uid
 // (isAdmin() in firestore.rules), so hiding the page is only cosmetic: the data stays locked.
 export const ADMIN_UID = "uKIRqdQ6OIfzQST0yUdGplTiWc73";
+// "Buy me a lunch" (js/features/support.js): a Stripe Payment Link for €2.99 (buy.stripe.com/…, public).
+// Empty = the sandwich button stays hidden. In Stripe, set "After payment" to redirect to
+// https://shinycheck.nl/?thanks=lunch so the app can say thank you.
+export const SUPPORT_URL = "";

@@ -1,0 +1,24 @@
+/* Buy me a lunch (js/features/support.js): the sandwich button in the sidebar's bottom bar and its dialog.
+   Files in css/ load in name order (index.html); later files win on equal selectors. */
+@media (hover: hover) { .support-ico:hover { color: #ffb347; } }
+
+.support-dlg .rl-card { width: min(440px, 100%); max-height: calc(100dvh - 24px); overflow-y: auto; }
+.sp-art { display: block; width: 150px; height: auto; margin: 0 auto 6px; color: var(--text); animation: spBob 3.2s ease-in-out infinite; }
+.sp-spark { transform-box: fill-box; transform-origin: center; animation: spTwinkle 2.4s ease-in-out infinite; }
+.sp-spark.two { animation-delay: -1.2s; }
+@keyframes spBob { 50% { transform: translateY(-4px); } }
+@keyframes spTwinkle { 50% { transform: scale(.55) rotate(20deg); opacity: .6; } }
+@media (prefers-reduced-motion: reduce) { .sp-art, .sp-spark { animation: none; } }
+.support-dlg .v2-title { margin-bottom: 8px; padding-right: 36px; }
+.sp-text { margin: 0 0 10px; color: var(--muted); font-size: 14.5px; line-height: 1.5; }
+.sp-text b { color: var(--text); }
+.support-dlg .rl-actions { margin-top: 16px; }
+.sp-go { display: grid; place-items: center; height: 48px; border-radius: 14px; font-weight: 750; font-size: 14px; text-decoration: none; flex: 1.6 !important; }
+.sp-fine { margin-top: 12px; text-align: center; }
+
+@media (max-width: 560px) {
+  .support-dlg .rl-card { padding: 22px 18px 18px; }
+  .sp-art { width: 128px; }
+  .support-dlg .rl-actions { flex-direction: column-reverse; }
+  .support-dlg .rl-actions > * { flex: none !important; width: 100%; }
+}
