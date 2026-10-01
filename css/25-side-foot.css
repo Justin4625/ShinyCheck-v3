@@ -26,8 +26,9 @@
 .side-menu[hidden] { display: none; }
 @keyframes side-menu-in { from { opacity: 0; transform: translateY(6px); } }
 .side-menu-item {
-  display: block; width: 100%; min-height: 40px; padding: 0 12px; border: 0; border-radius: 11px; background: none; cursor: pointer;
-  text-align: left; font-size: 14px; font-weight: 650; color: var(--text);
+  /* flex: the Admin dashboard link (an <a>) centres its text like the buttons do */
+  display: flex; align-items: center; width: 100%; min-height: 40px; padding: 0 12px; border: 0; border-radius: 11px; background: none; cursor: pointer;
+  text-align: left; font-size: 14px; font-weight: 650; color: var(--text); text-decoration: none;
 }
 .side-menu-item[hidden] { display: none; }
 .side-menu-item.danger { color: #ff5f7a; }

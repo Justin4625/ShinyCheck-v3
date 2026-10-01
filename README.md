@@ -16,9 +16,9 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
   and can be made private in Edit profile (name, unique @username, picture). The bell shows new followers and likes on your shinies. **Find trainers** (on the feed page) looks people up by name or @username. Emails are never shown.
 - **Admin dashboard** — `/admin`, only for the admin account (`ADMIN_UID` in `js/core/config.js`, `isAdmin()` in
   `firestore.rules`; reached from the ⚙ menu): accounts, trainers online now / today / this week, community totals and the
-  Firestore usage (reads, writes, deletes, stored data) against the free plan's limits. Online comes from `presence/{uid}`,
-  stamped every 4 minutes while the app is open (`features/presence.js`). Usage comes from Google Cloud Monitoring through a
-  separate Google sign-in (scope `monitoring.read`, lasts an hour; the Cloud Monitoring API must be on for the project).
+  free plan's Firestore limits with a link to the usage page in the Firebase console (reading the numbers in the app would
+  need Google's Monitoring API, which needs billing). Online comes from `presence/{uid}`, stamped every 4 minutes while
+  the app is open (`features/presence.js`).
 - **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore.
 - **What's new** — update log at `/updates`, filled from `data/updates.js` (newest first). The newest entry shows once as a popup with a short tutorial and screenshot (`shots/updates/`) to people who already use ShinyCheck; "seen" is kept in the account and on the device. To announce an update, add an entry at the top.
 - **Notifications** — opt-in update news (Menu → Notifications), sent with Firebase Cloud Messaging.
@@ -50,7 +50,7 @@ js/                     the app, as ES modules
   features/               drawers and dialogs: hunt-deck/, dex-entry, share card, backups, …
   services/cloud.js       Firebase: sign-in, Firestore sync, backups, push tokens (separate module)
   services/social.js      community data: profiles, usernames, posts, likes, follows (through cloud.js's connection)
-  services/admin.js       admin dashboard data: counts, who's online, Firestore usage from Cloud Monitoring
+  services/admin.js       admin dashboard data: counts, who's online, the free plan's limits
 scripts/                bump-version (asset versions), gen-forms.py, send-push.mjs (notifications)
 tests/smoke.mjs         end-to-end smoke test in headless Chrome
 sprites/ types/ logos/ icons/ shots/   images

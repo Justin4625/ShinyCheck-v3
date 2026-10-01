@@ -1,48 +1,12 @@
-/* Admin dashboard (/admin, js/pages/admin.js): usage meters, per-day charts, who's online, totals.
-   Reuses the Stats page's cards, columns and tooltip (13-stats.css). */
-:root { --ad-ok: #15803d; --ad-warn: #c26a00; --ad-bad: #d92d3a; }
-:root[data-theme="dark"] { --ad-ok: #3ccf8e; --ad-warn: #f5b33d; --ad-bad: #ff6b78; }
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --ad-ok: #3ccf8e; --ad-warn: #f5b33d; --ad-bad: #ff6b78; }
-}
+/* Admin dashboard (/admin, js/pages/admin.js): database usage link, who's online, totals.
+   Reuses the Stats page's cards (13-stats.css). */
 
 .ad-hero { margin-bottom: 18px; }
 .ad-refresh { position: relative; align-self: flex-start; }
 #adBody > .feed-empty { margin-bottom: 40px; }
 
 .ad-note { margin: 0 0 16px; color: var(--muted); font-size: 14px; max-width: 60ch; }
-.ad-error { margin: 0 0 16px; padding: 10px 14px; border-radius: 12px; font-size: 13.5px; background: color-mix(in srgb, var(--ad-bad) 10%, transparent); }
-.ad-error a { color: inherit; font-weight: 750; }
-.ad-link { padding: 0; border: 0; background: none; color: var(--text); font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; }
-
-/* ---------- Quota meters ---------- */
-.ad-meters { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
-.ad-meter { min-width: 0; padding: 14px 16px; border-radius: 16px; background: var(--surface-2); border: 1px solid var(--border); --lv: var(--faint); }
-.ad-meter.ok { --lv: var(--ad-ok); }
-.ad-meter.warn { --lv: var(--ad-warn); }
-.ad-meter.bad { --lv: var(--ad-bad); }
-.ad-meter-head, .ad-meter-foot { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.ad-meter-head b { font-size: 15px; font-weight: 800; }
-.ad-meter-head span, .ad-meter-foot { font: 700 10px/1.3 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.ad-meter-foot { margin-top: 10px; flex-direction: column; align-items: flex-start; gap: 6px; }
-.ad-meter-foot b { font: 800 20px/1 var(--font); letter-spacing: -.03em; color: var(--text); text-transform: none; font-variant-numeric: tabular-nums; }
-.ad-meter-track { height: 10px; margin-top: 12px; border-radius: 5px; background: var(--border); overflow: hidden; }
-.ad-meter-track i { display: block; height: 100%; border-radius: 5px; background: var(--lv); transition: width .4s; }
-/* The level in words, with a shape (not colour alone): ● fine, ▲ close, ■ at the limit. */
-.ad-level { display: inline-flex; align-items: center; gap: 5px; color: var(--text); }
-.ad-level::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--lv); }
-.ad-meter.warn .ad-level::before { border-radius: 0; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
-.ad-meter.bad .ad-level::before { border-radius: 1px; }
-
-/* ---------- Per-day charts ---------- */
-.ad-charts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; margin-top: 22px; }
-.ad-chart { min-width: 0; }
-.ad-chart-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
-.ad-chart-head b { font-size: 14px; font-weight: 800; }
-.ad-chart-head span { font: 700 10px/1 var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
-.ad-cols { height: 130px; }
-.ad-today .st-col-bar { background: color-mix(in srgb, var(--st-bar) 55%, transparent); outline: 1.5px dashed var(--st-bar); outline-offset: -1.5px; }
-.ad-today .st-col-label { color: var(--text); }
+.ad-usage-go { display: inline-flex; align-items: center; justify-content: center; margin-top: 16px; min-height: 44px; text-decoration: none; }
 
 /* ---------- Online now ---------- */
 .ad-people { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; max-height: 340px; overflow-y: auto; }
@@ -61,16 +25,8 @@
 .ad-list dt small { color: var(--muted); font-weight: 500; font-size: 12.5px; margin-left: 4px; }
 .ad-list dd { margin: 0; font: 700 15px/1 var(--mono); font-variant-numeric: tabular-nums; }
 
-@media (max-width: 900px) {
-  .ad-meters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ad-charts { grid-template-columns: 1fr; }
-}
 @media (max-width: 560px) {
   .ad-hero .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .ad-usage .st-card-head { flex-direction: column; align-items: flex-start; gap: 6px; }
   .ad-refresh { position: absolute; top: 14px; right: 14px; height: 40px; padding: 0 12px; font-size: 13px; }
-  .ad-meters { gap: 8px; }
-  .ad-meter { padding: 12px; }
-  .ad-meter-foot b { font-size: 17px; }
-  .ad-cols { height: 110px; }
+  .ad-usage-go { width: 100%; }
 }
