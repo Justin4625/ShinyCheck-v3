@@ -12,6 +12,20 @@
 .lp-links a { padding: 9px 12px; border-radius: 10px; color: var(--muted); font-weight: 650; font-size: 14px; text-decoration: none; }
 .lp-links a:hover { color: var(--text); background: var(--surface); }
 .lp-theme { flex: none; }
+/* Home / Feed tabs (js/features/landing-feed.js) */
+.lp-tabs { margin: 0; flex: none; }
+.lp-tabs .seg { padding: 8px 14px; }
+.lp-feedpane { max-width: 1180px; margin: 0 auto; padding: 24px 24px 56px; }
+.lp-feedpane .lp-head .lp-cta { justify-content: flex-start; margin-top: 18px; }
+.lp-feat-go { margin-top: 8px; }
+.gated .toast { z-index: 300; }
+@media (max-width: 720px) {
+  /* Phones: the tabs get their own full-width row under the logo bar. */
+  .lp-nav { flex-wrap: wrap; row-gap: 10px; }
+  .lp-tabs { order: 5; flex: 1 1 100%; display: flex; }
+  .lp-tabs .seg { flex: 1; justify-content: center; padding: 9px 12px; }
+  .lp-feedpane { padding: 20px 16px 48px; }
+}
 .lp-signin { flex: none; height: 40px; padding: 0 18px; border-radius: 12px; cursor: pointer; font-weight: 750; font-size: 14px; color: var(--bg); background: var(--text); border: 0; }
 
 .lp-hero, .lp-section, .lp-final, .lp-foot { position: relative; width: min(1180px, 100% - 48px); margin: 0 auto; }

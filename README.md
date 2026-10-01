@@ -8,7 +8,7 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, pace (encounters per hour, time to odds), a live chain counter for the Poké Radar, chain fishing and the DexNav, Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
 - **Forms** — cosmetic forms, switchable forms and gender differences (Vivillon, Furfrou, Flabébé, Rotom, …) as a checklist in Dex Entry; pick the form when adding, editing or hunting. Any form counts the species; forms are extra.
-- **Landing page** — shown before signing in (the gate in `index.html`): what shiny hunting is, the features with screenshots from `shots/`, and the sign-in card.
+- **Landing page** — shown before signing in (the gate in `index.html`): what shiny hunting is, the features with screenshots from `shots/`, and the sign-in card. Its **Feed** tab shows everyone's newest catches read-only (`js/features/landing-feed.js`); liking or opening a trainer asks to create an account. Firestore lets anyone read posts and public profiles for this.
 - **Community** — a feed (`/feed`) of everyone's new catches ("For you") or of the trainers you follow ("Following"),
   with likes (tap the heart or double-tap the Pokémon). Every trainer has a profile (`/@username`, or `/trainer` for your
   own) with their catches, whole collection (big cards with every fact, or mini tiles; search by name or dex number, sort by newest, dex number or name, filter by game with chips for only the games they have shinies in), likes, followers and following. A new catch (Gotcha, a phase, or a manual log

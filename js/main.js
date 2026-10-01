@@ -36,6 +36,7 @@ import { init as initFollowList } from "./features/follow-list.js";
 import { init as initProfileEdit } from "./features/profile-edit.js";
 import { init as initProfileCollection } from "./features/profile-collection.js";
 import { init as initTrainerSearch } from "./features/trainer-search.js";
+import { init as initLandingFeed } from "./features/landing-feed.js";
 import { init as initSocialBell } from "./features/social-bell.js";
 
 // Event wiring, in the order the features depend on (e.g. which Escape handler runs first).
@@ -68,6 +69,7 @@ initFollowList();
 initProfileEdit();
 initProfileCollection();
 initTrainerSearch();
+initLandingFeed();
 initSocialBell();
 
 // Bridge for services/cloud.js (a separate module that loads Firebase).

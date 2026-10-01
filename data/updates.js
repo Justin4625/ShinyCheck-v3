@@ -10,6 +10,19 @@
 //   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
 window.UPDATES = [
   {
+    id: "find-trainers-2026-10",
+    date: "2026-10-01",
+    title: "Find trainers & a new collection view",
+    text: "Look up other trainers by name or @username, and browse anyone's collection as big cards with all the facts. The feed is now also on the ShinyCheck home page, so friends can have a look before they sign up.",
+    steps: [
+      "On the **Feed**, tap **Find trainers** and type a name or @username. Follow them right from the list.",
+      "On a profile, open **Collection**: search by name or dex number, sort by **Newest**, **Dex #** or **A–Z**, and filter by game. **Mini** switches to small tiles.",
+      "Only your own shinies have a share button now.",
+    ],
+    shot: "shots/feed.webp",
+    action: { label: "Open the feed", go: "feed" },
+  },
+  {
     id: "community-2026-09",
     date: "2026-09-30",
     title: "Community: feed, profiles & follows",

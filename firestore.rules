@@ -63,7 +63,8 @@ service cloud.firestore {
           && d.createdAt is timestamp
           && d.updatedAt == request.time;
       }
-      allow read: if signedIn();
+      // Visitors without an account see the feed on the landing page, with the authors' public profiles.
+      allow read: if signedIn() || resource.data.public == true;
       allow create: if signedIn() && me() == uid && validProfile(request.resource.data)
         && request.resource.data.createdAt == request.time;
       allow update: if signedIn() && me() == uid && validProfile(request.resource.data)
@@ -108,7 +109,9 @@ service cloud.firestore {
           && num(d.likes);
       }
       function likeRef() { return /databases/$(database)/documents/likes/$(me() + '_' + postId); }
-      allow read: if signedIn();
+      // Posts only exist for public profiles (social-sync deletes them when one goes private), so
+      // anyone may read them: the landing page shows the feed before signing in.
+      allow read: if true;
       allow create: if signedIn() && request.resource.data.uid == me()
         && postId.matches(me() + '_[A-Za-z0-9]{6,24}')
         && validPost(request.resource.data) && request.resource.data.likes == 0;
