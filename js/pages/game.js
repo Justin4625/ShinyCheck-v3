@@ -4,17 +4,28 @@ import { sparkSvg } from "../components/icons.js";
 import { setRing, updateSection } from "../components/progress.js";
 import { empty, sectionHtml } from "../components/section.js";
 import { renderSidebar } from "../components/sidebar.js";
-import { done, gHas, matchText, pct } from "../core/collection.js";
+import { done, gHas, matchText, pct, sharing, shiniesOf } from "../core/collection.js";
 import { fmtPct } from "../core/format.js";
 import { el, state } from "../core/state.js";
-import { hk, hunts, isActive } from "../core/store.js";
+import { hk, hunts, isActive, shinies } from "../core/store.js";
 import { $, esc } from "../core/util.js";
 import { lockedIn } from "../model/availability.js";
+import { activeCount, matches, sorter } from "../model/dex-filter.js";
 import { mons } from "../model/dex.js";
 import { inGamePool, isExtraForm } from "../model/game-dex.js";
 import { GAME_INFO, codeIn, gameGrad, gameNum } from "../model/games.js";
 
 const inTab = (gid, p) => m => p === "O" ? !!m.games[gid] && isExtraForm(m, gid) : !!codeIn(m, gid, p) && !isExtraForm(m, gid);
+
+// Filter & sort (js/features/filter-sheet.js) on a game page looks at that game only
+// (plus shinies from other games while Share across games is on, like the cards do).
+const gameCtx = gid => ({
+  caught: gHas(gid),
+  hunting: m => isActive(hunts[hk(gid, m.id)]),
+  locked: m => lockedIn(m, gid),
+  lastCaught: m => Math.max(0, ...(sharing() ? shiniesOf(m) : shinies[hk(gid, m.id)] || []).map(s => s.ts || 0)),
+  encounters: m => isActive(hunts[hk(gid, m.id)]) ? hunts[hk(gid, m.id)].count || 0 : 0,
+});
 
 export function renderGame() {
   const gid = state.page, g = GAME_INFO[gid];
@@ -38,7 +49,9 @@ export function renderGame() {
       <span class="live-dot ${huntList.some(m => hunts[hk(gid, m.id)].since) ? "on" : ""}"></span>Hunts<small>${huntList.length}</small></button>`);
 
   if (state.tab === "hunts") {
-    const items = huntList.filter(m => matchText(m, el.gq));
+    const ctx = gameCtx(gid);
+    const items = huntList.filter(m => matchText(m, el.gq) && matches(state.gf, ctx)(m));
+    if (state.gf.sort !== "dex") items.sort(sorter(state.gf, ctx, () => 0));
     $("#gCount").textContent = `${items.length} active`;
     el.gameCards.className = "game-mode";
     el.gameCards.innerHTML = items.length
@@ -50,15 +63,16 @@ export function renderGame() {
 
   const section = g.sections.find(([p]) => p === state.tab);
   const tabAll = all.filter(inTab(gid, state.tab));
+  const ctx = gameCtx(gid);
   const items = tabAll
-    .filter(m => matchText(m, el.gq) && !(state.gMissing && gHas(gid)(m)))
-    .sort(state.tab === "O" ? (x, y) => +x.dex - +y.dex || x.id - y.id
-      : (x, y) => gameNum(codeIn(x, gid, state.tab)) - gameNum(codeIn(y, gid, state.tab)) || x.id - y.id);
+    .filter(m => matchText(m, el.gq) && matches(state.gf, ctx)(m))
+    .sort(sorter(state.gf, ctx, state.tab === "O" ? (x, y) => +x.dex - +y.dex || x.id - y.id
+      : (x, y) => gameNum(codeIn(x, gid, state.tab)) - gameNum(codeIn(y, gid, state.tab)) || x.id - y.id));
   $("#gCount").textContent = `${items.length} shown`;
   el.gameCards.className = "game-mode";
   el.gameCards.innerHTML = items.length
     ? sectionHtml(String(g.sections.indexOf(section) + 1).padStart(2, "0"), (section[0] === "O" ? section[1] : section[1] + " Dex"), "tab", tabAll.filter(m => !lockedIn(m, gid)), items, gameGrad(g), gid)
-    : empty(el.gq);
+    : empty(el.gq, activeCount(state.gf));
   renderGameStats();
 }
 

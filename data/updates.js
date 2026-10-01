@@ -7,8 +7,22 @@
 //   text    one or two sentences on what it is
 //   steps   optional mini tutorial for the popup and the log (plain text, **bold** allowed)
 //   shot    optional screenshot (phone, portrait, WebP in shots/updates/ or shots/)
-//   action  optional button: { label, go } with go = a page ("stats", "sv") or "entry:<keyword>" (Dex Entry)
+//   action  optional button: { label, go } with go = a page ("stats", "sv"), "entry:<keyword>" (Dex Entry)
+//           or "filter" (the Shiny Dex with Filter & sort open)
 window.UPDATES = [
+  {
+    id: "filter-sort-2026-10",
+    date: "2026-10-01",
+    title: "Filter & sort",
+    text: "Find the shiny you're after faster. Filter the Shiny Dex and every game by type or by what you've caught, are missing or are hunting, and sort by dex number, name, recently caught or most encounters.",
+    steps: [
+      "Tap **Filter & sort** next to the search bar, on the Shiny Dex or any game page.",
+      "Pick **Missing**, **Caught** or **Hunting**, and one or two types (two = a dual type, like Fire/Flying).",
+      "Sort by **Recently caught** to see your newest shinies first. **Reset** sets everything back.",
+    ],
+    shot: "shots/updates/filters.webp",
+    action: { label: "Try Filter & sort", go: "filter" },
+  },
   {
     id: "find-trainers-2026-10",
     date: "2026-10-01",

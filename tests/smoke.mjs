@@ -204,6 +204,37 @@ step("home: search + region + filters", async () => {
   await click("#recShuffle");
 });
 step("home: share across games", async () => { await click("#fShare"); await click("#fShare"); });
+step("filter & sort", async () => {
+  const ids = `[...document.querySelectorAll("#cards .pcard")].map(c => +c.dataset.id)`;
+  await click('[data-filter="home"]', 300);
+  expect(!(await js(`document.getElementById("filterDlg").hidden`)), "Filter & sort opens");
+  await click('#filterBody [data-group="types"] [data-v="fire"]');
+  await click('#filterBody [data-group="types"] [data-v="flying"]');
+  expect(await js(`${ids}.length > 0 && ${ids}.every(id => ["fire", "flying"].every(t => DEX.find(m => m.id === id).types.includes(t)))`), "two types = dual type");
+  await capture("filter dual type");
+  await click('#filterBody [data-clear="types"]');
+  await click('#filterBody [data-group="show"] [data-v="caught"]');
+  expect((await js(`${ids}.length`)) === 10, `Show caught: the 10 entries with a shiny, got ${await js(`${ids}.length`)}`);
+  await click('#filterBody [data-group="sort"] [data-v="recent"]');
+  expect((await js(`${ids}[0]`)) === (await js(`DEX.find(m => m.key === "furfrou").id`)), "Recently caught puts Furfrou (2 days ago) first");
+  expect((await text("#filterDone")) === "Show 10", `Done button shows the count, got ${await text("#filterDone")}`);
+  await capture("filter caught recent");
+  await key("Escape", 300);
+  expect((await text('[data-filter="home"] .filter-badge')) === "2", "badge counts the active settings");
+  await click("#fMissing");
+  expect((await js(`document.getElementById("fMissing").getAttribute("aria-pressed")`)) === "true", "Missing only = Show: Missing");
+  await click('[data-filter="home"]', 300);
+  await click("#filterReset");
+  expect(await js(`document.getElementById("fMissing").getAttribute("aria-pressed") === "false" && document.querySelector('[data-filter="home"] .filter-badge').hidden`), "Reset clears everything");
+  await key("Escape", 300);
+  await nav("sv", 400);
+  await click('[data-filter="game"]', 300);
+  await click('#filterBody [data-group="show"] [data-v="hunting"]');
+  expect((await js(`[...document.querySelectorAll("#gameCards .pcard")].map(c => +c.dataset.id).join()`)) === String(await js(`DEX.find(m => m.key === "sneasel").id`)), "Show hunting on SV: only Sneasel");
+  await click("#filterReset");
+  await key("Escape", 300);
+  await nav("", 300);
+});
 for (const g of ["gs", "crystal", "rs", "frlg", "emerald", "dp", "pt", "hgss", "bw", "bw2", "xy", "oras", "sm", "usum", "lgpe", "swsh", "bdsp", "pla", "sv", "lza"]) {
   step(`game ${g}`, async () => {
     await nav(g, 500);
@@ -589,6 +620,19 @@ step("phone layout", async () => {
   const overflow = await js(`[...document.querySelectorAll("#entry.open *")].filter(e => { const r = e.getBoundingClientRect(); return r.width && r.right > innerWidth + 1; }).length`);
   expect(overflow === 0, `nothing wider than the phone in Dex Entry (${overflow})`);
   await key("Escape");
+  await nav("sv", 400);
+  for (const w of [360, 390, 414]) {
+    await size(w, 780, true);
+    await click('[data-filter="game"]', 400);
+    await click('#filterBody [data-group="types"] [data-v="dragon"]');
+    const wide = await js(`[...document.querySelectorAll("#filterDlg *")].filter(e => { const r = e.getBoundingClientRect(); return r.width && (r.right > innerWidth + 1 || r.left < -1); }).length`);
+    expect(wide === 0, `Filter & sort fits a ${w}px phone (${wide})`);
+    expect(await js(`document.querySelector("#filterDone").getBoundingClientRect().bottom <= innerHeight`), `Show button visible at ${w}px`);
+    await capture(`phone filter ${w}`);
+    await click("#filterReset");
+    await key("Escape", 300);
+  }
+  await capture("phone sv toolbar");
   await size(1280, 900, false);
 });
 

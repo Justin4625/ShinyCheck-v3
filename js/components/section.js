@@ -17,4 +17,5 @@ export const sectionHtml = (num, title, key, all, items, grad, gid, f = gid ? gH
       <div class="card-grid">${items.map(m => card(m, gid)).join("")}</div>
     </section>`;
 
-export const empty = input => `<div class="empty-state">${sparkSvg()}No Pokémon found${input.value ? ` for “${esc(input.value)}”` : ""}</div>`;
+// `filtered`: Filter & sort has settings on, which may be what hides everything.
+export const empty = (input, filtered) => `<div class="empty-state">${sparkSvg()}No Pokémon found${input.value ? ` for “${esc(input.value)}”` : ""}${filtered ? "<small>Filters are on: check Filter &amp; sort.</small>" : ""}</div>`;

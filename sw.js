@@ -6,7 +6,7 @@
 // - Fonts and the Firebase SDK: served from the cache, refreshed in the background.
 // Firestore, sign-in and other API calls are never touched (Firestore keeps its own offline copy).
 // Also shows push notifications (update news) and opens the app when one is tapped.
-const VERSION = "20261001180739"; // stamped by scripts/bump-version.sh on every commit
+const VERSION = "20261001183249"; // stamped by scripts/bump-version.sh on every commit
 const SHELL = `shinycheck-shell-${VERSION}`;
 const RUNTIME = "shinycheck-runtime-v1";
 const CORE = [
@@ -41,6 +41,7 @@ const CORE = [
   `css/26-deck-phone.css?v=${VERSION}`,
   `css/27-social.css?v=${VERSION}`,
   `css/28-admin.css?v=${VERSION}`,
+  `css/29-filters.css?v=${VERSION}`,
   `data/evolutions.js?v=${VERSION}`,
   `data/forms.js?v=${VERSION}`,
   `data/pokedex.js?v=${VERSION}`,
@@ -70,6 +71,7 @@ const CORE = [
   `js/features/app-install.js?v=${VERSION}`,
   `js/features/backups.js?v=${VERSION}`,
   `js/features/dex-entry.js?v=${VERSION}`,
+  `js/features/filter-sheet.js?v=${VERSION}`,
   `js/features/follow-list.js?v=${VERSION}`,
   `js/features/hunt-deck/chain.js?v=${VERSION}`,
   `js/features/hunt-deck/deck.js?v=${VERSION}`,
@@ -94,6 +96,7 @@ const CORE = [
   `js/features/whats-new.js?v=${VERSION}`,
   `js/main.js?v=${VERSION}`,
   `js/model/availability.js?v=${VERSION}`,
+  `js/model/dex-filter.js?v=${VERSION}`,
   `js/model/dex.js?v=${VERSION}`,
   `js/model/evolutions.js?v=${VERSION}`,
   `js/model/forms.js?v=${VERSION}`,

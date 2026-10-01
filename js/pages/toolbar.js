@@ -8,7 +8,8 @@ let t;
 // Wiring: runs once at startup, from main.js.
 export function init() {
 
-  for (const [id, key] of [["#fMissing", "missing"], ["#fForms", "forms"], ["#gMissing", "gMissing"], ["#gForms", "gOutside"]]) {
+  // Missing only is wired in features/filter-sheet.js (it's a shortcut for Show: Missing).
+  for (const [id, key] of [["#fForms", "forms"], ["#gForms", "gOutside"]]) {
     $(id).addEventListener("click", e => {
       state[key] = !state[key];
       e.currentTarget.setAttribute("aria-pressed", state[key]);

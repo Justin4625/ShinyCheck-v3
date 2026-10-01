@@ -3,14 +3,15 @@ import { setRing, updateSection } from "../components/progress.js";
 import { empty, sectionHtml } from "../components/section.js";
 import { renderSidebar } from "../components/sidebar.js";
 import { toast } from "../components/toast.js";
-import { done, has, matchText, pct, sharing } from "../core/collection.js";
+import { done, has, matchText, pct, sharing, shiniesOf } from "../core/collection.js";
 import { GAMES } from "../core/config.js";
 import { fmtPct } from "../core/format.js";
 import { el, state } from "../core/state.js";
-import { prefs, savePrefs } from "../core/store.js";
+import { hk, hunts, isActive, prefs, savePrefs } from "../core/store.js";
 import { $, esc } from "../core/util.js";
 import { openEntry } from "../features/dex-entry.js";
-import { huntable } from "../model/availability.js";
+import { huntable, shinyStatus } from "../model/availability.js";
+import { SORTS, activeCount, matches, sorter } from "../model/dex-filter.js";
 import { genNames, mons, region } from "../model/dex.js";
 import { GAME_INFO } from "../model/games.js";
 import { render } from "./router.js";
@@ -35,17 +36,28 @@ const homeScope = m => !state.gen || m.gen === state.gen;
 // The Forms toggle decides whether alternate forms count towards totals and percentages:
 // Shiny Dex uses its own toggle, game pages share theirs.
 export const homePool = () => mons.filter(m => state.forms || !m.variant);
-const homeMatch = m => homeScope(m) && matchText(m, el.q) && !(state.missing && has(m)) && (state.forms || !m.variant);
+// Filter & sort (js/features/filter-sheet.js) on the Shiny Dex looks at every game at once.
+const homeCtx = {
+  caught: has,
+  hunting: m => GAMES.some(g => isActive(hunts[hk(g, m.id)])),
+  locked: m => !!shinyStatus(m),
+  lastCaught: m => Math.max(0, ...shiniesOf(m).map(s => s.ts || 0)),
+  encounters: m => GAMES.reduce((n, g) => n + (isActive(hunts[hk(g, m.id)]) ? hunts[hk(g, m.id)].count || 0 : 0), 0),
+};
+const homeMatch = m => homeScope(m) && matchText(m, el.q) && (state.forms || !m.variant) && matches(state.f, homeCtx)(m);
 
 export function renderHome() {
   const list = mons.filter(homeMatch);
   $("#count").textContent = `${list.length} shown`;
   let html = "";
-  for (const g of Object.keys(genNames).map(Number)) {
+  // Sorted by dex number the cards stay grouped by region; any other order is one list.
+  if (state.f.sort !== "dex") {
+    if (list.length) html = sectionHtml("✦", SORTS[state.f.sort], "sorted", homePool().filter(homeScope), list.sort(sorter(state.f, homeCtx, (x, y) => +x.dex - +y.dex || x.id - y.id)));
+  } else for (const g of Object.keys(genNames).map(Number)) {
     const items = list.filter(m => m.gen === g);
     if (items.length) html += sectionHtml(String(g).padStart(2, "0"), region(g), g, homePool().filter(m => m.gen === g), items);
   }
-  el.cards.innerHTML = html || empty(el.q);
+  el.cards.innerHTML = html || empty(el.q, activeCount(state.f));
   renderHomeStats();
 }
 
@@ -78,6 +90,7 @@ export function renderHomeStats() {
     : `<p class="up-next-empty">Nothing left to hunt here ✦</p>`;
 
   for (const g of Object.keys(genNames)) updateSection(el.cards, g, pool.filter(m => m.gen === +g));
+  updateSection(el.cards, "sorted", pool.filter(homeScope));
   renderSidebar();
 }
 

@@ -61,6 +61,11 @@ function wnGo(go) {
     navigate("");
     return setTimeout(() => openEntry(m.id), 60);
   }
+  // "filter": the Shiny Dex with Filter & sort open.
+  if (go === "filter") {
+    navigate("");
+    return setTimeout(() => $('[data-filter="home"]').click(), 60);
+  }
   navigate(go);
 }
 
