@@ -1,8 +1,11 @@
 /* Accounts: the sign-in gate and account area.
    Files in css/ load in name order (index.html); later files win on equal selectors. */
 /* ---------- Accounts ---------- */
-body.locked .shell { visibility: hidden; }
 body.gated { overflow: hidden; }
+/* Until Firebase answers, html[data-boot] (set in index.html's head) shows what this device last saw. */
+html[data-boot="out"] body { overflow: hidden; }
+html[data-boot="out"] .gate { display: block; }
+html[data-boot="out"] .shell { visibility: hidden; }
 /* The gate is the landing page: it scrolls on its own, with the sign-in card in the hero. */
 .gate {
   position: fixed; inset: 0; z-index: 200; overflow-y: auto; overflow-x: hidden; scroll-behavior: smooth; overscroll-behavior: contain;

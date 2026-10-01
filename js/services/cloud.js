@@ -11,6 +11,7 @@ const account = $("#account");
 if (!firebaseConfig) {
   // Local-only mode: no login, everything stays in this browser (and no community pages).
   window.CloudLocal = true;
+  delete document.documentElement.dataset.boot;
   account.innerHTML = `<span class="acc-local" title="Add your Firebase config in firebase-config.js to enable accounts">Local mode · not synced</span>`;
   setTimeout(() => window.ShinyApp.whatsNew(), 1500);
 } else {
@@ -21,8 +22,10 @@ if (!firebaseConfig) {
   });
 }
 
+// Remembered per device so the next start shows the app or the landing page at once (index.html's head).
+const SIGNED_IN = "shinycheck-v3-signed-in";
+
 async function start() {
-  document.body.classList.add("locked");
   const V = "12.19.0"; // also in sw.js (FIREBASE), which saves the SDK for offline use
   const [{ initializeApp }, authMod, fs] = await Promise.all([
     import(`https://www.gstatic.com/firebasejs/${V}/firebase-app.js`),
@@ -110,6 +113,7 @@ async function start() {
     loaded = false;
     dirty = false;
     emit("cloud:user", user);
+    localStorage.setItem(SIGNED_IN, user ? "1" : "0");
     if (!user) {
       showGate();
       renderAccount(null);
@@ -257,7 +261,7 @@ async function start() {
       <div class="acc">
         ${user.photoURL ? `<img class="acc-avatar" src="${user.photoURL}" alt="" referrerpolicy="no-referrer">`
           : `<span class="acc-avatar">${name[0].toUpperCase()}</span>`}
-        <span class="acc-text"><b>${escapeHtml(name)}</b><small id="syncStatus">Synced</small></span>
+        <span class="acc-text"><b>${escapeHtml(name)}</b><small id="syncStatus">Loading…</small></span>
       </div>`;
     $("#signOut").onclick = async () => {
       await flush();
@@ -371,6 +375,9 @@ async function start() {
     btn.disabled = false;
   };
   setMode("in");
+  // A sign-in sent before this was wired (index.html's head held it back) goes through now.
+  window.gateReady = true;
+  if (window.gateQueued) form.requestSubmit();
 }
 
 function loadScript(src) {
@@ -396,14 +403,15 @@ function friendly(err) {
 }
 
 function showGate() {
-  document.body.classList.remove("locked");
+  delete document.documentElement.dataset.boot;
   document.body.classList.add("gated");
   gate.hidden = false;
   // Only on wide screens: on phones the card sits below the intro, and focusing would jump to it.
   if (matchMedia("(min-width: 1001px)").matches) setTimeout(() => $("#gateEmail") && $("#gateEmail").focus({ preventScroll: true }), 50);
 }
 function hideGate() {
-  document.body.classList.remove("locked", "gated");
+  delete document.documentElement.dataset.boot;
+  document.body.classList.remove("gated");
   gate.hidden = true;
 }
 function setError(msg, ok = false) {

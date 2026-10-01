@@ -19,7 +19,8 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
   free plan's Firestore limits with a link to the usage page in the Firebase console (reading the numbers in the app would
   need Google's Monitoring API, which needs billing). Online comes from `presence/{uid}`, stamped every 4 minutes while
   the app is open (`features/presence.js`).
-- **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore.
+- **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore. On start the app shows the landing page or the app straight away, from what this device saw last
+  (`shinycheck-v3-signed-in`, read in `index.html`'s head); `services/cloud.js` corrects it once Firebase knows.
 - **What's new** — update log at `/updates`, filled from `data/updates.js` (newest first). The newest entry shows once as a popup with a short tutorial and screenshot (`shots/updates/`) to people who already use ShinyCheck; "seen" is kept in the account and on the device. To announce an update, add an entry at the top.
 - **Notifications** — opt-in update news (Menu → Notifications), sent with Firebase Cloud Messaging.
 - **App** — installable (Add to Home Screen / Install app) and works offline via a service worker (`sw.js`); new versions show an Update prompt.
