@@ -42,6 +42,7 @@ import { init as initSocialBell } from "./features/social-bell.js";
 import { init as initPresence } from "./features/presence.js";
 import { init as initAdmin } from "./pages/admin.js";
 import { init as initSupport } from "./features/support.js";
+import { init as initOwnerSocials } from "./components/owner-socials.js";
 
 // Event wiring, in the order the features depend on (e.g. which Escape handler runs first).
 initFormPicker();
@@ -79,6 +80,7 @@ initSocialBell();
 initPresence();
 initAdmin();
 initSupport();
+initOwnerSocials();
 
 // Bridge for services/cloud.js (a separate module that loads Firebase).
 window.ShinyApp = { snapshot, applyData, hasLocalData, toast, render, whatsNew: () => whatsNew() };

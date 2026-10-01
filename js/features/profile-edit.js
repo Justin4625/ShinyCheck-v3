@@ -1,15 +1,17 @@
 // Edit profile: your name, your unique @username, your picture (a shiny you logged, your Google photo or your
-// initial) and whether your profile is public.
+// initial; the admin can also upload a photo, features/photo-upload.js) and whether your profile is public.
 import { avatar } from "../components/avatar.js";
 import { closeDlg, openDlg, wireDlg } from "../components/dialog.js";
 import { toast } from "../components/toast.js";
 import { shinies } from "../core/store.js";
 import { $, esc } from "../core/util.js";
 import { mons } from "../model/dex.js";
+import { isAdmin } from "../services/admin.js";
 import * as social from "../services/social.js";
+import { isUpload, pickPhoto } from "./photo-upload.js";
 
 const dlg = $("#pfEditDlg");
-let pick = { avatar: "", photo: "" }, googlePhoto = "", current = null, checkTimer = null;
+let pick = { avatar: "", photo: "" }, googlePhoto = "", uploaded = "", current = null, checkTimer = null;
 
 // Checks the username as you type: its format first, then (after a pause) whether it's free.
 function checkUser() {
@@ -40,7 +42,11 @@ function myMons() {
 function paintPicks() {
   const opt = (id, on, inner, label) => `<button type="button" class="pe-pick ${on ? "on" : ""}" data-pe-pick="${esc(id)}" aria-pressed="${!!on}" title="${esc(label)}">${inner}</button>`;
   const own = myMons();
-  $("#peAvatars").innerHTML =
+  const upload = isAdmin()
+    ? (uploaded ? opt("upload", !pick.avatar && pick.photo === uploaded, avatar({ photo: uploaded }), "Your photo") : "")
+      + `<button type="button" class="pe-pick pe-upload" data-pe-upload title="Upload a photo" aria-label="Upload a photo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4M7 9l5-5 5 5M5 20h14"/></svg></button>`
+    : "";
+  $("#peAvatars").innerHTML = upload +
     (googlePhoto ? opt("photo", !pick.avatar && pick.photo, avatar({ photo: googlePhoto }), "Google photo") : "")
     + opt("letter", !pick.avatar && !pick.photo, avatar({ name: $("#peName").value || "?" }), "Initial")
     + own.map(m => opt(m.key, pick.avatar === m.key, avatar({ avatar: m.key }), m.name)).join("");
@@ -53,6 +59,7 @@ export async function openProfileEdit() {
   googlePhoto = /^https:\/\/[a-z0-9.-]+\.googleusercontent\.com\//.test(user.photoURL || "") ? user.photoURL.slice(0, 500) : "";
   current = p;
   pick = { avatar: p.avatar, photo: p.photo };
+  uploaded = isUpload(p.photo) ? p.photo : "";
   $("#peName").value = p.name;
   $("#peUser").value = p.username || "";
   checkUser();
@@ -84,14 +91,30 @@ async function save() {
   btn.disabled = false;
 }
 
+// Admin only: a photo of your own, shown as soon as it's picked and saved with Save.
+async function upload() {
+  try {
+    const url = await pickPhoto();
+    if (!url) return;
+    uploaded = url;
+    pick = { avatar: "", photo: url };
+    paintPicks();
+  } catch (err) {
+    console.error(err);
+    toast("Couldn't use that photo. Try another one.");
+  }
+}
+
 // Wiring: runs once at startup, from main.js.
 export function init() {
   wireDlg(dlg);
   dlg.addEventListener("click", e => {
+    if (e.target.closest("[data-pe-upload]")) return upload();
     const b = e.target.closest("[data-pe-pick]");
     if (!b) return;
     const id = b.dataset.pePick;
-    pick = id === "photo" ? { avatar: "", photo: googlePhoto } : id === "letter" ? { avatar: "", photo: "" } : { avatar: id, photo: pick.photo };
+    pick = id === "photo" ? { avatar: "", photo: googlePhoto } : id === "upload" ? { avatar: "", photo: uploaded }
+      : id === "letter" ? { avatar: "", photo: "" } : { avatar: id, photo: pick.photo };
     paintPicks();
   });
   $("#peName").addEventListener("input", () => { if (!pick.avatar && !pick.photo) paintPicks(); });

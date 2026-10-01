@@ -1,6 +1,7 @@
 // Trainer profile (/trainer/<uid>, /trainer = your own): picture, name, shinies, likes,
 // followers and following, a Follow button, and their catches and whole collection.
 import { avatar, trainerHref } from "../components/avatar.js";
+import { isOwner, ownerBadge, ownerLinks } from "../components/owner-socials.js";
 import { postCard } from "../components/post-card.js";
 import { renderSidebar } from "../components/sidebar.js";
 import { toast } from "../components/toast.js";
@@ -97,7 +98,7 @@ function paint() {
     body.innerHTML = `<div class="post-grid">${skeleton(3)}</div>`;
     return;
   }
-  const mine = own(), hidden = !p.public && !mine;
+  const mine = own(), hidden = !p.public && !mine, owner = isOwner(shown.uid);
   const likes = posts.reduce((n, x) => n + (x.likes || 0), 0);
   const stat = (n, label, list) => list
     ? `<button class="stat pf-stat" data-pf-list="${list}"><b>${nf(n)}</b><span>${label}</span></button>`
@@ -108,7 +109,7 @@ function paint() {
       <div class="pf-id">
         <p class="eyebrow"><svg class="eyebrow-spark"><use href="#spark" fill="url(#holo)"/></svg> ${mine ? "Your profile" : "Trainer"}</p>
         <h1>${esc(p.name)}</h1>
-        ${p.username ? `<p class="pf-handle">@${esc(p.username)}</p>` : ""}
+        ${p.username || owner ? `<p class="pf-handle">${p.username ? `<span>@${esc(p.username)}</span>` : ""}${owner ? ownerBadge() : ""}</p>` : ""}
         <p class="hero-sub">Joined ${new Date(p.joined).toLocaleDateString("en-GB", { month: "long", year: "numeric" })}${!p.public ? " · Private" : ""}</p>
       </div>
       <div class="pf-actions">
@@ -117,6 +118,7 @@ function paint() {
         ${p.public ? `<button class="pf-btn ghost" data-pf-link>Share profile</button>` : ""}
       </div>
     </div>
+    ${owner ? `<div class="pf-owner">${ownerLinks()}</div>` : ""}
     <div class="stats pf-stats">
       ${stat(hidden ? 0 : p.shinies, "Shinies")}${stat(likes, "Likes")}${stat(counts.followers, "Followers", "followers")}${stat(counts.following, "Following", "following")}
     </div>`;

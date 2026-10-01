@@ -27,6 +27,7 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 - **Buy me a lunch** — "Buy me a lunch" in the sidebar's ⚙ menu and a small card at the bottom of What's new opens a dialog that links to ShinyCheck's Ko-fi
   page (`SUPPORT_URL` and `SUPPORT_PRICE` in `js/core/config.js`; the button stays hidden while the URL is empty,
   `js/features/support.js`). Paying happens only on Ko-fi.
+- **Owner** — the footer under every page and the landing page links to the owner's socials (Instagram, X, TikTok), and the owner's profile shows a "ShinyCheck owner" badge with the same links (`OWNER_UID` and `OWNER_SOCIALS` in `js/core/config.js`, `js/components/owner-socials.js`). Only the admin can also upload a photo of their own as profile picture in Edit profile (`js/features/photo-upload.js`: cropped to a 320px square JPEG and stored as a data URL in the profile; `firestore.rules` allows that for `isAdmin()` only).
 - **Notifications** — opt-in update news (Menu → Notifications), sent with Firebase Cloud Messaging.
 - **App** — installable (Add to Home Screen / Install app) and works offline via a service worker (`sw.js`); new versions show an Update prompt.
 

@@ -261,3 +261,7 @@
   .pc-view .seg span { display: none; }
   .pc-games { margin-right: -16px; padding-right: 16px; }
 }
+/* Admin only: upload a photo of your own (features/photo-upload.js). */
+.pe-upload { border: 1.5px dashed var(--border-2); color: var(--muted); }
+.pe-upload svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+@media (hover: hover) { .pe-upload:hover { color: var(--text); border-color: var(--text); } }

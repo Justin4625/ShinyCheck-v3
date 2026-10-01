@@ -61,7 +61,9 @@ service cloud.firestore {
           && d.username is string
           && getAfter(/databases/$(database)/documents/usernames/$(d.username)).data.uid == uid
           && d.name is string && d.name.size() >= 1 && d.name.size() <= 30
-          && str(d.photo, 500) && (d.photo == '' || d.photo.matches('https://[a-z0-9.-]+\\.googleusercontent\\.com/.*'))
+          // A Google photo, or (admin only) an uploaded photo as a small JPEG data URL (features/photo-upload.js).
+          && ((str(d.photo, 500) && (d.photo == '' || d.photo.matches('https://[a-z0-9.-]+\\.googleusercontent\\.com/.*')))
+            || (isAdmin() && str(d.photo, 90000) && d.photo.matches('data:image/jpeg;base64,[A-Za-z0-9+/=]+')))
           && str(d.avatar, 60)
           && d.public is bool
           && num(d.shinies)
