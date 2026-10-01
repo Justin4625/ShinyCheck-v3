@@ -2,8 +2,10 @@
    Files in css/ load in name order (index.html); later files win on equal selectors. */
 
 /* ---------- Sidebar: Feed / My profile, and the bell in the bottom bar ---------- */
-.feed-icon, .profile-icon { width: 14px; height: 14px; border-radius: 0; background: none; box-shadow: none; }
-.feed-icon svg, .profile-icon svg { display: block; width: 14px; height: 14px; }
+.find-icon svg { fill: none; stroke: var(--muted); stroke-width: 2.6; stroke-linecap: round; }
+.side-find { width: 100%; font: inherit; text-align: left; cursor: pointer; background: none; }
+.feed-icon, .profile-icon, .find-icon { width: 14px; height: 14px; border-radius: 0; background: none; box-shadow: none; }
+.feed-icon svg, .profile-icon svg, .find-icon svg { display: block; width: 14px; height: 14px; }
 .feed-icon svg { fill: #ff5c93; }
 .profile-icon svg { fill: none; stroke: var(--muted); stroke-width: 2.4; stroke-linecap: round; }
 .side-item.active .profile-icon svg { stroke: var(--text); }
@@ -50,7 +52,10 @@
 .feed-hero { margin-bottom: 18px; }
 .feed-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 22px; }
 .feed-bar .segmented { margin: 0; }
-.feed-refresh { width: 44px; padding: 0; font-size: 18px; }
+.feed-refresh, .feed-find { width: 44px; padding: 0; font-size: 18px; }
+.feed-find svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; }
+.find-search { flex: none; margin: 4px 0 12px; }
+#findDlg .rl-card { min-height: min(460px, calc(100dvh - 40px)); }
 .feed-empty {
   grid-column: 1 / -1; margin: 0; padding: 40px 20px; border-radius: 22px; text-align: center; color: var(--muted);
   border: 1.5px dashed var(--border-2);

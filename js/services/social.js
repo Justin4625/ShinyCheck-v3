@@ -2,7 +2,7 @@
 // Uses the connection that services/cloud.js opens (window.Cloud.fb) and only works signed in.
 //
 //   profiles/{uid}        name, @username, picture, public or not, number of shinies
-//   usernames/{name}      which trainer has claimed a username
+//   usernames/{name}      which trainer has claimed a username (also searched: searchTrainers)
 //   collections/{uid}     every logged shiny, for the profile page (features/social-sync.js)
 //   posts/{uid_pid}       a catch in the feed, with its like count
 //   likes/{liker_postId}  one like
@@ -93,6 +93,24 @@ export async function setUsername(name) {
   byName.set(name, me.uid);
   if (me.username) byName.delete(me.username);
   return profile(me.uid, true);
+}
+// Trainers whose @username or name starts with the text, at most `max`. Usernames are lowercase; names are
+// matched as typed, in lowercase and with a capital first letter (Firestore can't compare without case).
+export async function searchTrainers(text, max = 20) {
+  const { query, where, orderBy, startAt, endAt, limit, getDocs, documentId } = fb().fs;
+  const raw = text.trim().replace(/^@/, ""), user = cleanUsername(raw), END = "\uf8ff";
+  const names = [...new Set([raw, raw.toLowerCase(), raw.charAt(0).toUpperCase() + raw.slice(1)])].filter(Boolean);
+  const [byUser, ...byNames] = await Promise.all([
+    user ? getDocs(query(col("usernames"), orderBy(documentId()), startAt(user), endAt(user + END), limit(max))) : null,
+    ...names.map(n => getDocs(query(col("profiles"), orderBy("name"), startAt(n), endAt(n + END), limit(max)))),
+  ]);
+  const found = new Map();
+  for (const snap of byNames) for (const d of snap.docs) found.set(d.id, { uid: d.id, ...d.data(), joined: at(d.data().createdAt) });
+  const rest = byUser ? byUser.docs.map(d => d.data().uid).filter(u => !found.has(u)) : [];
+  for (const [u, p] of await profilesOf(rest)) if (p) found.set(u, p);
+  // Usernames that start with the text first, then by name.
+  const starts = p => (p.username || "").startsWith(user) ? 0 : 1;
+  return [...found.values()].sort((a, b) => starts(a) - starts(b) || a.name.localeCompare(b.name)).slice(0, max);
 }
 export async function saveProfile(patch) {
   const { updateDoc, serverTimestamp } = fb().fs;
