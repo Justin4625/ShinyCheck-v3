@@ -202,6 +202,16 @@ export function watchFollowers(cb) {
   }, err => console.warn("Followers not loaded:", err.code || err));
 }
 
+// Live list of likes on the signed-in trainer's posts by others (for notifications), newest first.
+// One equality filter, sorted here, so no extra index is needed. Returns the unsubscribe.
+export function watchLikes(cb) {
+  const { query, where, onSnapshot } = fb().fs, me = myUid();
+  return onSnapshot(query(col("likes"), where("owner", "==", me)), snap => {
+    cb(snap.docs.map(d => ({ uid: d.data().uid, post: d.data().post, at: at(d.data().createdAt) }))
+      .filter(l => l.uid !== me).sort((a, b) => b.at - a.at));
+  }, err => console.warn("Likes not loaded:", err.code || err));
+}
+
 // ---------- Writing your own posts (used by features/social-sync.js) ----------
 export async function myPostIds() {
   return new Map((await postsOf(myUid())).map(p => [p.id, p]));

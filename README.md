@@ -13,7 +13,7 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
   with likes (tap the heart or double-tap the Pokémon). Every trainer has a profile (`/@username`, or `/trainer` for your
   own) with their catches, whole collection (big cards with every fact, or mini tiles; search by name or dex number, sort by newest, dex number or name, filter by game with chips for only the games they have shinies in), likes, followers and following. A new catch (Gotcha, a phase, or a manual log
   dated in the last 3 days) is posted by itself; editing or deleting it updates the post. Profiles are public by default
-  and can be made private in Edit profile (name, unique @username, picture). The bell shows new followers. **Find trainers** (on the feed page) looks people up by name or @username. Emails are never shown.
+  and can be made private in Edit profile (name, unique @username, picture). The bell shows new followers and likes on your shinies. **Find trainers** (on the feed page) looks people up by name or @username. Emails are never shown.
 - **Accounts** — Firebase Auth (Google or email) with progress synced to Firestore.
 - **What's new** — update log at `/updates`, filled from `data/updates.js` (newest first). The newest entry shows once as a popup with a short tutorial and screenshot (`shots/updates/`) to people who already use ShinyCheck; "seen" is kept in the account and on the device. To announce an update, add an entry at the top.
 - **Notifications** — opt-in update news (Menu → Notifications), sent with Firebase Cloud Messaging.

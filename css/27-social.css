@@ -170,6 +170,7 @@
 .bell-item { margin: 0 -8px; padding: 0 8px; border-radius: 14px; }
 .bell-item + .bell-item .fl-row { border-top: 1px solid var(--border); }
 .bell-item .fl-row { border-top: 0; }
+.bell-mon { flex: none; width: 44px; height: 44px; object-fit: contain; }
 .bell-item.new { background: color-mix(in srgb, #9d7bff 12%, transparent); }
 
 .pe-field { position: relative; display: grid; gap: 6px; margin-bottom: 12px; }
