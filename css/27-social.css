@@ -126,7 +126,7 @@
 
 /* ---------- Profile ---------- */
 .pf-hero { margin-bottom: 16px; }
-.pf-top { position: relative; display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
+.pf-top { position: relative; flex: 1 1 100%; display: flex; align-items: center; gap: 22px; flex-wrap: wrap; }
 .pf-id { min-width: 0; flex: 1 1 240px; }
 .pf-id h1 { overflow-wrap: anywhere; }
 .pf-handle { margin: 8px 0 0; font: 700 14px/1 var(--mono); color: var(--muted); }
@@ -134,7 +134,7 @@
 .pf-actions { display: flex; gap: 8px; flex-wrap: wrap; }
 .pf-ghost { background: var(--surface-2); animation: ghost 1.4s ease-in-out infinite; }
 .pf-ghost-line { width: 240px; max-width: 100%; border-radius: 14px; background: var(--surface-2); }
-.pf-stats { position: relative; margin-top: 0; }
+.pf-stats { position: relative; flex: 1 1 100%; align-items: flex-start; margin-top: 0; }
 .pf-stat { font: inherit; color: inherit; text-align: left; cursor: pointer; }
 @media (hover: hover) { .pf-stat:hover { border-color: var(--border-2); background: var(--surface); } }
 .pf-tabs { margin: 0 0 16px; }
