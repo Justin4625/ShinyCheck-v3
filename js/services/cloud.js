@@ -60,7 +60,10 @@ async function start() {
   const emit = (name, detail) => dispatchEvent(new CustomEvent(name, { detail }));
 
   const OWNER = "shinycheck-v3-owner";
-  let ref = null, unsub = null, first = true;
+  // `loaded`: the account's data has arrived (from the server, or Firestore's offline copy). Until then
+  // nothing is written, so a device whose local storage is empty or stale can't overwrite the account
+  // while it's still loading.
+  let ref = null, unsub = null, first = true, loaded = false;
   let dirty = false, timer = null, lastWrite = 0, lastRev = null;
 
   // ---------- Sync ----------
@@ -81,7 +84,7 @@ async function start() {
 
   async function flush() {
     clearTimeout(timer);
-    if (!ref || !dirty) return;
+    if (!ref || !dirty || !loaded) return;
     dirty = false;
     lastWrite = Date.now();
     lastRev = Math.random().toString(36).slice(2);
@@ -104,6 +107,8 @@ async function start() {
     unsub && unsub();
     unsub = null;
     ref = null;
+    loaded = false;
+    dirty = false;
     emit("cloud:user", user);
     if (!user) {
       showGate();
@@ -116,6 +121,7 @@ async function start() {
     first = true;
     unsub = onSnapshot(ref, { includeMetadataChanges: false }, snap => {
       if (snap.metadata.hasPendingWrites) return;
+      loaded = true;
       const owner = localStorage.getItem(OWNER);
       if (!snap.exists()) {
         // New account: bring along progress made in this browser (once, and only if
@@ -129,6 +135,8 @@ async function start() {
         }
       } else {
         const data = snap.data();
+        // Changes made while the account was loading were made on top of old local data: the account wins.
+        if (first) dirty = false;
         if (data.rev !== lastRev) window.ShinyApp.applyData(data, { quiet: true });
       }
       localStorage.setItem(OWNER, user.uid);
