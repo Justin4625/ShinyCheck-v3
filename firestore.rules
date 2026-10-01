@@ -102,10 +102,11 @@ service cloud.firestore {
     // posts/{uid_id}: a catch in the feed. The owner writes everything but `likes`.
     match /posts/{postId} {
       function validPost(d) {
-        return d.keys().hasOnly(['uid', 'key', 'g', 'alt', 'count', 'time', 'odds', 'method', 'phases', 'ts', 'createdAt', 'likes'])
+        return d.keys().hasOnly(['uid', 'key', 'g', 'alt', 'mark', 'count', 'time', 'odds', 'method', 'phases', 'ts', 'createdAt', 'likes'])
           && d.keys().hasAll(['uid', 'key', 'g', 'count', 'time', 'ts', 'createdAt', 'likes'])
           && str(d.key, 60) && str(d.g, 20)
           && (!('alt' in d) || str(d.alt, 60))
+          && (!('mark' in d) || str(d.mark, 30))
           && num(d.count) && num(d.time)
           && (!('odds' in d) || d.odds == null || num(d.odds))
           && (!('method' in d) || str(d.method, 100))

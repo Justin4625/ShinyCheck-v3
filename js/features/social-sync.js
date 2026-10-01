@@ -27,13 +27,14 @@ function catches() {
   });
 }
 // The fields a post has, in a fixed order so two versions compare as JSON.
-const postFields = ({ key, g, alt, count, time, odds, method, phases, ts }) => ({
-  key, g, ...(alt ? { alt } : {}), count: count || 0, time: time || 0,
+// Never the nickname: that stays private.
+const postFields = ({ key, g, alt, mark, count, time, odds, method, phases, ts }) => ({
+  key, g, ...(alt ? { alt } : {}), ...(mark ? { mark } : {}), count: count || 0, time: time || 0,
   ...(odds !== undefined ? { odds: odds || null } : {}), ...(method ? { method: method.slice(0, 100) } : {}),
   ...(phases ? { phases } : {}), ts: ts || 0,
 });
 const toList = all => all.slice(-5000).map(({ s, g, key }) => ({
-  k: key, g, ...(s.alt ? { a: s.alt } : {}), c: s.count || 0, t: s.time || 0,
+  k: key, g, ...(s.alt ? { a: s.alt } : {}), ...(s.mark ? { mk: s.mark } : {}), c: s.count || 0, t: s.time || 0,
   ...(s.odds ? { o: s.odds } : {}), ...(s.method ? { m: s.method.slice(0, 100) } : {}), ts: s.ts || 0,
 }));
 

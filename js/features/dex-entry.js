@@ -2,6 +2,7 @@
 import { burst } from "../components/burst.js";
 import { card } from "../components/card.js";
 import { formPicker } from "../components/form-picker.js";
+import { markPicker } from "../components/mark-picker.js";
 import { gamePicker } from "../components/game-picker.js";
 import { setupHtml, setupPatch } from "../components/hunt-setup.js";
 import { statusNote } from "../components/status.js";
@@ -23,6 +24,7 @@ import { altId, altOf, altSprite, altsOf, formText } from "../model/forms.js";
 import { codeLabel } from "../model/game-dex.js";
 import { GAME_INFO } from "../model/games.js";
 import { HUNT_SETUP, defaultSetup, evalSetup, patchSetup } from "../model/hunt-setup.js";
+import { markOf } from "../model/marks.js";
 import { renderHomeStats } from "../pages/home.js";
 import { navigate } from "../pages/router.js";
 
@@ -40,6 +42,29 @@ function paintAddSetup(g) {
   box.hidden = !!GAME_INFO[g].noOdds || !HUNT_SETUP[g];
   if (box.hidden) return;
   box.innerHTML = `<div class="en-setup-head"><span>Hunt method</span><b>1/${nf(evalSetup(g, addSetup).odds)}</b></div>${setupHtml(g, addSetup)}`;
+}
+// Nickname and mark fields (add and edit). The nickname is private: it stays in your own account and is
+// never part of a post, the public collection or the share card (features/social-sync.js copies named fields only).
+const NICK_MAX = 12;
+const nickField = nick => `<label class="wide en-nick-field">Nickname <small>only you see this</small><input type="text" name="nick" maxlength="${NICK_MAX}" value="${esc(nick || "")}" placeholder="None" autocomplete="off" spellcheck="false"></label>`;
+const markField = (g, mark) => {
+  const pick = markPicker(g, mark);
+  return pick ? `<div class="wide en-fp"><span>Mark</span>${pick}</div>` : "";
+};
+function paintAddMark(g) {
+  const box = $("#enMark");
+  if (!box) return;
+  const cur = box.querySelector('[name="mark"]');
+  box.innerHTML = markField(g, cur ? cur.value : "");
+  box.hidden = !box.innerHTML;
+}
+// Reads the two fields into an entry: sets or removes `nick` and `mark`.
+function applyExtras(entry, box) {
+  const nick = box.querySelector('[name="nick"]'), mark = box.querySelector('[name="mark"]');
+  const n = nick ? nick.value.trim().slice(0, NICK_MAX) : entry.nick;
+  if (n) entry.nick = n; else delete entry.nick;
+  if (mark) { if (mark.value) entry.mark = mark.value; else delete entry.mark; }
+  return entry;
 }
 
 export function openEntry(id) {
@@ -119,7 +144,7 @@ export function paintEntry() {
         <button class="en-row" data-edit="${key}">
           <span class="en-thumb">${l.m.sprite ? `<img src="${altSprite(l.m, l.alt)}" alt="">` : ""}</span>
           <span class="en-main">
-            <b>${esc(l.m.name)}${formText(l.m, l.alt) ? ` <em>${esc(formText(l.m, l.alt))}</em>` : ""}</b>
+            <b>${markOf(l.mark) ? `<img class="en-mark" src="${markOf(l.mark).icon}" alt="${esc(markOf(l.mark).n)}" title="${esc(markOf(l.mark).n)}">` : ""}${l.nick ? `<span class="en-nick">“${esc(l.nick)}”</span> ` : ""}${esc(l.m.name)}${formText(l.m, l.alt) ? ` <em>${esc(formText(l.m, l.alt))}</em>` : ""}</b>
             <span class="en-game">${esc(g.name)}${l.caughtIn && GAME_INFO[l.caughtIn] ? ` <em class="en-from">· caught in ${esc(GAME_INFO[l.caughtIn].abbr || GAME_INFO[l.caughtIn].name)}</em>` : ""}</span>
             <small>${fmtDate(l.ts)}${l.method ? ` · ${esc(l.method)}` : ""}${l.odds && !GAME_INFO[l.g].noOdds ? ` · 1/${l.odds}` : ""}${l.phases ? ` · after ${l.phases} ${l.phases === 1 ? "phase" : "phases"}` : ""}</small>
           </span>
@@ -132,6 +157,8 @@ export function paintEntry() {
           <label>Sec<input type="number" min="0" max="59" name="s" value="${l.time % 60}"></label>
           <label class="wide">Caught on<input type="datetime-local" name="ts" value="${local}"></label>
           ${altsOf(l.m).length ? `<div class="wide en-fp"><span>Form</span>${formPicker(l.m, l.alt)}</div>` : ""}
+          ${markField(l.g, l.mark)}
+          ${nickField(l.nick)}
           ${(() => {
           const prev = (l.evolvedFrom || []).length && mons.find(x => x.id === l.evolvedFrom.at(-1));
           return prev ? `<button class="en-devolve" data-devolve title="Move this shiny back to ${esc(prev.name)}">
@@ -174,13 +201,15 @@ export function paintEntry() {
         <div class="wide en-setup" id="enSetup"></div>
         <label class="wide">Caught on<input type="datetime-local" name="ts" value="${nowLocal}"></label>
         ${alts.length ? `<div class="wide en-fp"><span>Form</span>${formPicker(m, viewAlt)}</div>` : ""}
+        <div class="wide" id="enMark"></div>
+        ${nickField("")}
         <div class="en-edit-actions">
           <button class="en-save" data-add-save>Add ${esc(m.name)}${m.form && m.form !== "Original" ? ` (${esc(m.form)})` : ""} ✦</button>
           <button class="dr-danger en-cancel" data-add-cancel>Cancel</button>
         </div>
       </div>`
     : `<button class="en-add-btn" data-add-open><span>+</span> Add a shiny${altOf(m, viewAlt) ? ` ${esc(altOf(m, viewAlt).n)}` : " manually"}</button>`;
-  if (adding) paintAddSetup(preset);
+  if (adding) { paintAddSetup(preset); paintAddMark(preset); }
 
   const games = [...GAMES].reverse().filter(gid => m.games[gid]);  // newest game first
   $("#enGames").innerHTML = games.length
@@ -214,6 +243,7 @@ export function init() {
     if (e.target.name !== "game" || !e.target.closest(".en-add-form")) return;
     addSetup = addSetupFor(e.target.value);
     paintAddSetup(e.target.value);
+    paintAddMark(e.target.value);
   });
 
   en.root.addEventListener("input", e => {
@@ -251,6 +281,7 @@ export function init() {
       const g = val("game"), ts = new Date(val("ts")).getTime(), num = n => Math.max(0, +val(n) || 0);
       const k = hk(g, entryMon.id), alt = f.querySelector('[name="alt"]') ? f.querySelector('[name="alt"]').value : "";
       (shinies[k] = shinies[k] || []).push(markPost({ count: num("count"), time: num("h") * 3600 + num("m") * 60 + num("s"), ...(GAME_INFO[g].noOdds || !HUNT_SETUP[g] ? { odds: null } : { odds: evalSetup(g, addSetup).odds, method: evalSetup(g, addSetup).label }), ...(alt ? { alt } : {}), ts: isNaN(ts) ? Date.now() : ts, manual: true }, { manual: true }));
+      applyExtras(shinies[k].at(-1), f);
       shinies[k].sort((x, y) => x.ts - y.ts);
       saveShinies();
       adding = false;
@@ -341,6 +372,7 @@ export function init() {
       Object.assign(list[+i], { count: v("count"), time: v("h") * 3600 + v("m") * 60 + v("s"), ts: isNaN(ts) ? list[+i].ts : ts });
       const altBox = box.querySelector('[name="alt"]');
       if (altBox) { if (altBox.value) list[+i].alt = altBox.value; else delete list[+i].alt; }
+      applyExtras(list[+i], box);
       saveShinies();
       editing = null;
       paintEntry();

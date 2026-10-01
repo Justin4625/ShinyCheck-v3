@@ -1,4 +1,4 @@
-// Form picker: dropdown with sprites to choose a Pokémon's form (add, edit, Hunt Deck).
+// Form picker: dropdown with sprites to choose a Pokémon's form (add, edit, Hunt Deck); the mark picker reuses it.
 import { $, esc, norm } from "../core/util.js";
 import { mons } from "../model/dex.js";
 import { altId, altOf, altSprite, altsOf } from "../model/forms.js";
@@ -7,6 +7,8 @@ import { altId, altOf, altSprite, altsOf } from "../model/forms.js";
 // from data/forms.js only, so new forms show up by themselves. A hidden input carries the value and
 // fires "change" like a <select>; long lists get a filter. Wiring: see "Form picker" below.
 const FP_FILTER = 8;
+// Other pickers built on the same dropdown (mark-picker.js) set `data-kind` and register their face here.
+export const pickerFaces = {};
 const fpFace = (m, id) => {
   const f = altOf(m, id);
   return `${f ? `<img src="${altSprite(m, id)}" alt="">` : `<span class="fp-none">?</span>`}<span class="fp-label">${esc(f ? f.n : "Form not set")}</span>`;
@@ -53,10 +55,11 @@ function fpToggle(fp) {
   (q && matchMedia("(hover: hover)").matches ? q : sel || pop.querySelector(".fp-opt")).focus({ preventScroll: true });
 }
 function fpPick(opt) {
-  const fp = opt.closest(".fp"), m = mons.find(x => x.id === +fp.dataset.mon), input = fp.querySelector('input[name="alt"]');
+  const fp = opt.closest(".fp"), input = fp.querySelector('input[type="hidden"]');
   input.value = opt.dataset.v;
   fp.querySelectorAll(".fp-opt").forEach(o => o.setAttribute("aria-selected", o === opt));
-  fp.querySelector(".fp-btn").innerHTML = fpFace(m, opt.dataset.v) + fp.querySelector(".fp-chev").outerHTML;
+  const face = pickerFaces[fp.dataset.kind] || (v => fpFace(mons.find(x => x.id === +fp.dataset.mon), v));
+  fp.querySelector(".fp-btn").innerHTML = face(opt.dataset.v) + fp.querySelector(".fp-chev").outerHTML;
   fpClose(fp, true);
   input.dispatchEvent(new Event("change", { bubbles: true }));
 }

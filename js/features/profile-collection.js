@@ -9,6 +9,7 @@ import { fmtDate, nf } from "../core/format.js";
 import { $, esc, norm, safe } from "../core/util.js";
 import { openShare } from "./share-card.js";
 import { altSprite, formText } from "../model/forms.js";
+import { markOf } from "../model/marks.js";
 import { GAME_INFO } from "../model/games.js";
 
 const SORTS = [["new", "Newest"], ["dex", "Dex #"], ["name", "A–Z"]];
@@ -38,6 +39,7 @@ const tile = ({ c, m, g }) => {
   return `<div class="pf-tile" style="--accent:${g.accent};--accent2:${g.accent2}" title="${esc(`${m.name} · ${g.name}${facts ? ` · ${facts}` : ""}`)}">
       <img src="${altSprite(m, c.a)}" alt="" loading="lazy" decoding="async">
       <small class="pf-no">#${String(+m.dex).padStart(4, "0")}</small>
+      ${markOf(c.mk) ? `<img class="pf-mark" src="${markOf(c.mk).icon}" alt="${esc(markOf(c.mk).n)}" title="${esc(markOf(c.mk).n)}">` : ""}
       <b>${esc(m.name)}</b><span>${esc(g.abbr || g.name)}</span>
     </div>`;
 };

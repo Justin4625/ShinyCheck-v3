@@ -8,6 +8,7 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 - **Filter & sort** — on the Shiny Dex and every game page (shared by all games): show all, missing, caught or hunting, one or two types (two = a dual type), hide shiny-locked Pokémon, and sort by dex number, name, recently caught or most encounters. The rules are in `js/model/dex-filter.js`, the dialog (a bottom sheet on phones) in `js/features/filter-sheet.js`; "Missing only" is a shortcut for Show: Missing.
 - **Hunt Deck** — encounter counter, timer that keeps running, luck meter, pace (encounters per hour, time to odds), a live chain counter for the Poké Radar, chain fishing and the DexNav, Gotcha! log, pop-out mini window.
 - **Dex Entry** — every shiny of a species across all games (and Pokémon GO), edit, evolve and undo evolve.
+- **Marks & nicknames** — a shiny from Sword & Shield, Scarlet & Violet or HOME can carry its mark (the lists per game are in `js/model/marks.js`, icons in `marks/`, picked with `js/components/mark-picker.js`). The mark is public: it shows on feed posts, the profile collection and the share card. Every shiny can also get a nickname, which is private: it stays in the account and is never copied into posts, the public collection or the share card (`features/social-sync.js` copies named fields only).
 - **Forms** — cosmetic forms, switchable forms and gender differences (Vivillon, Furfrou, Flabébé, Rotom, …) as a checklist in Dex Entry; pick the form when adding, editing or hunting. Any form counts the species; forms are extra.
 - **Landing page** — shown before signing in (the gate in `index.html`): what shiny hunting is, the features with screenshots from `shots/`, and the sign-in card. Its **Feed** tab shows everyone's newest catches read-only (`js/features/landing-feed.js`); liking or opening a trainer asks to create an account. Firestore lets anyone read posts and public profiles for this.
 - **Community** — a feed (`/feed`) of everyone's new catches ("For you") or of the trainers you follow ("Following"),
@@ -35,6 +36,7 @@ no dependencies. Live at [shinycheck.nl](https://shinycheck.nl).
 index.html              the page: all markup (landing/sign-in gate, pages, drawers, dialogs)
 404.html                GitHub Pages fallback: sends clean URLs like /sv back to the app
 sw.js                   service worker: offline app, update prompt, push notifications
+marks/                  mark icons (Serebii), one PNG per mark id
 manifest.webmanifest    installable app
 firebase-config.js      Firebase web config (public); null = local-only mode
 firestore.rules         Firestore security rules

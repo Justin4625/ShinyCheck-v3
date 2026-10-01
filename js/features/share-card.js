@@ -4,6 +4,7 @@ import { $, norm } from "../core/util.js";
 import { isIOS } from "./app-install.js";
 import { altSprite, formText } from "../model/forms.js";
 import { GAME_INFO } from "../model/games.js";
+import { markOf } from "../model/marks.js";
 
 // s = a shiny log entry plus its game (g) and Pokémon (m). Drawn on a canvas at
 // 1080×1350 (4:5, fits Instagram, WhatsApp and Discord without cropping).
@@ -111,7 +112,8 @@ export function cardFacts(s) {
 async function drawShareCard(s) {
   const g = GAME_INFO[s.g], m = s.m;
   const { W, H, x, F, M, HOLO, holo, glow, spark, text, fit, spaced, panel, blob } = await cardCanvas(g.accent + "8c", g.accent2 + "80");
-  const [sprite, logo] = await Promise.all([loadImg(altSprite(m, s.alt)), loadImg(g.logo)]);
+  const mark = markOf(s.mark);
+  const [sprite, logo, markImg] = await Promise.all([loadImg(altSprite(m, s.alt)), loadImg(g.logo), mark && loadImg(mark.icon)]);
   const rnd = seeded(m.id * 7919 + (s.ts || 1) % 104729 + 1);
   // Only around the sprite, so they never cover the name or the stats.
   for (let i = 0, n = 0; n < 18 && i < 200; i++) {
@@ -161,6 +163,18 @@ async function drawShareCard(s) {
   x.fillStyle = holo(cx + 170, cy - 290, cx + 250, cy - 210);
   spark(cx + 215, cy - 245, 38);
   spark(cx - 250, cy + 190, 22);
+  // Mark: a badge on the ring, bottom right. The nickname never goes on the card (it's private).
+  if (markImg) {
+    const bx = cx + 205, by = cy + 205;
+    x.fillStyle = "rgba(14,12,28,.82)";
+    x.beginPath();
+    x.arc(bx, by, 58, 0, Math.PI * 2);
+    x.fill();
+    x.lineWidth = 4;
+    x.strokeStyle = holo(bx - 58, by - 58, bx + 58, by + 58);
+    x.stroke();
+    x.drawImage(markImg, bx - 40, by - 40, 80, 80);
+  }
 
   // Name, with form and game below.
   x.textBaseline = "alphabetic";

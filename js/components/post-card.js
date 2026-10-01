@@ -6,11 +6,12 @@ import { esc } from "../core/util.js";
 import { cardFacts } from "../features/share-card.js";
 import { altSprite, formText } from "../model/forms.js";
 import { GAME_INFO } from "../model/games.js";
+import { markOf } from "../model/marks.js";
 
 // A post as a shiny log entry (what the share card and cardFacts take).
 export function postShiny(p) {
   const m = monByKey(p.key);
-  return m && GAME_INFO[p.g] ? { count: p.count, time: p.time, odds: p.odds, method: p.method, phases: p.phases, alt: p.alt, ts: p.ts, g: p.g, m } : null;
+  return m && GAME_INFO[p.g] ? { count: p.count, time: p.time, odds: p.odds, method: p.method, phases: p.phases, alt: p.alt, mark: p.mark, ts: p.ts, g: p.g, m } : null;
 }
 
 const SHARE_ICON = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V3M8 7l4-4 4 4M6 11H5a1 1 0 00-1 1v8a1 1 0 001 1h14a1 1 0 001-1v-8a1 1 0 00-1-1h-1"/></svg>`;
@@ -24,6 +25,7 @@ function catchBody(s, g, likeTap) {
       <p class="post-kicker">Shiny found</p>
       <h3 class="post-name">${esc(s.m.name)}</h3>
       <p class="post-sub">${esc(sub)}</p>
+      ${markOf(s.mark) ? `<p class="post-mark"><img src="${markOf(s.mark).icon}" alt=""><span>${esc(markOf(s.mark).n)} <small>· ${esc(markOf(s.mark).title)}</small></span></p>` : ""}
       <dl class="post-stats">${stats.map(([k, v]) => `<div><dd>${esc(v)}</dd><dt>${k.toLowerCase()}</dt></div>`).join("")}</dl>
       ${foot.length ? `<p class="post-foot">${esc(foot.join(" · "))}</p>` : ""}`;
 }
@@ -54,7 +56,7 @@ export function postCard(p, author, liked, mine) {
 // with its dex number and, on your own profile, a share button. `i` finds the shiny again (features/profile-collection.js).
 export const collectionShiny = c => {
   const m = monByKey(c.k);
-  return m && GAME_INFO[c.g] ? { count: c.c, time: c.t, odds: c.o, method: c.m, alt: c.a, ts: c.ts, g: c.g, m } : null;
+  return m && GAME_INFO[c.g] ? { count: c.c, time: c.t, odds: c.o, method: c.m, alt: c.a, mark: c.mk, ts: c.ts, g: c.g, m } : null;
 };
 export function collectionCard(c, i, mine) {
   const s = collectionShiny(c);

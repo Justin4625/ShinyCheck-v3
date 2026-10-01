@@ -11,6 +11,18 @@
 //           or "filter" (the Shiny Dex with Filter & sort open)
 window.UPDATES = [
   {
+    id: "marks-nicknames-2026-10",
+    date: "2026-10-01",
+    title: "Marks & nicknames",
+    text: "Caught a shiny with a mark in Sword & Shield or Scarlet & Violet? Add it to your shiny and it shows on your card in the feed, your profile and the share card. You can give every shiny its nickname too: only you see that.",
+    steps: [
+      "Open a Pokémon's **Dex Entry** and tap a shiny in the log (or **Add a shiny manually**).",
+      "Pick its **Mark**. The list shows the marks of that game, with their titles like “the Recluse”.",
+      "Type a **Nickname** if you like. It stays private: it never shows on the feed, your profile or the share card.",
+    ],
+    shot: "shots/updates/marks.webp",
+  },
+  {
     id: "filter-sort-2026-10",
     date: "2026-10-01",
     title: "Filter & sort",

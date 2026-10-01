@@ -1,0 +1,27 @@
+/* Marks and nicknames: the mark picker (built on the form picker), the log row in Dex Entry and the
+   mark badge on feed posts and collection cards. */
+.mp .fp-btn img, .mp .fp-opt img { width: 30px; height: 30px; margin: 2px; }
+.mp .fp-label small { display: block; margin-top: 2px; font: 600 11px/1.2 var(--font); color: var(--muted); overflow: hidden; text-overflow: ellipsis; }
+
+.en-nick-field small { margin-left: 4px; font: 600 9px/1 var(--mono); letter-spacing: .06em; text-transform: none; color: var(--faint); opacity: .8; }
+.en-nick-field small::before { content: "🔒 "; }
+.en-edit input[name="nick"], .en-add-form input[name="nick"] { text-align: left; font-family: var(--font); font-size: 14px; }
+
+.en-main b .en-mark { width: 20px; height: 20px; margin: -3px 5px 0 0; vertical-align: middle; object-fit: contain; }
+.en-nick { font-weight: 750; color: var(--accent); }
+
+.post-mark {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%; margin: 8px 0 0; padding: 3px 10px 3px 4px; border-radius: 999px;
+  background: var(--surface-2); border: 1px solid var(--border); font: 700 11px/1.2 var(--font); color: var(--text);
+}
+.post-mark img { flex: none; width: 22px; height: 22px; object-fit: contain; }
+.post-mark span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.post-mark small { font: inherit; font-weight: 600; color: var(--muted); }
+
+@media (max-width: 560px) {
+  .en-edit input[name="nick"], .en-add-form input[name="nick"] { font-size: 16px; }
+}
+
+/* Mini collection tile: mark in the top-right corner. */
+.pf-tile { position: relative; }
+.pf-tile img.pf-mark { position: absolute; top: 6px; right: 6px; width: 22px; height: 22px; }

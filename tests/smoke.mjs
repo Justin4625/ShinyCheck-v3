@@ -478,6 +478,13 @@ step("community pages in local mode", async () => {
   await nav("@some_trainer", 400);
   expect(await js(`!document.getElementById("profileView").classList.contains("hidden")`), "/@username routes to a profile");
   expect(await js(`[...document.querySelectorAll("[data-bell]")].every(b => b.hidden)`), "no bell without an account");
+  // A post with a mark shows it; posts never carry a nickname (that stays private).
+  await nav("feed", 300);
+  await js(`import("/js/components/post-card.js").then(({ postCard }) => {
+    document.getElementById("feedList").innerHTML = postCard({ id: "u_x", uid: "u", key: "pikachu", g: "sv", mark: "jumbo", count: 412, time: 3600, odds: 1365, ts: 1, at: Date.now() }, { name: "Ash", username: "ash" }, false, false);
+  })`, 400);
+  expect((await text("#feedList .post-mark")).includes("Jumbo Mark"), "a post shows its mark");
+  await capture("post with mark");
   await nav("", 300);
 });
 step("what's new popup once", async () => {
@@ -534,6 +541,43 @@ step("dex entry: evolve and undo", async () => {
   await click('.en-form[data-form]:not(.active)', 300).catch(() => {});
   await click("[data-hunt]", 700);
   expect(await js(`document.getElementById("drawer").classList.contains("open")`), "Hunt it in opens the Hunt Deck");
+  await key("Escape");
+});
+step("dex entry: mark and nickname", async () => {
+  await openEntry("pikachu");
+  await click("[data-add-open]", 300);
+  await click('.en-add-form .gp-tile input[value="bdsp"]', 200);
+  expect(await js(`document.getElementById("enMark").hidden`), "no mark field for a game without marks");
+  await click('.en-add-form .gp-tile input[value="swsh"]', 200);
+  expect((await js(`document.querySelectorAll("#enMark .fp-opt").length`)) === 46, "Sword & Shield lists its 45 marks plus No mark");
+  await click("#enMark .fp-btn"); await click('#enMark .fp-opt[data-v="rare"]');
+  await type('.en-add-form [name="nick"]', "Sparky");
+  await click("[data-add-save]", 500);
+  const sparky = `[...document.querySelectorAll(".en-row")].find(r => r.querySelector(".en-mark"))`;
+  expect(await js(`(${sparky} || {}).textContent.includes("“Sparky”")`), "the log shows the nickname and the mark");
+  await capture("entry with mark and nickname");
+  await js(`${sparky}.click()`, 300);
+  expect((await js(`document.querySelector('.en-edit [name="mark"]').value`)) === "rare", "edit keeps the mark");
+  await click(".en-edit .fp.mp .fp-btn"); await click('.en-edit .fp-opt[data-v="curry"]');
+  await type('.en-edit [name="nick"]', "  ");
+  await click(".en-edit [data-save]", 400);
+  const saved = await js(`(s => s.mark + "|" + ("nick" in s))(JSON.parse(localStorage.getItem("shinycheck-v3-shinies"))["swsh:" + DEX.find(m => m.key === "pikachu").id].at(-1))`);
+  expect(saved === "curry|false", `edit changes the mark and an empty nickname is removed, got ${saved}`);
+  await js(`${sparky}.click()`, 300);
+  await click(".en-edit [data-share]", 1200);
+  await capture("share card with mark");
+  await key("Escape", 300);
+  // Phones: the mark list and nickname field fit without sideways scrolling.
+  for (const w of [360, 390, 414]) {
+    await size(w, 800, true);
+    await js(`document.querySelector(".en-edit .fp.mp").scrollIntoView({ block: "center" })`, 300);
+    await click(".en-edit .fp.mp .fp-btn", 300);
+    expect(await js(`(() => { const p = document.querySelector(".en-edit .fp.mp .fp-pop").getBoundingClientRect(), n = document.querySelector('.en-edit [name="nick"]').getBoundingClientRect(); return p.left >= 0 && p.right <= innerWidth && n.right <= innerWidth; })()`), `mark list fits at ${w}px`);
+    await capture(`mark picker at ${w}px`);
+    await key("Escape", 200);
+  }
+  await size(1280, 900, false);
+  await click(".en-edit [data-delete]"); await click(".en-edit [data-delete]", 400);
   await key("Escape");
 });
 step("dialogs", async () => {

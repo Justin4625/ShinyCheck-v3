@@ -20,6 +20,7 @@ import { openShare } from "../share-card.js";
 import { markPost } from "../social-sync.js";
 import { mons } from "../../model/dex.js";
 import { altOf, altSprite, altsOf } from "../../model/forms.js";
+import { markOf } from "../../model/marks.js";
 import { codeLabel, whereIn } from "../../model/game-dex.js";
 import { GAME_INFO } from "../../model/games.js";
 import { afterShiny, defaultSetup, evalSetup, patchSetup } from "../../model/hunt-setup.js";
@@ -179,7 +180,7 @@ export function paintLog() {
   dr.log.innerHTML = list.length
     ? list.map((s, i) => `<li>
           <span class="log-n">${sparkSvg()}${i + 1}</span>
-          <span class="log-main"><b>${nf(s.count)}</b> encounters · ${fmtShort(s.time)}<small>${altOf(cur, s.alt) ? `${esc(altOf(cur, s.alt).n)} · ` : ""}${fmtDate(s.ts)}${s.method ? ` · ${esc(s.method)}` : ""}${s.odds ? ` · 1/${s.odds}` : ""}${s.phases ? ` · after ${s.phases} ${s.phases === 1 ? "phase" : "phases"}` : ""}</small></span>
+          <span class="log-main"><b>${nf(s.count)}</b> encounters · ${fmtShort(s.time)}<small>${s.nick ? `“${esc(s.nick)}” · ` : ""}${markOf(s.mark) ? `${esc(markOf(s.mark).n)} · ` : ""}${altOf(cur, s.alt) ? `${esc(altOf(cur, s.alt).n)} · ` : ""}${fmtDate(s.ts)}${s.method ? ` · ${esc(s.method)}` : ""}${s.odds ? ` · 1/${s.odds}` : ""}${s.phases ? ` · after ${s.phases} ${s.phases === 1 ? "phase" : "phases"}` : ""}</small></span>
           <button class="log-share" data-share="${i}" title="Share card" aria-label="Share card">${SHARE_ICO}</button>
           <button class="log-del" data-del="${i}" title="Delete entry">✕</button>
         </li>`).join("")

@@ -224,7 +224,7 @@ export async function writePost(id, data, isNew) {
   }
   const { postedAt, ...rest } = data;
   // Optional fields that were removed from the catch are removed from the post too.
-  const gone = Object.fromEntries(["alt", "odds", "method", "phases"].filter(k => !(k in rest)).map(k => [k, deleteField()]));
+  const gone = Object.fromEntries(["alt", "mark", "odds", "method", "phases"].filter(k => !(k in rest)).map(k => [k, deleteField()]));
   return updateDoc(ref(`posts/${id}`), { ...rest, ...gone });
 }
 export const deletePost = id => fb().fs.deleteDoc(ref(`posts/${id}`));
