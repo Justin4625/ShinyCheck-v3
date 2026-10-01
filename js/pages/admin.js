@@ -8,18 +8,19 @@ import { state } from "../core/state.js";
 import { $, esc } from "../core/util.js";
 import * as admin from "../services/admin.js";
 import * as social from "../services/social.js";
+import { navigate } from "./router.js";
 
 let data = null, people = null, error = "", loading = false, loadedAt = 0;
 const plural = (n, one, many = one + "s") => `${nf(n)} ${n === 1 ? one : many}`;
 
+// Anyone else who opens /admin goes back to the Shiny Dex, once it's known who is signed in.
+let authKnown = false;
+const notAdmin = () => social.localOnly() || (social.available() ? !admin.isAdmin() : authKnown);
+
 export function renderAdmin() {
+  if (notAdmin()) return navigate("/", true);
   renderSidebar();
-  if (social.localOnly() || (social.available() && !admin.isAdmin())) {
-    $("#adStats").innerHTML = "";
-    $("#adBody").innerHTML = `<p class="feed-empty">This page is only for the ShinyCheck admin.</p>`;
-    return;
-  }
-  if (!social.available()) { $("#adBody").innerHTML = `<p class="feed-empty">Loading…</p>`; return; }
+  if (!social.available()) { $("#adStats").innerHTML = ""; $("#adBody").innerHTML = `<p class="feed-empty">Loading…</p>`; return; }
   // Coming back after half a minute loads fresh numbers.
   if (!loading && Date.now() - loadedAt > 30000) load();
   paint();
@@ -101,5 +102,9 @@ export function init() {
   setInterval(() => { if (state.adminView && !document.hidden && !loading && admin.isAdmin()) load(); }, 60000);
   // The ⚙ menu entry, for the admin only.
   const item = $("#adminOpen");
-  addEventListener("cloud:user", () => { item.hidden = !admin.isAdmin(); });
+  addEventListener("cloud:user", () => {
+    authKnown = true;
+    item.hidden = !admin.isAdmin();
+    if (state.adminView && notAdmin()) navigate("/", true);
+  });
 }

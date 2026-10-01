@@ -192,7 +192,8 @@ step("home", async () => {
 step("home: search + region + filters", async () => {
   await type("#q", "vivi");
   await until(`document.querySelectorAll("#cards .pcard").length === 1`);
-  expect(await js(`document.querySelectorAll("#cards .pcard").length`) === 1, "search finds Vivillon");
+  const vivi = await js(`[document.querySelectorAll("#cards .pcard").length, document.getElementById("q").value, [...document.querySelectorAll("#cards .pcard")].slice(0, 4).map(c => c.textContent.trim().slice(0, 30)).join(" / "), location.pathname]`);
+  expect(vivi[0] === 1, `search finds Vivillon, got ${JSON.stringify(vivi)}`);
   await type("#q", "");
   await click('#regions [data-gen="6"]');
   await click("#fMissing");
