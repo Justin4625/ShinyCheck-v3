@@ -6,7 +6,7 @@
 // - Fonts and the Firebase SDK: served from the cache, refreshed in the background.
 // Firestore, sign-in and other API calls are never touched (Firestore keeps its own offline copy).
 // Also shows push notifications (update news) and opens the app when one is tapped.
-const VERSION = "20261001203505"; // stamped by scripts/bump-version.sh on every commit
+const VERSION = "20261001204715"; // stamped by scripts/bump-version.sh on every commit
 const SHELL = `shinycheck-shell-${VERSION}`;
 const RUNTIME = "shinycheck-runtime-v1";
 const CORE = [
@@ -45,6 +45,7 @@ const CORE = [
   `css/30-support.css?v=${VERSION}`,
   `css/31-marks.css?v=${VERSION}`,
   `css/32-owner.css?v=${VERSION}`,
+  `css/33-photo-crop.css?v=${VERSION}`,
   `data/evolutions.js?v=${VERSION}`,
   `data/forms.js?v=${VERSION}`,
   `data/pokedex.js?v=${VERSION}`,
@@ -73,6 +74,7 @@ const CORE = [
   `js/core/state.js?v=${VERSION}`,
   `js/core/store.js?v=${VERSION}`,
   `js/core/util.js?v=${VERSION}`,
+  `js/features/account-avatar.js?v=${VERSION}`,
   `js/features/app-install.js?v=${VERSION}`,
   `js/features/backups.js?v=${VERSION}`,
   `js/features/dex-entry.js?v=${VERSION}`,
@@ -86,6 +88,7 @@ const CORE = [
   `js/features/install-help.js?v=${VERSION}`,
   `js/features/landing-feed.js?v=${VERSION}`,
   `js/features/notifications.js?v=${VERSION}`,
+  `js/features/photo-crop.js?v=${VERSION}`,
   `js/features/photo-upload.js?v=${VERSION}`,
   `js/features/post-actions.js?v=${VERSION}`,
   `js/features/presence.js?v=${VERSION}`,

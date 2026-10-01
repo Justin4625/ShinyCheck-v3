@@ -34,6 +34,7 @@ import { init as initSocialSync } from "./features/social-sync.js";
 import { init as initFeed } from "./pages/feed.js";
 import { init as initProfile } from "./pages/profile.js";
 import { init as initFollowList } from "./features/follow-list.js";
+import { init as initPhotoCrop } from "./features/photo-crop.js";
 import { init as initProfileEdit } from "./features/profile-edit.js";
 import { init as initProfileCollection } from "./features/profile-collection.js";
 import { init as initTrainerSearch } from "./features/trainer-search.js";
@@ -43,6 +44,7 @@ import { init as initPresence } from "./features/presence.js";
 import { init as initAdmin } from "./pages/admin.js";
 import { init as initSupport } from "./features/support.js";
 import { init as initOwnerSocials } from "./components/owner-socials.js";
+import { init as initAccountAvatar } from "./features/account-avatar.js";
 
 // Event wiring, in the order the features depend on (e.g. which Escape handler runs first).
 initFormPicker();
@@ -72,6 +74,7 @@ initSocialSync();
 initFeed();
 initProfile();
 initFollowList();
+initPhotoCrop();
 initProfileEdit();
 initProfileCollection();
 initTrainerSearch();
@@ -81,6 +84,7 @@ initPresence();
 initAdmin();
 initSupport();
 initOwnerSocials();
+initAccountAvatar();
 
 // Bridge for services/cloud.js (a separate module that loads Firebase).
 window.ShinyApp = { snapshot, applyData, hasLocalData, toast, render, whatsNew: () => whatsNew() };

@@ -1,0 +1,21 @@
+/* Crop your photo (js/features/photo-crop.js): the photo behind a round frame, and the zoom row. */
+.crop-dlg { z-index: 95; }
+.crop-stage {
+  position: relative; width: min(320px, 100%); aspect-ratio: 1; margin: 6px auto 14px; border-radius: 22px; overflow: hidden;
+  background: #0d0c16; touch-action: none; cursor: grab; user-select: none; -webkit-user-select: none;
+}
+.crop-stage:active { cursor: grabbing; }
+.crop-stage img { position: absolute; left: 50%; top: 50%; max-width: none; transform: translate(-50%, -50%); pointer-events: none; -webkit-user-drag: none; }
+.crop-ring {
+  position: absolute; inset: 7%; border-radius: 50%; pointer-events: none;
+  box-shadow: 0 0 0 999px rgba(10, 9, 18, .62), inset 0 0 0 2px rgba(255, 255, 255, .9);
+}
+.crop-zoom { display: flex; align-items: center; gap: 10px; width: min(320px, 100%); margin: 0 auto; }
+.crop-zoom input { flex: 1; min-width: 0; accent-color: #9d7bff; height: 40px; }
+.crop-step {
+  flex: none; width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; cursor: pointer;
+  color: var(--text); background: var(--surface); border: 1px solid var(--border-2);
+}
+.crop-step svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; }
+@media (hover: hover) { .crop-step:hover { background: var(--surface-2); } }
+.crop-fine { text-align: center; margin-top: 10px; }
