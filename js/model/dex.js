@@ -18,4 +18,11 @@ for (const m of mons) {
 }
 
 export const region = g => (genNames[g].match(/\((.*)\)/) || [, genNames[g]])[1];
+// Shiny Dex regions, in order. Each generation is one region, except that the species Legends: Arceus
+// introduced (#899–905, Wyrdeer to Enamorus) are Gen 8 but from Hisui, so they get a region of their own
+// after Galar. Regional forms (Hisuian Growlithe…) stay with their species, like Alolan and Galarian forms.
+export const REGIONS = Object.keys(genNames).flatMap(g => [{ key: g, gen: +g, name: region(g) },
+  ...(g === "8" ? [{ key: "8h", gen: 8, name: "Hisui" }] : [])]);
+export const regionOf = m => m.gen === 8 && +m.dex >= 899 && +m.dex <= 905 ? "8h" : String(m.gen);
+export const regionName = m => REGIONS.find(r => r.key === regionOf(m)).name;
 export const speciesOf = m => mons.filter(x => x.dex === m.dex);

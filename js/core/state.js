@@ -13,4 +13,4 @@ export const el = {
 // huntsView: the Active hunts page (/hunts), statsView: Stats (/stats), updatesView: What's new
 // (/updates), feedView: the community feed (/feed), profileId: a trainer profile (/trainer/<uid>,
 // "me" for /trainer), f / gf: Filter & sort on the Shiny Dex / on every game page (model/dex-filter.js), adminView: the admin dashboard (/admin); page stays "" there. pendingHunt: Pokémon to open in the Hunt Deck after navigating.
-export const state = { pendingHunt: null, huntsView: false, statsView: false, updatesView: false, feedView: false, adminView: false, profileId: "", page: "", gen: 0, tab: "", forms: true, gOutside: false, f: newFilter(), gf: newFilter() };
+export const state = { pendingHunt: null, huntsView: false, statsView: false, updatesView: false, feedView: false, adminView: false, profileId: "", page: "", gen: "0", tab: "", forms: true, gOutside: false, f: newFilter(), gf: newFilter() };

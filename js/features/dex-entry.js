@@ -18,12 +18,12 @@ import { SHARE_ICO } from "./hunt-deck/deck.js";
 import { openShare } from "./share-card.js";
 import { markPost } from "./social-sync.js";
 import { EVENT_ONLY } from "../model/availability.js";
-import { mons, region, speciesOf } from "../model/dex.js";
+import { mons, regionName, speciesOf } from "../model/dex.js";
 import { evolutionsOf } from "../model/evolutions.js";
 import { altId, altOf, altSprite, altsOf, formText } from "../model/forms.js";
 import { codeLabel } from "../model/game-dex.js";
 import { GAME_INFO } from "../model/games.js";
-import { HUNT_SETUP, defaultSetup, evalSetup, patchSetup } from "../model/hunt-setup.js";
+import { HUNT_SETUP, defaultSetup, evalSetup, patchSetup, startSetup } from "../model/hunt-setup.js";
 import { markOf } from "../model/marks.js";
 import { renderHomeStats } from "../pages/home.js";
 import { navigate } from "../pages/router.js";
@@ -35,7 +35,7 @@ export let entryMon = null, entryFocus = null, editing = null, adding = false;
 let viewAlt = "", altsAll = false;
 // Setup for "Add a shiny": starts from the game's remembered hunt setup.
 let addSetup = null;
-const addSetupFor = g => ({ ...defaultSetup(g), ...((prefs[g] || {}).setup || {}) });
+const addSetupFor = g => startSetup(g, entryMon.dex, { ...defaultSetup(g), ...((prefs[g] || {}).setup || {}) });
 function paintAddSetup(g) {
   const box = $("#enSetup");
   if (!box) return;
@@ -98,7 +98,7 @@ export function paintEntry() {
   const logs = forms.flatMap(shiniesOf).sort((a, b) => b.ts - a.ts);
   $("#enChip").textContent = `National Dex #${m.dex}`;
   $("#enImg").src = altSprite(m, viewAlt) || "";
-  $("#enMeta").textContent = `${region(m.gen)} · Gen ${m.gen}`;
+  $("#enMeta").textContent = `${regionName(m)} · Gen ${m.gen}`;
   $("#enWiki").href = m.url;
   $("#enStatus").innerHTML = statusNote(m);
   $("#enName").innerHTML = `${esc(m.name)}${logs.length ? ` <span class="en-x">✦${logs.length}</span>` : ""}`;

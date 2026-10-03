@@ -195,6 +195,12 @@ step("home: search + region + filters", async () => {
   const vivi = await js(`[document.querySelectorAll("#cards .pcard").length, document.getElementById("q").value, [...document.querySelectorAll("#cards .pcard")].slice(0, 4).map(c => c.textContent.trim().slice(0, 30)).join(" / "), location.pathname]`);
   expect(vivi[0] === 1, `search finds Vivillon, got ${JSON.stringify(vivi)}`);
   await type("#q", "");
+  await click('#regions [data-gen="8h"]');
+  const hisui = await js(`[[...document.querySelectorAll("#cards .pcard")].map(c => +c.dataset.id), document.querySelector('#regions [data-gen="8h"] .r-name').textContent]`);
+  const hisuiIds = await js(`DEX.filter(m => +m.dex >= 899 && +m.dex <= 905).map(m => m.id)`);
+  expect(hisui[1] === "Hisui" && hisui[0].length === hisuiIds.length && hisui[0].every(id => hisuiIds.includes(id)), `Hisui shows Wyrdeer to Enamorus, got ${JSON.stringify(hisui)}`);
+  await click('#regions [data-gen="8"]');
+  expect(!(await js(`[...document.querySelectorAll("#cards .pcard")].some(c => DEX.find(m => m.id === +c.dataset.id).dex >= "0899")`)), "Galar no longer lists the Hisui species");
   await click('#regions [data-gen="6"]');
   await click("#fMissing");
   await click("#fForms");
@@ -453,6 +459,29 @@ step("hunt deck: more hunt methods", async () => {
   await click('#drSetup [data-hm="horde"]');
   expect((await odds()) === "1/274", `horde with charm is 1/274, got ${await odds()}`);
   await click('#drSetup [data-hm="wild"]'); await click('#drSetup [data-hb="charm"]');
+  await key("Escape");
+});
+step("hunt deck: shiny charm per encounter, number fields", async () => {
+  const odds = () => text("#drOddsShow");
+  const open = async (g, q) => { await nav(g, 400); await type("#gq", q); await click("#gameCards .pcard", 400); };
+  // Sword & Shield: revived fossils (and the Regis) ignore the Shiny Charm and start on their own method.
+  await open("swsh", "dracozolt");
+  expect(await exists('#drSetup [data-hm="fossil"].on') && (await odds()) === "1/4,096", `a fossil hunt starts on Fossil / Regi at 1/4,096, got ${await odds()}`);
+  await key("Escape");
+  // Scarlet & Violet: wild Tera Pokémon and fixed encounters get neither the charm nor Sparkling Power.
+  await open("sv", "pikachu");
+  await click('#drSetup [data-hm="fixed"]');
+  expect((await odds()) === "1/4,096", `Wild Tera / fixed is 1/4,096, got ${await odds()}`);
+  await click('#drSetup [data-hm="wild"]');
+  // Number fields have no spin arrows and the mouse wheel never changes them.
+  await js(`document.querySelector(".dr-settings").open = true; document.getElementById("drSetCount").scrollIntoView({ block: "center" })`, 200);
+  const before = await js(`document.getElementById("drSetCount").focus(), document.getElementById("drSetCount").value`);
+  const r = await js(`(() => { const b = document.getElementById("drSetCount").getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2]; })()`);
+  await cdp("Input.dispatchMouseEvent", { type: "mouseWheel", x: r[0], y: r[1], deltaX: 0, deltaY: -120 });
+  await sleep(200);
+  const after = await js(`[document.getElementById("drSetCount").value, document.activeElement.id, getComputedStyle(document.getElementById("drSetCount")).appearance]`);
+  expect(after[0] === before && after[1] !== "drSetCount" && after[2] === "textfield", `the wheel leaves Encounters alone, got ${JSON.stringify([before, ...after])}`);
+  await js(`document.querySelector(".dr-settings").open = false`);
   await key("Escape");
 });
 step("hunt deck: forms, phases, prev/next, reset, cancel", async () => {

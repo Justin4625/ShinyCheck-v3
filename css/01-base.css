@@ -79,5 +79,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 button, input { font: inherit; color: inherit; }
+/* Number fields (encounters, time, step) are typed, not clicked: no up/down arrows (wheel: js/features/number-inputs.js). */
+input[type="number"] { -moz-appearance: textfield; appearance: textfield; }
+input[type="number"]::-webkit-inner-spin-button, input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
 .hidden { display: none !important; }
 ::selection { background: #ff7ad955; }

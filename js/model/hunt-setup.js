@@ -6,6 +6,13 @@
 // shiny rolls, P = 1 − (4095/4096)^rolls, or (8191/8192)^rolls up to Gen 5 (`rate: 8192`); roll counts
 // checked against RotomLabs and PokéTools. Some methods have a fixed rate ({ odds, charm }) or a table/formula of their
 // own (a function of the chosen levels) instead. A new game only needs its parts.
+// The Shiny Charm (Bulbapedia, Shiny Charm and Shiny Pokémon): from Black 2 & White 2 through Ultra Sun & Ultra
+// Moon and in Let's Go it also works on static encounters such as legendaries (never on gifts, trades or events), so
+// those are hunted with Wild (Static in Let's Go, where a Lure and the Catch Combo don't apply). Exceptions are
+// methods of their own: in Sword & Shield the Regis, revived fossils, curry and den Pokémon ignore it; in Scarlet &
+// Violet wild Tera Pokémon and fixed (wanderer) encounters, incl. the Area Zero Underdepths, ignore the charm and
+// Sparkling Power; in BD & SP it only works for eggs. `species` lists the species a game always hunts with one
+// method (by national dex number); a new hunt for one of them starts on that method (see startSetup).
 // A level bonus may set `def` (the level used when a setup hasn't picked one yet) and `tag` (how the
 // chosen level reads in the method label; default "<label> <level>"). A `live` level bonus is a chain the
 // Hunt Deck counts itself (see liveChain); it has a `name` for the Hunt Deck, may give its exact value per
@@ -104,18 +111,22 @@ export const HUNT_SETUP = {
   get sm() { return { ...this.usum, methods: this.usum.methods.filter(([id]) => id !== "uw") }; },
   // Let's Go: rolls from a Lure (+1), the Shiny Charm (+2) and the species' Catch Combo
   // (11+ → +3, 21+ → +7, 31+ → +11); all three together give 1/273.
-  lgpe: { methods: [["wild", "Wild", 1, ["charm", "lure", "combo"]]],
+  // Static encounters (the legendary birds, Mewtwo, Snorlax) only get the charm.
+  lgpe: { methods: [["wild", "Wild", 1, ["charm", "lure", "combo"]], ["static", "Static", 1, ["charm"]]],
+    species: { static: [143, 144, 145, 146, 150] },
     bonus: [{ ...CHARM, rolls: 2 }, { id: "lure", label: "Lure", type: "toggle", rolls: 1 },
       { id: "combo", label: "Catch Combo", type: "level", levels: [["0–10", 0], ["11+", 3], ["21+", 7], ["31+", 11]] }] },
   // Sword & Shield (RotomLabs): the Number Battled bonus only helps Pokémon with a Brilliant Aura, which
   // need at least 1 KO of the species: 2 rolls, 3 from 50, 4 from 100, 5 from 200, 6 from 300, 7 from 500
   // (+2 with the charm, best 1/455.6). Other wild spawns stay at the normal rate. Max Raids are 1/4096
-  // and ignore the charm.
+  // and ignore the charm, and so do the legendary giants (Regirock, Regice, Registeel, Regigigas, Regieleki,
+  // Regidrago), revived fossils (Dracozolt, Arctozolt, Dracovish, Arctovish) and curry visitors.
   swsh: { methods: [["wild", "Wild", 1, ["charm"]], ["brilliant", "Brilliant Aura", 2, ["charm", "ko"]],
     ["breed", "Breeding", 1, ["charm:1"]], ["masuda", "Masuda", 6, ["charm"]],
-    ["raid", "Max Raid", { odds: 4096 }, []], ["dyna", "Dynamax Adventure", { odds: 300, charm: 100 }, ["charm"]]],
+    ["fossil", "Fossil / Regi", { odds: 4096 }, []], ["raid", "Max Raid", { odds: 4096 }, []], ["dyna", "Dynamax Adventure", { odds: 300, charm: 100 }, ["charm"]]],
     bonus: [{ ...CHARM, rolls: 2 },
-      { id: "ko", label: "Number battled", type: "level", levels: [["1+", 0], ["50+", 1], ["100+", 2], ["200+", 3], ["300+", 4], ["500+", 5]] }] },
+      { id: "ko", label: "Number battled", type: "level", levels: [["1+", 0], ["50+", 1], ["100+", 2], ["200+", 3], ["300+", 4], ["500+", 5]] }],
+    species: { fossil: [377, 378, 379, 486, 894, 895, 880, 881, 882, 883] } },
   // Poké Radar (RotomLabs): the chance a shiny patch appears, by chain length. It climbs slowly to
   // 1/1192 at 35, then jumps: 36 → 1/993, 37 → 1/799, 38 → 1/400, 39 → 1/200, 40+ → 1/99.
   // "10+" etc. use the lowest rate of that stretch. Hunts from before the chain picker were at 40.
@@ -126,10 +137,11 @@ export const HUNT_SETUP = {
         levels: [["0–9", 4096], ["10+", 2521], ["20+", 1820], ["30+", 1310], ["36", 993], ["37", 799], ["38", 400], ["39", 200], ["40+", 99]] }] },
   pla: { methods: [["wild", "Wild", 1, ["charm", "research"]], ["mo", "Mass outbreak", 26, ["charm", "research"]], ["mmo", "Massive mass outbreak", 13, ["charm", "research"]]],
     bonus: [{ ...CHARM, rolls: 3 }, { id: "research", label: "Research", type: "level", levels: [["–", 0], ["Lv 10", 1], ["Perfect", 3]] }] },
-  // Scarlet & Violet (RotomLabs): eggs 1/4096, 1/2048 with the charm; Tera Raids 1/4103 and the
-  // charm doesn't apply.
+  // Scarlet & Violet (RotomLabs, Bulbapedia): eggs 1/4096, 1/2048 with the charm; Tera Raids 1/4103. Wild
+  // Tera Pokémon and fixed encounters (wanderers, everything in the Area Zero Underdepths) stay at 1/4096:
+  // neither the charm nor Sparkling Power applies.
   sv: { methods: [["wild", "Wild", 1, ["charm", "outbreak", "sparkling"]], ["breed", "Breeding", 1, ["charm:1"]], ["masuda", "Masuda", 6, ["charm"]],
-    ["raid", "Tera Raid", { odds: 4103 }, []]],
+    ["fixed", "Wild Tera / fixed", { odds: 4096 }, []], ["raid", "Tera Raid", { odds: 4103 }, []]],
     bonus: [{ ...CHARM, rolls: 2 }, { id: "outbreak", label: "Outbreak cleared", type: "level", levels: [["–", 0], ["30+", 1], ["60+", 2]] },
       { id: "sparkling", label: "Sparkling Power", type: "level", levels: [["–", 0], ["1", 1], ["2", 2], ["3", 3]] }] },
   lza: { methods: [["wild", "Wild", 1, ["charm", "sparkling"]]],
@@ -192,6 +204,17 @@ const levelFor = (b, n) => b.levels.reduce((best, _, i) => levelStart(b, i) <= n
 export function afterShiny(gid, setup) {
   const b = liveChain(gid, setup);
   return b && b.endsOnShiny ? patchSetup(gid, setup, { [b.id + "N"]: 0 }) : setup;
+}
+// The setup a new hunt starts from: the method this species is always hunted with in this game (a Regi or a
+// fossil in Sword & Shield), else the game's last setup — unless that was such a species method.
+export function startSetup(gid, dex, last) {
+  const species = (HUNT_SETUP[gid] || {}).species || {};
+  const own = Object.keys(species).find(id => species[id].includes(+dex));
+  // Owning the Shiny Charm carries over to the other method.
+  const charm = last && last.charm ? { charm: true } : {};
+  if (own) return { ...(last && last.m === own ? last : charm), m: own };
+  if (last && species[last.m]) return { ...defaultSetup(gid), ...charm };
+  return last || defaultSetup(gid);
 }
 export const defaultSetup = gid => ({ m: HUNT_SETUP[gid] ? HUNT_SETUP[gid].methods[0][0] : "wild" });
 export function patchSetup(gid, setup, patch) {

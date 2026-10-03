@@ -1,4 +1,4 @@
-// Shiny Dex page (/): all entries by generation, totals and recommendations.
+// Shiny Dex page (/): all entries by region, totals and recommendations.
 import { setRing, updateSection } from "../components/progress.js";
 import { empty, sectionHtml } from "../components/section.js";
 import { renderSidebar } from "../components/sidebar.js";
@@ -12,7 +12,7 @@ import { $, esc } from "../core/util.js";
 import { openEntry } from "../features/dex-entry.js";
 import { huntable, shinyStatus } from "../model/availability.js";
 import { SORTS, activeCount, matches, sorter } from "../model/dex-filter.js";
-import { genNames, mons, region } from "../model/dex.js";
+import { REGIONS, mons, regionOf } from "../model/dex.js";
 import { GAME_INFO } from "../model/games.js";
 import { render } from "./router.js";
 
@@ -32,7 +32,8 @@ function recommended(scope) {
   return recOrder.filter(id => ok.has(id)).slice(0, 6).map(id => mons.find(m => m.id === id));
 }
 
-const homeScope = m => !state.gen || m.gen === state.gen;
+const homeScope = m => state.gen === "0" || regionOf(m) === state.gen;
+const inRegion = (list, key) => list.filter(m => regionOf(m) === key);
 // The Forms toggle decides whether alternate forms count towards totals and percentages:
 // Shiny Dex uses its own toggle, game pages share theirs.
 export const homePool = () => mons.filter(m => state.forms || !m.variant);
@@ -53,9 +54,9 @@ export function renderHome() {
   // Sorted by dex number the cards stay grouped by region; any other order is one list.
   if (state.f.sort !== "dex") {
     if (list.length) html = sectionHtml("✦", SORTS[state.f.sort], "sorted", homePool().filter(homeScope), list.sort(sorter(state.f, homeCtx, (x, y) => +x.dex - +y.dex || x.id - y.id)));
-  } else for (const g of Object.keys(genNames).map(Number)) {
-    const items = list.filter(m => m.gen === g);
-    if (items.length) html += sectionHtml(String(g).padStart(2, "0"), region(g), g, homePool().filter(m => m.gen === g), items);
+  } else for (const r of REGIONS) {
+    const items = inRegion(list, r.key);
+    if (items.length) html += sectionHtml(String(r.gen).padStart(2, "0"), r.name, r.key, inRegion(homePool(), r.key), items);
   }
   el.cards.innerHTML = html || empty(el.q, activeCount(state.f));
   renderHomeStats();
@@ -64,13 +65,13 @@ export function renderHome() {
 export function renderHomeStats() {
   const pool = homePool();
   const got = done(pool), p = pct(pool);
-  const regionsDone = Object.keys(genNames).filter(g => {
-    const l = pool.filter(m => m.gen === +g);
+  const regionsDone = REGIONS.filter(r => {
+    const l = inRegion(pool, r.key);
     return done(l) === l.length;
   }).length;
   $("#statCaught").textContent = got;
   $("#statLeft").textContent = pool.length - got;
-  $("#statRegions").textContent = `${regionsDone}/${Object.keys(genNames).length}`;
+  $("#statRegions").textContent = `${regionsDone}/${REGIONS.length}`;
   $("#heroPct").textContent = fmtPct(p);
   setRing($("#heroRing"), p);
   const left = pool.length - got;
@@ -78,7 +79,7 @@ export function renderHomeStats() {
     ? `<b>${left}</b> Pokémon and forms still missing from your shiny collection. ${got ? "Keep going!" : "Open a Pokémon to log your first shiny."}`
     : `<b>Shiny Dex complete!</b> Every form, shiny and in one place. ✦`;
 
-  el.regions.innerHTML = [[0, "All regions", pool], ...Object.keys(genNames).map(g => [+g, region(g), pool.filter(m => m.gen === +g)])]
+  el.regions.innerHTML = [["0", "All regions", pool], ...REGIONS.map(r => [r.key, r.name, inRegion(pool, r.key)])]
     .map(([g, n, l]) => `<button class="region ${state.gen === g ? "active" : ""} ${done(l) === l.length ? "done" : ""}" data-gen="${g}">
         <span class="r-name">${esc(n)}</span><span class="r-num">${done(l)} / ${l.length}</span>
         <span class="r-bar" style="width:${pct(l)}%"></span>
@@ -89,7 +90,7 @@ export function renderHomeStats() {
     ? next.map(m => `<button data-jump="${m.id}" title="#${m.dex} ${esc(m.name)}${m.form ? " (" + esc(m.form) + ")" : ""} — hunt in ${esc(GAMES.filter(g => m.games[g]).map(g => GAME_INFO[g].name).reverse().join(", "))}"><img src="${m.sprite}" alt="${esc(m.name)}"></button>`).join("")
     : `<p class="up-next-empty">Nothing left to hunt here ✦</p>`;
 
-  for (const g of Object.keys(genNames)) updateSection(el.cards, g, pool.filter(m => m.gen === +g));
+  for (const r of REGIONS) updateSection(el.cards, r.key, inRegion(pool, r.key));
   updateSection(el.cards, "sorted", pool.filter(homeScope));
   renderSidebar();
 }
@@ -100,7 +101,7 @@ export function init() {
 
   el.regions.addEventListener("click", e => {
     const r = e.target.closest(".region");
-    if (r) { state.gen = +r.dataset.gen; render(); }
+    if (r) { state.gen = r.dataset.gen; render(); }
   });
   // A recommendation opens its Dex Entry, where "Hunt it in" starts the hunt.
   el.upNext.addEventListener("click", e => {

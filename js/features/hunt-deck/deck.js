@@ -24,7 +24,7 @@ import { altOf, altSprite, altsOf } from "../../model/forms.js";
 import { markOf } from "../../model/marks.js";
 import { codeLabel, whereIn } from "../../model/game-dex.js";
 import { GAME_INFO } from "../../model/games.js";
-import { afterShiny, defaultSetup, evalSetup, patchSetup } from "../../model/hunt-setup.js";
+import { HUNT_SETUP, afterShiny, defaultSetup, evalSetup, patchSetup, startSetup } from "../../model/hunt-setup.js";
 import { renderGameStats } from "../../pages/game.js";
 import { renderHunts } from "../../pages/hunts.js";
 import { render } from "../../pages/router.js";
@@ -56,8 +56,14 @@ function paintAlt() {
   if (alts.length) $("#drAltBox").innerHTML = formPicker(cur, huntAlt(), "Form you're hunting");
   dr.img.src = altSprite(cur, huntAlt()) || "";
 }
-// A new hunt starts from the game's default method (1/8192 up to Gen 5), or the game's last setup.
-const gamePrefs = () => ({ inc: 1, setup: defaultSetup(curGame), odds: evalSetup(curGame, defaultSetup(curGame)).odds, ...prefs[curGame] });
+// A new hunt starts from the game's default method (1/8192 up to Gen 5), or the game's last setup; a species
+// with a method of its own (a Regi in Sword & Shield) starts on that one (startSetup).
+const gamePrefs = () => {
+  const p = { inc: 1, setup: defaultSetup(curGame), odds: evalSetup(curGame, defaultSetup(curGame)).odds, ...prefs[curGame] };
+  if (!HUNT_SETUP[curGame]) return p;
+  const setup = startSetup(curGame, cur.dex, p.setup);
+  return { ...p, setup, odds: evalSetup(curGame, setup).odds };
+};
 export const hunt = () => {
   const h = hunts[curKey()] || { count: 0, time: 0, since: null, ...gamePrefs() };
   // Hunts and prefs from before hunt setups existed get the default setup.

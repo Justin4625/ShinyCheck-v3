@@ -46,6 +46,7 @@ import { init as initAdmin } from "./pages/admin.js";
 import { init as initSupport } from "./features/support.js";
 import { init as initOwnerSocials } from "./components/owner-socials.js";
 import { init as initAccountAvatar } from "./features/account-avatar.js";
+import { init as initNumberInputs } from "./features/number-inputs.js";
 
 // Event wiring, in the order the features depend on (e.g. which Escape handler runs first).
 initFormPicker();
@@ -85,6 +86,7 @@ initSocialBell();
 initPresence();
 initAdmin();
 initSupport();
+initNumberInputs();
 initOwnerSocials();
 initAccountAvatar();
 
