@@ -475,7 +475,11 @@ step("hunt deck: shiny charm per encounter, number fields", async () => {
   await click('#drSetup [data-hm="wild"]');
   // Number fields have no spin arrows and the mouse wheel never changes them.
   await js(`document.querySelector(".dr-settings").open = true; document.getElementById("drSetCount").scrollIntoView({ block: "center" })`, 200);
-  const before = await js(`document.getElementById("drSetCount").focus(), document.getElementById("drSetCount").value`);
+  await cdp("Emulation.setFocusEmulationEnabled", { enabled: true });
+  const before = await js(`document.getElementById("drSetCount").value`);
+  // A field showing 0 empties on focus, so a new number can be typed straight away.
+  const focused = await js(`document.getElementById("drSetCount").focus(), document.getElementById("drSetCount").value`);
+  expect(before === "0" && focused === "", `Encounters' 0 goes away on focus, got ${JSON.stringify([before, focused])}`);
   const r = await js(`(() => { const b = document.getElementById("drSetCount").getBoundingClientRect(); return [b.x + b.width / 2, b.y + b.height / 2]; })()`);
   await cdp("Input.dispatchMouseEvent", { type: "mouseWheel", x: r[0], y: r[1], deltaX: 0, deltaY: -120 });
   await sleep(200);
