@@ -6,6 +6,7 @@ import { markPicker } from "../components/mark-picker.js";
 import { gamePicker } from "../components/game-picker.js";
 import { setupHtml, setupPatch } from "../components/hunt-setup.js";
 import { statusNote } from "../components/status.js";
+import { readTracked, trackedFields } from "../components/tracked-fields.js";
 import { toast } from "../components/toast.js";
 import { arm, disarm } from "../components/two-step.js";
 import { shiniesOf } from "../core/collection.js";
@@ -25,6 +26,7 @@ import { codeLabel } from "../model/game-dex.js";
 import { GAME_INFO } from "../model/games.js";
 import { HUNT_SETUP, defaultSetup, evalSetup, patchSetup, startSetup } from "../model/hunt-setup.js";
 import { markOf } from "../model/marks.js";
+import { canMove } from "../model/transfers.js";
 import { renderHomeStats } from "../pages/home.js";
 import { navigate } from "../pages/router.js";
 
@@ -148,13 +150,10 @@ export function paintEntry() {
             <span class="en-game">${esc(g.name)}${l.caughtIn && GAME_INFO[l.caughtIn] ? ` <em class="en-from">· caught in ${esc(GAME_INFO[l.caughtIn].abbr || GAME_INFO[l.caughtIn].name)}</em>` : ""}</span>
             <small>${fmtDate(l.ts)}${l.method ? ` · ${esc(l.method)}` : ""}${l.odds && !GAME_INFO[l.g].noOdds ? ` · 1/${l.odds}` : ""}${l.phases ? ` · after ${l.phases} ${l.phases === 1 ? "phase" : "phases"}` : ""}</small>
           </span>
-          <span class="en-nums"><b>${nf(l.count)}</b><small>${fmtShort(l.time)}</small></span>
+          <span class="en-nums"><b>${l.count ? nf(l.count) : "—"}</b><small>${l.time ? fmtShort(l.time) : "No time"}</small></span>
         </button>
         ${open ? `<div class="en-edit" data-key="${key}">
-          <label>Encounters<input type="number" min="0" name="count" value="${l.count}"></label>
-          <label>Hours<input type="number" min="0" name="h" value="${Math.floor(l.time / 3600)}"></label>
-          <label>Min<input type="number" min="0" max="59" name="m" value="${Math.floor(l.time / 60) % 60}"></label>
-          <label>Sec<input type="number" min="0" max="59" name="s" value="${l.time % 60}"></label>
+          ${trackedFields(l.count || 0, l.time || 0, true)}
           <label class="wide">Caught on<input type="datetime-local" name="ts" value="${local}"></label>
           ${altsOf(l.m).length ? `<div class="wide en-fp"><span>Form</span>${formPicker(l.m, l.alt)}</div>` : ""}
           ${markField(l.g, l.mark)}
@@ -171,8 +170,8 @@ export function paintEntry() {
             : `<div class="en-evolve final"><span>Final evolution ✦</span></div>`;
         })()}
           ${(() => {
-          // Moved through HOME to another game: the shiny then counts there.
-          const to = LOG_GAMES.filter(x => x !== l.g && (GAME_INFO[x].logOnly || l.m.games[x]))
+          // Moved to another game (trade, Pal Park, Bank, HOME…): the shiny then counts there.
+          const to = LOG_GAMES.filter(x => canMove(l, x))
             .sort((x, y) => !!GAME_INFO[x].logOnly - !!GAME_INFO[y].logOnly || (GAME_INFO[y].released || "").localeCompare(GAME_INFO[x].released || ""));
           return to.length ? `<div class="en-move"><span>Move to game</span>${to.map(x => `<button class="en-move-btn" data-move="${x}" style="--accent:${GAME_INFO[x].accent};--accent2:${GAME_INFO[x].accent2}">${esc(GAME_INFO[x].abbr || GAME_INFO[x].name)}</button>`).join("")}</div>` : "";
         })()}
@@ -194,10 +193,7 @@ export function paintEntry() {
   const now = new Date(), nowLocal = new Date(now - now.getTimezoneOffset() * 6e4).toISOString().slice(0, 16);
   $("#enAdd").innerHTML = adding ? `<div class="en-add-form">
         <div class="wide">${gamePicker(addGames, preset)}</div>
-        <label>Encounters<input type="number" min="0" name="count" value="0"></label>
-        <label>Hours<input type="number" min="0" name="h" value="0"></label>
-        <label>Min<input type="number" min="0" max="59" name="m" value="0"></label>
-        <label>Sec<input type="number" min="0" max="59" name="s" value="0"></label>
+        ${trackedFields(0, 0)}
         <div class="wide en-setup" id="enSetup"></div>
         <label class="wide">Caught on<input type="datetime-local" name="ts" value="${nowLocal}"></label>
         ${alts.length ? `<div class="wide en-fp"><span>Form</span>${formPicker(m, viewAlt)}</div>` : ""}
@@ -278,9 +274,9 @@ export function init() {
     const addBtn = e.target.closest("[data-add-save]");
     if (addBtn) {
       const f = addBtn.closest(".en-add-form"), val = n => f.querySelector(`[name="${n}"]:not([type="radio"]), [name="${n}"]:checked`).value;
-      const g = val("game"), ts = new Date(val("ts")).getTime(), num = n => Math.max(0, +val(n) || 0);
+      const g = val("game"), ts = new Date(val("ts")).getTime();
       const k = hk(g, entryMon.id), alt = f.querySelector('[name="alt"]') ? f.querySelector('[name="alt"]').value : "";
-      (shinies[k] = shinies[k] || []).push(markPost({ count: num("count"), time: num("h") * 3600 + num("m") * 60 + num("s"), ...(GAME_INFO[g].noOdds || !HUNT_SETUP[g] ? { odds: null } : { odds: evalSetup(g, addSetup).odds, method: evalSetup(g, addSetup).label }), ...(alt ? { alt } : {}), ts: isNaN(ts) ? Date.now() : ts, manual: true }, { manual: true }));
+      (shinies[k] = shinies[k] || []).push(markPost({ ...readTracked(f), ...(GAME_INFO[g].noOdds || !HUNT_SETUP[g] ? { odds: null } : { odds: evalSetup(g, addSetup).odds, method: evalSetup(g, addSetup).label }), ...(alt ? { alt } : {}), ts: isNaN(ts) ? Date.now() : ts, manual: true }, { manual: true }));
       applyExtras(shinies[k].at(-1), f);
       shinies[k].sort((x, y) => x.ts - y.ts);
       saveShinies();
@@ -367,9 +363,8 @@ export function init() {
     }
     if (e.target.closest("[data-share]")) return openShare({ ...list[+i], g: gid, m: mons.find(m => m.id === +id) });
     if (e.target.closest("[data-save]")) {
-      const v = n => Math.max(0, +box.querySelector(`[name="${n}"]`).value || 0);
       const ts = new Date(box.querySelector('[name="ts"]').value).getTime();
-      Object.assign(list[+i], { count: v("count"), time: v("h") * 3600 + v("m") * 60 + v("s"), ts: isNaN(ts) ? list[+i].ts : ts });
+      Object.assign(list[+i], { ...readTracked(box), ts: isNaN(ts) ? list[+i].ts : ts });
       const altBox = box.querySelector('[name="alt"]');
       if (altBox) { if (altBox.value) list[+i].alt = altBox.value; else delete list[+i].alt; }
       applyExtras(list[+i], box);

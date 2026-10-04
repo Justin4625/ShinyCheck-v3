@@ -16,10 +16,6 @@ let statsYear = "all";
 const yearOf = s => s.ts ? new Date(s.ts).getFullYear() : null;
 const luckOf = s => s.count && s.odds && !GAME_INFO[s.g].noOdds ? s.count / s.odds : null;
 const fmtLuck = r => `${r < .01 ? "<0.01" : r < 10 ? r.toFixed(2) : r.toFixed(1)}×`;
-const median = a => {
-  const b = [...a].sort((p, q) => p - q), i = b.length >> 1;
-  return !b.length ? null : b.length % 2 ? b[i] : (b[i - 1] + b[i]) / 2;
-};
 // "Wild · Shiny Charm · Phase 2" → "Wild"; GO / HOME have no method, so their name.
 const baseMethod = s => (s.method || "").split(" · ")[0] || (GAME_INFO[s.g].logOnly ? GAME_INFO[s.g].name : "Not tracked");
 const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -34,7 +30,6 @@ function statsFor(list) {
     enc: list.reduce((t, s) => t + (s.count || 0), 0),
     time: list.reduce((t, s) => t + (s.time || 0), 0),
     species: new Set(list.map(s => s.m.dex)).size,
-    luck: median(lucks),
     under: lucks.length ? lucks.filter(r => r < 1).length / lucks.length : null,
     luckiest: most(hunted, s => -luckOf(s)),
     grind: most(list.filter(s => s.count), s => s.count),
@@ -63,7 +58,6 @@ export function renderStats() {
     : "No shinies logged yet. Hit Gotcha! in a hunt or add one from the Shiny Dex, and your stats show up here.";
   $("#stStats").innerHTML = [
     [nf(st.n), "Shinies"], [st.enc ? nf(st.enc) : "—", "Encounters"], [st.time ? fmtShort(st.time) : "—", "Hunt time"],
-    [st.luck != null ? fmtLuck(st.luck) : "—", "Typical luck"],
   ].map(([v, l]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
   if (!st.n) { $("#stBody").innerHTML = ""; return renderSidebar(); }
 
@@ -150,7 +144,7 @@ export function renderStats() {
         ${box(byYear ? "Shinies per year" : "Shinies per month", byYear ? "" : String(statsYear === "all" ? years[0] || "" : statsYear), timeline, "wide")}
         ${box("By game", plural(st.games.length, "game"), `<div class="st-rows">${games}</div>`)}
         ${box("By method", "", `<div class="st-rows">${methodRows}</div>`)}
-        ${luck ? box("Luck", st.luck != null ? `typically ${fmtLuck(st.luck)} odds` : "", luck, "wide") : ""}
+        ${luck ? box("Luck", "", luck, "wide") : ""}
       </div>`;
   $("#stBody").dataset.period = period;
   renderSidebar();
@@ -194,8 +188,7 @@ async function drawWrappedCard(st, label) {
   });
 
   // Totals
-  const stats = [["ENCOUNTERS", st.enc ? nf(st.enc) : "—"], ["HUNT TIME", st.time ? fmtShort(st.time) : "—"],
-    st.luck != null ? ["TYPICAL LUCK", fmtLuck(st.luck)] : ["SPECIES", nf(st.species)]];
+  const stats = [["ENCOUNTERS", st.enc ? nf(st.enc) : "—"], ["HUNT TIME", st.time ? fmtShort(st.time) : "—"], ["SPECIES", nf(st.species)]];
   panel(80, 770, W - 160, 136, 30);
   const colW = (W - 160) / 3;
   stats.forEach(([l, v], i) => {

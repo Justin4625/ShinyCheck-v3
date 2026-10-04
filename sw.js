@@ -6,7 +6,7 @@
 // - Fonts and the Firebase SDK: served from the cache, refreshed in the background.
 // Firestore, sign-in and other API calls are never touched (Firestore keeps its own offline copy).
 // Also shows push notifications (update news) and opens the app when one is tapped.
-const VERSION = "20261003213057"; // stamped by scripts/bump-version.sh on every commit
+const VERSION = "20261004183056"; // stamped by scripts/bump-version.sh on every commit
 const SHELL = `shinycheck-shell-${VERSION}`;
 const RUNTIME = "shinycheck-runtime-v1";
 const CORE = [
@@ -46,6 +46,7 @@ const CORE = [
   `css/31-marks.css?v=${VERSION}`,
   `css/32-owner.css?v=${VERSION}`,
   `css/33-photo-crop.css?v=${VERSION}`,
+  `css/34-tracked.css?v=${VERSION}`,
   `data/evolutions.js?v=${VERSION}`,
   `data/forms.js?v=${VERSION}`,
   `data/pokedex.js?v=${VERSION}`,
@@ -67,6 +68,7 @@ const CORE = [
   `js/components/sidebar.js?v=${VERSION}`,
   `js/components/status.js?v=${VERSION}`,
   `js/components/toast.js?v=${VERSION}`,
+  `js/components/tracked-fields.js?v=${VERSION}`,
   `js/components/two-step.js?v=${VERSION}`,
   `js/core/collection.js?v=${VERSION}`,
   `js/core/config.js?v=${VERSION}`,
@@ -117,6 +119,7 @@ const CORE = [
   `js/model/hunt-pace.js?v=${VERSION}`,
   `js/model/hunt-setup.js?v=${VERSION}`,
   `js/model/marks.js?v=${VERSION}`,
+  `js/model/transfers.js?v=${VERSION}`,
   `js/pages/admin.js?v=${VERSION}`,
   `js/pages/feed.js?v=${VERSION}`,
   `js/pages/game.js?v=${VERSION}`,

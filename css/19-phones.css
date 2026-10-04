@@ -133,8 +133,9 @@ button, a, label, .pcard, .region { touch-action: manipulation; -webkit-tap-high
   .share-dlg.roulette { padding: 12px; }
   .st-hero-side { width: 100%; align-items: stretch; }
   .st-years { align-self: flex-start; }
+  #stStats .stat { padding: 12px; }
+  #stStats .stat b { font-size: 20px; }
   .st-share { justify-content: center; height: 48px; }
-  #stStats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .st-highlights { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .st-hl { padding: 12px 12px 14px; border-radius: 18px; }
   .st-hl-img { width: 76px; height: 76px; }
@@ -148,7 +149,6 @@ button, a, label, .pcard, .region { touch-action: manipulation; -webkit-tap-high
 
   /* Add / edit a shiny: encounters gets its own row, then hours · min · sec. */
   .en-add-form, .en-edit { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-  .en-add-form > label:not(.wide):first-of-type, .en-edit > label:not(.wide):first-of-type { grid-column: 1 / -1; }
   .en-add-form input, .en-edit input { font-size: 16px; padding: 10px 8px; }
 
 }

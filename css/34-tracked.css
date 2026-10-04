@@ -1,0 +1,41 @@
+/* Encounters and hunt time with a "Not tracked" switch (js/components/tracked-fields.js), in Dex Entry's add and edit forms. */
+.tf { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.tf-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; min-height: 32px; }
+.tf-head > span { font: 700 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); }
+.tf-inputs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.tf-inputs.tf-time { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.en-edit .tf-inputs label, .en-add-form .tf-inputs label { min-width: 0; }
+
+/* The switch: a pill that lights up when on. Its label isn't one of the form's column labels. */
+.en-edit label.tf-off, .en-add-form label.tf-off {
+  position: relative; flex-direction: row; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 999px;
+  cursor: pointer; user-select: none; -webkit-user-select: none;
+  font: 650 12px/1 var(--font); letter-spacing: 0; text-transform: none; color: var(--muted);
+  background: var(--surface-2); border: 1px solid var(--border); transition: color .15s, background .15s, border-color .15s;
+}
+.tf-off input { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+.tf-off span::before {
+  content: ""; display: inline-block; width: 12px; height: 12px; margin-right: 6px; vertical-align: -2px; border-radius: 4px;
+  border: 1.5px solid var(--border-2); transition: background .15s, border-color .15s;
+}
+.tf-off:has(input:checked) { color: var(--bg); background: var(--text); border-color: var(--text); }
+.tf-off:has(input:checked) span::before {
+  border: 0; background: var(--bg);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.3l2.6 2.6L10 3.3' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2 6.3l2.6 2.6L10 3.3' fill='none' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center / 12px no-repeat;
+}
+.tf-off:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media (hover: hover) { .tf-off:not(:has(input:checked)):hover { border-color: var(--border-2); color: var(--text); } }
+
+/* Switched on: the fields make way for a quiet "Not tracked" box. */
+.tf-none {
+  display: none; margin: 0; height: 40px; align-items: center; justify-content: center; border-radius: 10px;
+  border: 1.5px dashed var(--border-2); font: 700 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--faint);
+}
+.tf:has(.tf-off input:checked) .tf-inputs { display: none; }
+.tf:has(.tf-off input:checked) .tf-none { display: flex; }
+
+@media (max-width: 560px) {
+  .en-edit label.tf-off, .en-add-form label.tf-off { height: 40px; padding: 0 14px; font-size: 13px; }
+  .tf-none { height: 44px; }
+}

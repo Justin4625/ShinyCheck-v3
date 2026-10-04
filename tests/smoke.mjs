@@ -584,6 +584,36 @@ step("dex entry: add, edit, move, delete", async () => {
   await capture("entry deleted");
   await key("Escape");
 });
+step("dex entry: not tracked, move between games", async () => {
+  await openEntry("mew");
+  await click(".en-row", 300);
+  expect(await js(`document.querySelector('.en-edit [name="countOff"]').checked && document.querySelector('.en-edit [name="timeOff"]').checked`), "A shiny without encounters or time opens as Not tracked");
+  const moves = await js(`[...document.querySelectorAll(".en-edit [data-move]")].map(b => b.dataset.move).join()`);
+  expect(/sv/.test(moves) && /swsh/.test(moves) && !/pogo|frlg/.test(moves), "Mew in HOME moves to Switch games only: " + moves);
+  await capture("entry not tracked");
+  await key("Escape");
+  await openEntry("mew");
+  await click("[data-add-open]", 300);
+  await click('.en-add-form .gp-tile input[value="frlg"]', 200);
+  await type('.en-add-form [name="count"]', "500");
+  await click('.en-add-form [name="timeOff"]', 200);
+  await capture("entry add not tracked");
+  await click("[data-add-save]", 500);
+  const s = await js(`JSON.parse(localStorage.getItem("shinycheck-v3-shinies"))["frlg:" + DEX.find(m => m.key === "mew").id][0]`);
+  expect(s.count === 500 && s.time === 0, "Add keeps the encounters and saves time as not tracked");
+  await click('.en-row', 300);
+  const from = await js(`[...document.querySelectorAll(".en-edit [data-move]")].map(b => b.dataset.move).join()`);
+  expect(/emerald/.test(from) && /hgss/.test(from) && /sv/.test(from) && !/gs|pogo|lgpe/.test(from.replace("hgss", "")), "Mew in FireRed & LeafGreen moves forward only: " + from);
+  await size(390, 844, true);
+  await capture("entry edit phone");
+  await size(1280, 900, false);
+  await click(".en-edit [data-delete]"); await click(".en-edit [data-delete]", 400);
+  await key("Escape");
+  await size(390, 844, true); await nav("stats", 600);
+  expect(!(await text("#stStats")).includes("luck"), "Stats has no Typical luck");
+  await capture("stats phone");
+  await size(1280, 900, false);
+});
 step("dex entry: evolve and undo", async () => {
   await openEntry("floette");
   await click(".en-row", 300);
