@@ -1,0 +1,21 @@
+/* Change Pokémon of a logged shiny (js/features/change-mon.js) */
+#changeDlg .rl-card { min-height: min(460px, calc(100dvh - 40px)); }
+#changeFrom { text-transform: none; letter-spacing: .02em; }
+.cm-row {
+  display: flex; align-items: center; gap: 10px; width: 100%; min-height: 52px; padding: 6px 8px; margin: 0 -8px;
+  box-sizing: content-box; border: 0; border-top: 1px solid var(--border); background: none; color: var(--text);
+  text-align: left; cursor: pointer; border-radius: 0;
+}
+.cm-row:first-of-type { border-top: 0; }
+.cm-row:focus-visible { outline: 2px solid var(--accent, #9d7bff); outline-offset: -2px; border-radius: 10px; }
+@media (hover: hover) { .cm-row:hover { background: var(--surface-2); border-radius: 10px; } }
+.cm-img { flex: none; width: 44px; height: 44px; display: grid; place-items: center; }
+.cm-img img { width: 44px; height: 44px; object-fit: contain; }
+.cm-name { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.cm-name b { font-weight: 700; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.cm-name small { color: var(--muted); font-size: 12px; }
+.cm-dex { flex: none; font: 700 11px/1 var(--mono); color: var(--faint); }
+
+/* The button in a Dex Entry log entry */
+.en-change { grid-column: 1 / -1; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding-top: 4px; }
+.en-change > span { width: 100%; font: 700 9px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--faint); margin-bottom: 2px; }

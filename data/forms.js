@@ -142,6 +142,7 @@ window.FORMS = {
   "squawkabilly": [{"id": "green-plumage", "n": "Green Plumage", "s": "sprites/forms/squawkabilly-green-plumage.png"}, {"id": "blue-plumage", "n": "Blue Plumage", "s": "sprites/forms/squawkabilly-blue-plumage.png"}, {"id": "yellow-plumage", "n": "Yellow Plumage", "s": "sprites/forms/squawkabilly-yellow-plumage.png"}, {"id": "white-plumage", "n": "White Plumage", "s": "sprites/forms/squawkabilly-white-plumage.png"}],
   "tatsugiri": [{"id": "curly", "n": "Curly", "s": "sprites/forms/tatsugiri-curly.png"}, {"id": "droopy", "n": "Droopy", "s": "sprites/forms/tatsugiri-droopy.png"}, {"id": "stretchy", "n": "Stretchy", "s": "sprites/forms/tatsugiri-stretchy.png"}],
   "dudunsparce": [{"id": "two-segment", "n": "Two-Segment", "s": "sprites/forms/dudunsparce-two-segment.png"}, {"id": "three-segment", "n": "Three-Segment", "s": "sprites/forms/dudunsparce-three-segment.png"}],
+  "gimmighoul": [{"id": "chest", "n": "Chest", "s": "sprites/forms/gimmighoul-chest.png"}, {"id": "roaming", "n": "Roaming", "s": "sprites/forms/gimmighoul-roaming.png"}],
   "poltchageist": [{"id": "counterfeit", "n": "Counterfeit", "s": "sprites/forms/poltchageist-counterfeit.png"}, {"id": "artisan", "n": "Artisan", "s": "sprites/forms/poltchageist-artisan.png"}],
   "sinistcha": [{"id": "unremarkable", "n": "Unremarkable", "s": "sprites/forms/sinistcha-unremarkable.png"}, {"id": "masterpiece", "n": "Masterpiece", "s": "sprites/forms/sinistcha-masterpiece.png"}]
 };

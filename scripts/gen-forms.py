@@ -25,8 +25,8 @@ dex = json.loads(subprocess.check_output(["node", "-e",
 # Left out: never shiny in the tracked games (Arceus, Silvally and Genesect held-item forms, Magearna Original,
 # Zarude Dada, Ogerpon, Keldeo, Zygarde, Hoopa, Bloodmoon Ursaluna), fusions (Kyurem, Necrozma, Calyrex),
 # battle/ride forms (Eternamax, Koraidon, Miraidon), and forms that look the same (Scatterbug, Spewpa, Mothim,
-# Own Tempo Rockruff, Battle Bond Greninja, Gimmighoul, and Minior: every shiny core looks the same).
-SKIP_SPECIES = {493, 773, 649, 801, 893, 1017, 647, 718, 720, 901, 646, 800, 898, 890, 1007, 1008, 664, 665, 414, 744, 658, 999,
+# Own Tempo Rockruff, Battle Bond Greninja, and Minior: every shiny core looks the same).
+SKIP_SPECIES = {493, 773, 649, 801, 893, 1017, 647, 718, 720, 901, 646, 800, 898, 890, 1007, 1008, 664, 665, 414, 744, 658,
                 774}
 # Regional forms are their own entries in data/pokedex.js; cap and cosplay Pikachu, Partner Pikachu/Eevee, Spiky-eared
 # Pichu and Eternal Floette are shiny-locked; totems and Minior's Meteor Form aren't catchable forms.

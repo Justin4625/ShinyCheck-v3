@@ -664,6 +664,39 @@ step("dex entry: mark and nickname", async () => {
   await click(".en-edit [data-delete]"); await click(".en-edit [data-delete]", 400);
   await key("Escape");
 });
+step("dex entry: change Pokémon, Gimmighoul forms", async () => {
+  const saved = `JSON.parse(localStorage.getItem("shinycheck-v3-shinies"))`, id = k => `DEX.find(m => m.key === "${k}").id`;
+  await openEntry("gimmighoul");
+  expect((await js(`[...document.querySelectorAll("#enAlts .en-alt b")].map(b => b.textContent).join()`)) === "Chest,Roaming", "Gimmighoul lists Chest and Roaming");
+  await click("[data-add-open]", 300);
+  await click('.en-add-form .gp-tile input[value="sv"]', 200);
+  await click("[data-add-save]", 500);
+  await click(".en-row", 300);
+  await size(360, 760, true);
+  await js(`document.querySelector(".en-edit [data-change]").scrollIntoView({ block: "center" })`, 300);
+  expect(await js(`document.querySelector(".en-edit [data-change]").getBoundingClientRect().right <= innerWidth`), "Change Pokémon button fits at 360px");
+  await capture("change pokemon button at 360px");
+  await size(1280, 900, false);
+  await click(".en-edit [data-change]", 300);
+  expect(await js(`!document.getElementById("changeDlg").hidden`), "Change Pokémon opens its dialog");
+  await type("#changeQ", "mew");
+  expect(!(await js(`[...document.querySelectorAll("#changeList .cm-name b")].some(b => b.textContent === "Meltan")`)), "only Pokémon Scarlet & Violet can hold");
+  await capture("change pokemon dialog");
+  for (const w of [360, 414]) {
+    await size(w, 760, true);
+    expect(await js(`(() => { const c = document.querySelector("#changeDlg .rl-card").getBoundingClientRect(), r = document.querySelector("#changeList .cm-row").getBoundingClientRect(); return c.left >= 0 && c.right <= innerWidth && r.right <= c.right && r.height >= 40; })()`), `Change Pokémon fits at ${w}px`);
+    await capture(`change pokemon at ${w}px`);
+  }
+  await size(1280, 900, false);
+  await type("#changeQ", "gholdengo");
+  await click('#changeList [data-change-to]', 600);
+  expect(await js(`!!(${saved})["sv:" + ${id("gholdengo")}] && !(${saved})["sv:" + ${id("gimmighoul")}]`), "the shiny moved to Gholdengo in the same game");
+  expect(await js(`document.querySelector("#enName").textContent.startsWith("Gholdengo") && !!document.querySelector(".en-edit")`), "Dex Entry follows it, still open for editing");
+  await click(".toast-action", 500);
+  expect(await js(`!!(${saved})["sv:" + ${id("gimmighoul")}] && !(${saved})["sv:" + ${id("gholdengo")}]`), "Undo puts it back");
+  await click(".en-edit [data-delete]"); await click(".en-edit [data-delete]", 400);
+  await key("Escape");
+});
 step("dialogs", async () => {
   await nav("", 300);
   for (const [open, dlg, close] of [["#backupsOpen", "#backups", "Escape"], ["#pushOpen", "#pushDlg", "Escape"]]) {

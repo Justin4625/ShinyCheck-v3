@@ -1,4 +1,4 @@
-// Dex Entry: every shiny of a species across games, forms checklist, add / edit / evolve / move.
+// Dex Entry: every shiny of a species across games, forms checklist, add / edit / evolve / move / change Pokémon.
 import { burst } from "../components/burst.js";
 import { card } from "../components/card.js";
 import { formPicker } from "../components/form-picker.js";
@@ -16,6 +16,7 @@ import { el, state } from "../core/state.js";
 import { hk, hunts, isActive, prefs, saveShinies, shinies } from "../core/store.js";
 import { $, esc } from "../core/util.js";
 import { SHARE_ICO } from "./hunt-deck/deck.js";
+import { openChangeMon } from "./change-mon.js";
 import { openShare } from "./share-card.js";
 import { markPost } from "./social-sync.js";
 import { EVENT_ONLY } from "../model/availability.js";
@@ -175,6 +176,7 @@ export function paintEntry() {
             .sort((x, y) => !!GAME_INFO[x].logOnly - !!GAME_INFO[y].logOnly || (GAME_INFO[y].released || "").localeCompare(GAME_INFO[x].released || ""));
           return to.length ? `<div class="en-move"><span>Move to game</span>${to.map(x => `<button class="en-move-btn" data-move="${x}" style="--accent:${GAME_INFO[x].accent};--accent2:${GAME_INFO[x].accent2}">${esc(GAME_INFO[x].abbr || GAME_INFO[x].name)}</button>`).join("")}</div>` : "";
         })()}
+          <div class="en-change"><span>Wrong Pokémon?</span><button class="en-move-btn" data-change>Change Pokémon</button></div>
           <div class="en-edit-actions">
             <button class="en-save" data-save>Save</button>
             <button class="en-share" data-share title="Share card">${SHARE_ICO}Share</button>
@@ -350,6 +352,41 @@ export function init() {
         refreshHomeCard(mon.id);
         renderHomeStats();
       } });
+    }
+    // Logged on the wrong Pokémon: the shiny moves to the picked one in the same game. Its form only stays
+    // when the new Pokémon has that form too; the evolve history is dropped.
+    if (e.target.closest("[data-change]")) {
+      const from = mons.find(m => m.id === +id), src = `${gid}:${id}`;
+      return openChangeMon(from, gid, to => {
+        const [entry] = list.splice(+i, 1);
+        if (!list.length) delete shinies[src];
+        const moved = { ...entry };
+        delete moved.evolvedFrom;
+        if (!altOf(to, moved.alt)) delete moved.alt;
+        const dest = shinies[hk(gid, to.id)] = shinies[hk(gid, to.id)] || [];
+        dest.push(moved);
+        dest.sort((x, y) => (x.ts || 0) - (y.ts || 0));
+        saveShinies();
+        refreshHomeCard(from.id);
+        refreshHomeCard(to.id);
+        renderHomeStats();
+        openEntry(to.id);
+        editing = `${gid}:${to.id}:${dest.indexOf(moved)}`;
+        paintEntry();
+        toast(`Shiny ${from.name} changed to ${to.name}`, { label: "Undo", run: () => {
+          const d = shinies[hk(gid, to.id)] || [], j = d.indexOf(moved);
+          if (j >= 0) d.splice(j, 1);
+          if (!d.length) delete shinies[hk(gid, to.id)];
+          const orig = shinies[src] = shinies[src] || [];
+          orig.push(entry);
+          orig.sort((x, y) => (x.ts || 0) - (y.ts || 0));
+          saveShinies();
+          refreshHomeCard(from.id);
+          refreshHomeCard(to.id);
+          renderHomeStats();
+          if (entryMon) { openEntry(from.id); editing = `${src}:${orig.indexOf(entry)}`; paintEntry(); }
+        } });
+      });
     }
     const back = e.target.closest("[data-devolve]");
     if (back) {
